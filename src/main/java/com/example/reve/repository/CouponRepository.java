@@ -1,0 +1,19 @@
+package com.example.reve.repository;
+
+import com.example.reve.domain.Coupon;
+import org.springframework.data.jpa.repository.JpaRepository;
+
+import java.util.List;
+import java.util.Optional;
+
+public interface CouponRepository extends JpaRepository<Coupon, Long> {
+
+  // 쿠폰 코드로 조회
+  Optional<Coupon> findByCode(String code);
+
+  // 특정 유저가 가지고 있는 쿠폰 목록
+  List<Coupon> findByUser_UserId(Long userId);
+
+  // 아직 사용되지 않는 쿠폰만 조회
+  List<Coupon> findByIsUsedFalse();
+}
