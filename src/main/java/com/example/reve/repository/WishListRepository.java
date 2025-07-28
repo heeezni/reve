@@ -1,10 +1,11 @@
 package com.example.reve.repository;
 
-import com.example.reve.domain.WishList;
-import org.springframework.data.jpa.repository.JpaRepository;
-
 import java.util.List;
 import java.util.Optional;
+
+import org.springframework.data.jpa.repository.JpaRepository;
+
+import com.example.reve.domain.WishList;
 
 public interface WishListRepository extends JpaRepository<WishList, Long> {
 

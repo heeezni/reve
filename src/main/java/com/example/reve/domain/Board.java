@@ -1,6 +1,7 @@
 package com.example.reve.domain;
 
 import jakarta.persistence.*;
+
 import lombok.*;
 
 /*
@@ -20,18 +21,23 @@ public class Board extends BaseEntity {
   @GeneratedValue(strategy = GenerationType.IDENTITY)
   @Column(name = "board_id")
   private Long boardId;
+
   // 게시판 카테고리
   @Column(nullable = false)
   private String category;
+
   // 게시글 제목
   @Column(nullable = false)
   private String title;
+
   // 게시글 내용
   @Column(nullable = false, columnDefinition = "TEXT")
   private String content;
+
   // 게시글 조회수
   @Column(nullable = false)
   private int hit = 0;
+
   // 게시글 비밀번호(게시글 수정이나 삭제시 필요)
   @Column(name = "board_password", nullable = false)
   private String boardPassword;
@@ -40,5 +46,4 @@ public class Board extends BaseEntity {
   @ManyToOne
   @JoinColumn(name = "user_id", nullable = false)
   private User user;
-
 }

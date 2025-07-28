@@ -1,6 +1,7 @@
 package com.example.reve.domain;
 
 import jakarta.persistence.*;
+
 import lombok.*;
 
 /*
@@ -20,11 +21,14 @@ public class User extends BaseEntity {
   @GeneratedValue(strategy = GenerationType.IDENTITY)
   @Column(name = "user_id")
   private Long userId;
+
   // 유저 이름
   private String name;
+
   // 로그인 아이디
   @Column(name = "login_id")
   private String loginId;
+
   // 비밀번호
   private String password;
 

@@ -1,6 +1,7 @@
 package com.example.reve.domain;
 
 import jakarta.persistence.*;
+
 import lombok.*;
 
 @Entity
@@ -21,6 +22,7 @@ public class WishList extends BaseEntity {
   @ManyToOne(fetch = FetchType.LAZY)
   @JoinColumn(name = "user_id", nullable = false)
   private User user;
+
   // 찜목록과 향수와의 관계 (N : 1)
   @ManyToOne(fetch = FetchType.LAZY)
   @JoinColumn(name = "perfume_id", nullable = false)

@@ -1,9 +1,10 @@
 package com.example.reve.repository;
 
-import com.example.reve.domain.QnA;
+import java.util.List;
+
 import org.springframework.data.jpa.repository.JpaRepository;
 
-import java.util.List;
+import com.example.reve.domain.QnA;
 
 public interface QnARepository extends JpaRepository<QnA, Long> {
 
