@@ -70,4 +70,5 @@ keys/
 *.cmd
 *.command
 
-*.application-dev.properties
+# 설정파일인 application-dev.properties 파일만 지정해서 무시
+application-dev.properties
