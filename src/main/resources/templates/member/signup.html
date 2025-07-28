@@ -1,10 +1,480 @@
 <!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <title>Title</title>
-</head>
-<body>
-회원가입 화면
-</body>
+<html lang="ko" xmlns:th="http://www.thymeleaf.org">
+  <head th:replace="~{fragments/header :: head}">
+    <title>회원가입 - Rêve</title>
+  </head>
+  <body class="font-sans text-gray-800">
+    <!-- Header Fragment -->
+    <div th:replace="~{fragments/header :: header}"></div>
+
+    <!-- Main Content -->
+    <main class="pt-20">
+      <div class="min-h-screen bg-gray-50 py-12">
+        <div class="max-w-2xl mx-auto px-4 sm:px-6 lg:px-8">
+          <!-- Page Title -->
+          <div class="text-center mb-8">
+            <h1 class="text-3xl font-bold text-gray-800 mb-2">회원가입</h1>
+            <p class="text-gray-600">
+              Rêve의 회원이 되어 특별한 혜택을 받아보세요
+            </p>
+          </div>
+
+          <!-- Signup Form -->
+          <div class="bg-white rounded-lg shadow-sm p-8">
+            <!-- Kakao Login -->
+            <div class="mb-8">
+              <button
+                type="button"
+                class="w-full bg-yellow-400 text-gray-800 py-3 px-6 rounded-md hover:bg-yellow-500 transition-colors font-medium flex items-center justify-center"
+              >
+                <i class="fas fa-comment mr-2"></i>
+                카카오 로그인
+              </button>
+            </div>
+
+            <!-- Divider -->
+            <div class="relative mb-8">
+              <div class="absolute inset-0 flex items-center">
+                <div class="w-full border-t border-gray-300"></div>
+              </div>
+              <div class="relative flex justify-center text-sm">
+                <span class="px-2 bg-white text-gray-500">또는</span>
+              </div>
+            </div>
+
+            <form action="/member/signup" method="post" class="space-y-6">
+              <!-- Member Type -->
+              <div>
+                <label class="block text-sm font-medium text-gray-700 mb-2">
+                  회원구분 <span class="text-red-500">*</span>
+                </label>
+                <div class="flex space-x-4">
+                  <label class="flex items-center">
+                    <input
+                      type="radio"
+                      name="memberType"
+                      value="personal"
+                      class="mr-2"
+                      checked
+                    />
+                    <span class="text-sm">개인회원</span>
+                  </label>
+                  <label class="flex items-center">
+                    <input
+                      type="radio"
+                      name="memberType"
+                      value="business"
+                      class="mr-2"
+                    />
+                    <span class="text-sm">사업자회원</span>
+                  </label>
+                  <label class="flex items-center">
+                    <input
+                      type="radio"
+                      name="memberType"
+                      value="foreigner"
+                      class="mr-2"
+                    />
+                    <span class="text-sm">외국인회원</span>
+                  </label>
+                </div>
+              </div>
+
+              <!-- Basic Information Section -->
+              <div class="border-t pt-6">
+                <h3 class="text-lg font-semibold text-gray-800 mb-4">
+                  기본정보
+                </h3>
+                <p class="text-sm text-red-500 mb-4">필수 필수입력사항</p>
+
+                <!-- Username -->
+                <div class="mb-4">
+                  <label class="block text-sm font-medium text-gray-700 mb-2">
+                    아이디 <span class="text-red-500">*</span>
+                  </label>
+                  <label>
+                    <input
+                      type="text"
+                      name="username"
+                      required
+                      class="w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-gray-800 focus:border-transparent"
+                      placeholder="아이디를 입력하세요"
+                    />
+                  </label>
+                  <p class="text-xs text-gray-500 mt-1">
+                    (영문소문자/숫자, 4~16자)
+                  </p>
+                </div>
+
+                <!-- Password -->
+                <div class="mb-4">
+                  <label class="block text-sm font-medium text-gray-700 mb-2">
+                    비밀번호 <span class="text-red-500">*</span>
+                  </label>
+                  <label>
+                    <input
+                      type="password"
+                      name="password"
+                      required
+                      class="w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-gray-800 focus:border-transparent"
+                      placeholder="비밀번호를 입력하세요"
+                    />
+                  </label>
+                  <p class="text-xs text-gray-500 mt-1">
+                    (영문 대소문자/숫자/특수문자 중 2가지 이상 조합, 10자~16자)
+                  </p>
+                </div>
+
+                <!-- Password Confirm -->
+                <div class="mb-4">
+                  <label class="block text-sm font-medium text-gray-700 mb-2">
+                    비밀번호 확인 <span class="text-red-500">*</span>
+                  </label>
+                  <label>
+                    <input
+                      type="password"
+                      name="passwordConfirm"
+                      required
+                      class="w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-gray-800 focus:border-transparent"
+                      placeholder="비밀번호를 다시 입력하세요"
+                    />
+                  </label>
+                </div>
+
+                <!-- Name -->
+                <div class="mb-4">
+                  <label class="block text-sm font-medium text-gray-700 mb-2">
+                    이름 <span class="text-red-500">*</span>
+                  </label>
+                  <label>
+                    <input
+                      type="text"
+                      name="name"
+                      required
+                      class="w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-gray-800 focus:border-transparent"
+                      placeholder="이름을 입력하세요"
+                    />
+                  </label>
+                </div>
+
+                <!-- Address -->
+                <div class="mb-4">
+                  <label class="block text-sm font-medium text-gray-700 mb-2">
+                    주소 <span class="text-red-500">*</span>
+                  </label>
+                  <div class="space-y-2">
+                    <div class="flex space-x-2">
+                      <label>
+                        <input
+                          type="text"
+                          name="postcode"
+                          placeholder="우편번호"
+                          class="flex-1 border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-gray-800 focus:border-transparent"
+                          readonly
+                        />
+                      </label>
+                      <button
+                        type="button"
+                        class="px-4 py-2 bg-gray-800 text-white rounded-md hover:bg-gray-700 transition-colors text-sm"
+                      >
+                        주소검색
+                      </button>
+                    </div>
+                    <label>
+                      <input
+                        type="text"
+                        name="address"
+                        placeholder="기본주소"
+                        class="w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-gray-800 focus:border-transparent"
+                        readonly
+                      />
+                    </label>
+                    <label>
+                      <input
+                        type="text"
+                        name="addressDetail"
+                        placeholder="나머지 주소"
+                        class="w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-gray-800 focus:border-transparent"
+                      />
+                    </label>
+                  </div>
+                </div>
+
+                <!-- Phone Numbers -->
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
+                  <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-2">
+                      일반전화
+                    </label>
+                    <div class="flex space-x-2">
+                      <label>
+                        <select
+                          class="border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-gray-800 focus:border-transparent"
+                        >
+                          <option>02</option>
+                          <option>031</option>
+                          <option>032</option>
+                          <option>033</option>
+                        </select>
+                      </label>
+                      <label>
+                        <input
+                          type="text"
+                          class="flex-1 border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-gray-800 focus:border-transparent"
+                          placeholder="-"
+                        />
+                      </label>
+                      <label>
+                        <input
+                          type="text"
+                          class="flex-1 border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-gray-800 focus:border-transparent"
+                          placeholder="-"
+                        />
+                      </label>
+                    </div>
+                  </div>
+                  <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-2">
+                      휴대전화 <span class="text-red-500">*</span>
+                    </label>
+                    <div class="flex space-x-2">
+                      <label>
+                        <select
+                          class="border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-gray-800 focus:border-transparent"
+                        >
+                          <option>010</option>
+                          <option>011</option>
+                          <option>016</option>
+                          <option>017</option>
+                          <option>018</option>
+                          <option>019</option>
+                        </select>
+                      </label>
+                      <label>
+                        <input
+                          type="text"
+                          required
+                          class="flex-1 border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-gray-800 focus:border-transparent"
+                          placeholder="-"
+                        />
+                      </label>
+                      <label>
+                        <input
+                          type="text"
+                          required
+                          class="flex-1 border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-gray-800 focus:border-transparent"
+                          placeholder="-"
+                        />
+                      </label>
+                    </div>
+                  </div>
+                </div>
+
+                <!-- Email -->
+                <div class="mb-6">
+                  <label class="block text-sm font-medium text-gray-700 mb-2">
+                    이메일 <span class="text-red-500">*</span>
+                  </label>
+                  <label>
+                    <input
+                      type="email"
+                      name="email"
+                      required
+                      class="w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-gray-800 focus:border-transparent"
+                      placeholder="이메일을 입력하세요"
+                    />
+                  </label>
+                </div>
+              </div>
+
+              <!-- Additional Information Section -->
+              <div class="border-t pt-6">
+                <h3 class="text-lg font-semibold text-gray-800 mb-4">
+                  추가정보 (선택)
+                </h3>
+
+                <!-- Refund Account -->
+                <div class="mb-4">
+                  <h4 class="text-sm font-medium text-gray-700 mb-2">
+                    환불계좌 정보
+                  </h4>
+                  <div class="space-y-2">
+                    <label>
+                      <input
+                        type="text"
+                        name="accountHolder"
+                        placeholder="예금주"
+                        class="w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-gray-800 focus:border-transparent"
+                      />
+                    </label>
+                    <label>
+                      <select
+                        name="bankName"
+                        class="w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-gray-800 focus:border-transparent"
+                      >
+                        <option value="">- 은행선택 -</option>
+                        <option value="shinhan">신한은행</option>
+                        <option value="kb">KB국민은행</option>
+                        <option value="woori">우리은행</option>
+                        <option value="hana">하나은행</option>
+                        <option value="nh">NH농협은행</option>
+                        <option value="ibk">IBK기업은행</option>
+                      </select>
+                    </label>
+                    <label>
+                      <input
+                        type="text"
+                        name="accountNumber"
+                        placeholder="계좌번호"
+                        class="w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-gray-800 focus:border-transparent"
+                      />
+                    </label>
+                    <p class="text-xs text-gray-500">
+                      ('-'와 숫자만 입력해주세요.)
+                    </p>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Agreement Section -->
+              <div class="border-t pt-6">
+                <h3 class="text-lg font-semibold text-gray-800 mb-4">
+                  약관 동의
+                </h3>
+
+                <!-- All Agreement -->
+                <div class="mb-4">
+                  <label class="flex items-start">
+                    <input
+                      type="checkbox"
+                      id="allAgreement"
+                      class="mt-1 mr-3"
+                    />
+                    <div>
+                      <span class="font-medium">전체 동의</span>
+                      <p class="text-sm text-gray-600 mt-1">
+                        이용약관 및 개인정보수집 및 이용, 쇼핑정보 수신(선택)에
+                        모두 동의합니다.
+                      </p>
+                    </div>
+                  </label>
+                </div>
+
+                <!-- Individual Agreements -->
+                <div class="space-y-3">
+                  <label class="flex items-start">
+                    <input
+                      type="checkbox"
+                      name="termsAgreement"
+                      required
+                      class="mt-1 mr-3"
+                    />
+                    <div>
+                      <span class="font-medium"
+                        >이용약관에 동의합니다.
+                        <span class="text-red-500">(필수)</span></span
+                      >
+                    </div>
+                  </label>
+                  <label class="flex items-start">
+                    <input
+                      type="checkbox"
+                      name="privacyAgreement"
+                      required
+                      class="mt-1 mr-3"
+                    />
+                    <div>
+                      <span class="font-medium"
+                        >개인정보처리방침에 동의합니다.
+                        <span class="text-red-500">(필수)</span></span
+                      >
+                    </div>
+                  </label>
+                  <label class="flex items-start">
+                    <input
+                      type="checkbox"
+                      name="smsAgreement"
+                      class="mt-1 mr-3"
+                    />
+                    <div>
+                      <span class="font-medium"
+                        >SMS 수신 동의
+                        <span class="text-gray-500">(선택)</span></span
+                      >
+                    </div>
+                  </label>
+                  <label class="flex items-start">
+                    <input
+                      type="checkbox"
+                      name="emailAgreement"
+                      class="mt-1 mr-3"
+                    />
+                    <div>
+                      <span class="font-medium"
+                        >이메일 수신 동의
+                        <span class="text-gray-500">(선택)</span></span
+                      >
+                    </div>
+                  </label>
+                </div>
+              </div>
+
+              <!-- Submit Button -->
+              <div class="border-t pt-6">
+                <button
+                  type="submit"
+                  class="w-full bg-gray-800 text-white py-3 px-6 rounded-md hover:bg-gray-700 transition-colors font-medium text-lg"
+                >
+                  회원가입
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      </div>
+    </main>
+
+    <!-- Footer Fragment -->
+    <div th:replace="~{fragments/footer :: footer}"></div>
+
+    <!-- Login Modal Fragment -->
+    <div th:replace="~{fragments/modal :: loginModal}"></div>
+
+    <script src="/js/script.js"></script>
+    <script>
+      // 전체 동의 체크박스 기능
+      document
+        .getElementById('allAgreement')
+        .addEventListener('change', function () {
+          const checkboxes = document.querySelectorAll(
+            'input[type="checkbox"]'
+          );
+          checkboxes.forEach((checkbox) => {
+            if (checkbox !== this) {
+              checkbox.checked = this.checked;
+            }
+          });
+        });
+
+      // 개별 체크박스 변경 시 전체 동의 상태 업데이트
+      document
+        .querySelectorAll('input[type="checkbox"]')
+        .forEach((checkbox) => {
+          if (checkbox.id !== 'allAgreement') {
+            checkbox.addEventListener('change', function () {
+              const allCheckboxes = document.querySelectorAll(
+                'input[type="checkbox"]'
+              );
+              const allAgreement = document.getElementById('allAgreement');
+              const checkedCount = Array.from(allCheckboxes).filter(
+                (cb) => cb.checked && cb.id !== 'allAgreement'
+              ).length;
+              const totalCount = allCheckboxes.length - 1;
+
+              allAgreement.checked = checkedCount === totalCount;
+            });
+          }
+        });
+    </script>
+  </body>
 </html>

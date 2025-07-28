@@ -1,10 +1,125 @@
 <!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <title>Title</title>
-</head>
-<body>
-에러 페이지
-</body>
+<html lang="ko" xmlns:th="http://www.thymeleaf.org">
+  <head th:replace="~{fragments/header :: head}">
+    <title>페이지를 찾을 수 없습니다 - Rêve</title>
+  </head>
+  <body class="font-sans text-gray-800">
+    <!-- Header Fragment -->
+    <div th:replace="~{fragments/header :: header}"></div>
+
+    <!-- Main Content -->
+    <main class="pt-20">
+      <div class="min-h-screen flex items-center justify-center bg-gray-50">
+        <div class="max-w-md mx-auto text-center px-4">
+          <!-- Error Icon -->
+          <div class="mb-8">
+            <div
+              class="w-32 h-32 mx-auto bg-gray-200 rounded-full flex items-center justify-center"
+            >
+              <i class="fas fa-exclamation-triangle text-6xl text-gray-400"></i>
+            </div>
+          </div>
+
+          <!-- Error Message -->
+          <div class="mb-8">
+            <h1 class="text-6xl font-bold text-gray-300 mb-4">404</h1>
+            <h2 class="text-2xl font-bold text-gray-800 mb-4">
+              페이지를 찾을 수 없습니다
+            </h2>
+            <p class="text-gray-600 leading-relaxed">
+              요청하신 페이지가 존재하지 않거나<br />
+              이동되었을 수 있습니다.
+            </p>
+          </div>
+
+          <!-- Action Buttons -->
+          <div class="space-y-4">
+            <a
+              href="/"
+              class="inline-block w-full bg-gray-800 text-white py-3 px-6 rounded-md hover:bg-gray-700 transition-colors font-medium"
+            >
+              홈으로 돌아가기
+            </a>
+            <div class="flex space-x-4">
+              <a
+                href="/shop/list"
+                class="flex-1 border border-gray-300 text-gray-700 py-3 px-6 rounded-md hover:bg-gray-50 transition-colors font-medium"
+              >
+                쇼핑하기
+              </a>
+              <a
+                href="/board/notice/list"
+                class="flex-1 border border-gray-300 text-gray-700 py-3 px-6 rounded-md hover:bg-gray-50 transition-colors font-medium"
+              >
+                공지사항
+              </a>
+            </div>
+          </div>
+
+          <!-- Search Section -->
+          <div class="mt-12 p-6 bg-white rounded-lg shadow-sm">
+            <h3 class="text-lg font-semibold mb-4">
+              원하시는 상품을 찾아보세요
+            </h3>
+            <form action="/shop/list" method="get" class="flex">
+              <label>
+                <input
+                  type="text"
+                  name="search"
+                  placeholder="상품명을 입력하세요"
+                  class="flex-1 border border-gray-300 rounded-l-md px-4 py-2 focus:outline-none focus:ring-2 focus:ring-gray-800 focus:border-transparent"
+                />
+              </label>
+              <button
+                type="submit"
+                class="bg-gray-800 text-white px-4 py-2 rounded-r-md hover:bg-gray-700 transition-colors"
+              >
+                <i class="fas fa-search"></i>
+              </button>
+            </form>
+          </div>
+
+          <!-- Quick Links -->
+          <div class="mt-8">
+            <h4 class="text-sm font-medium text-gray-500 mb-3">
+              자주 찾는 페이지
+            </h4>
+            <div class="flex flex-wrap justify-center gap-4 text-sm">
+              <a
+                href="/info/about"
+                class="text-gray-600 hover:text-gray-800 transition-colors"
+                >브랜드 소개</a
+              >
+              <span class="text-gray-300">|</span>
+              <a
+                href="/board/qna/list"
+                class="text-gray-600 hover:text-gray-800 transition-colors"
+                >Q&A</a
+              >
+              <span class="text-gray-300">|</span>
+              <a
+                href="/info/policy"
+                class="text-gray-600 hover:text-gray-800 transition-colors"
+                >개인정보처리방침</a
+              >
+              <span class="text-gray-300">|</span>
+              <a
+                href="/info/terms"
+                class="text-gray-600 hover:text-gray-800 transition-colors"
+                >이용약관</a
+              >
+            </div>
+          </div>
+        </div>
+      </div>
+    </main>
+
+    <!-- Footer Fragment -->
+    <div th:replace="~{fragments/footer :: footer}"></div>
+
+    <!-- Login Modal Fragment -->
+    <div th:replace="~{fragments/modal :: loginModal}"></div>
+
+    <script src="/js/script.js"></script>
+  </body>
 </html>

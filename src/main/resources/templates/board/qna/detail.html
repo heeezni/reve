@@ -1,0 +1,424 @@
+<!DOCTYPE html>
+<html lang="ko" xmlns:th="http://www.thymeleaf.org">
+  <head th:replace="~{fragments/header :: head}">
+    <title>Q&A 상세 - Rêve</title>
+  </head>
+  <body class="font-sans text-gray-800">
+    <!-- Header Fragment -->
+    <div th:replace="~{fragments/header :: header}"></div>
+
+    <!-- Main Content -->
+    <main class="pt-20">
+      <div class="min-h-screen bg-gray-50 py-12">
+        <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
+          <!-- Breadcrumb -->
+          <nav class="mb-6">
+            <ol class="flex items-center space-x-2 text-sm text-gray-600">
+              <li><a href="/" class="hover:text-gray-800">홈</a></li>
+              <li><i class="fas fa-chevron-right text-xs"></i></li>
+              <li>
+                <a href="/board/qna/list" class="hover:text-gray-800">Q&A</a>
+              </li>
+              <li><i class="fas fa-chevron-right text-xs"></i></li>
+              <li class="text-gray-800">상세보기</li>
+            </ol>
+          </nav>
+
+          <!-- Question Section -->
+          <div class="bg-white rounded-lg shadow-sm p-8 mb-6">
+            <div class="border-b border-gray-200 pb-6 mb-6">
+              <!-- Category and Status -->
+              <div class="flex items-center space-x-3 mb-4">
+                <span
+                  class="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium bg-blue-100 text-blue-800"
+                >
+                  상품문의
+                </span>
+                <span
+                  class="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium bg-green-100 text-green-800"
+                >
+                  답변완료
+                </span>
+                <span
+                  class="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-gray-100 text-gray-600"
+                >
+                  <i class="fas fa-lock mr-1"></i>
+                  비밀글
+                </span>
+              </div>
+
+              <h1 class="text-2xl font-bold text-gray-800 mb-4 leading-tight">
+                디어 무드 퍼퓸의 지속력이 궁금합니다
+              </h1>
+
+              <!-- Question Meta -->
+              <div
+                class="flex items-center justify-between text-sm text-gray-600"
+              >
+                <div class="flex items-center space-x-6">
+                  <span>작성자: 김**</span>
+                  <span>작성일: 2025.02.18</span>
+                  <span>조회수: 45</span>
+                </div>
+                <div class="flex items-center space-x-4">
+                  <button
+                    class="flex items-center space-x-1 text-gray-500 hover:text-gray-700"
+                  >
+                    <i class="far fa-heart"></i>
+                    <span>스크랩</span>
+                  </button>
+                  <button
+                    class="flex items-center space-x-1 text-gray-500 hover:text-gray-700"
+                  >
+                    <i class="fas fa-share"></i>
+                    <span>공유</span>
+                  </button>
+                </div>
+              </div>
+            </div>
+
+            <!-- Question Content -->
+            <div class="mb-8">
+              <h3
+                class="text-lg font-semibold text-gray-800 mb-4 flex items-center"
+              >
+                <i class="fas fa-question-circle text-blue-500 mr-2"></i>
+                질문 내용
+              </h3>
+              <div
+                class="bg-blue-50 border-l-4 border-blue-400 p-6 rounded-r-lg"
+              >
+                <div class="text-gray-800 leading-relaxed space-y-4">
+                  <p>
+                    안녕하세요! Rêve 디어 무드 퍼퓸을 구매하려고 하는데, 향의
+                    지속력이 궁금합니다.
+                  </p>
+
+                  <p>
+                    현재 사용 중인 다른 브랜드 퍼퓸은 2-3시간 정도만 지속되는데,
+                    디어 무드 퍼퓸은 어느 정도 지속되나요? 특히 봄철에 사용할
+                    때의 지속력을 알고 싶습니다.
+                  </p>
+
+                  <p>
+                    또한, 향을 더 오래 지속시키는 팁이 있다면 함께 알려주시면
+                    감사하겠습니다. 스프레이 방법이나 보관 방법 등에 대한 조언도
+                    부탁드립니다.
+                  </p>
+
+                  <p>답변 부탁드립니다! 😊</p>
+                </div>
+              </div>
+            </div>
+
+            <!-- Attachments -->
+            <div class="mb-8">
+              <h3 class="text-lg font-semibold text-gray-800 mb-4">첨부파일</h3>
+              <div class="space-y-2">
+                <a
+                  href="#"
+                  class="flex items-center space-x-3 p-3 border border-gray-200 rounded-md hover:bg-gray-50 transition-colors"
+                >
+                  <i class="fas fa-file-image text-blue-500"></i>
+                  <span class="text-gray-800">현재_사용중인_퍼퓸.jpg</span>
+                  <span class="text-sm text-gray-500">(1.2MB)</span>
+                </a>
+              </div>
+            </div>
+          </div>
+
+          <!-- Answer Section -->
+          <div class="bg-white rounded-lg shadow-sm p-8 mb-6">
+            <div class="mb-6">
+              <h3
+                class="text-lg font-semibold text-gray-800 mb-4 flex items-center"
+              >
+                <i class="fas fa-comment-dots text-green-500 mr-2"></i>
+                답변
+              </h3>
+              <div class="flex items-center space-x-4 mb-4">
+                <div class="flex items-center space-x-2">
+                  <i class="fas fa-user-tie text-gray-600"></i>
+                  <span class="text-sm font-medium text-gray-800"
+                    >Rêve 고객센터</span
+                  >
+                </div>
+                <span class="text-sm text-gray-500">2025.02.19</span>
+              </div>
+            </div>
+
+            <div
+              class="bg-green-50 border-l-4 border-green-400 p-6 rounded-r-lg"
+            >
+              <div class="text-gray-800 leading-relaxed space-y-4">
+                <p>안녕하세요, Rêve를 사랑해주시는 고객님! 😊</p>
+
+                <p>디어 무드 퍼퓸의 지속력에 대해 문의해 주셔서 감사합니다.</p>
+
+                <h4 class="font-semibold text-gray-800 mt-6 mb-2">
+                  📊 지속력 정보
+                </h4>
+                <ul class="list-disc list-inside space-y-1 text-gray-700">
+                  <li><strong>평균 지속력:</strong> 4-6시간</li>
+                  <li>
+                    <strong>피부 타입별:</strong> 건성 피부 5-7시간, 지성 피부
+                    3-5시간
+                  </li>
+                  <li><strong>계절별:</strong> 봄철 4-5시간, 여름철 3-4시간</li>
+                </ul>
+
+                <h4 class="font-semibold text-gray-800 mt-6 mb-2">
+                  💡 향 지속력 향상 팁
+                </h4>
+                <div class="bg-white p-4 rounded-lg border border-green-200">
+                  <ol class="list-decimal list-inside space-y-2 text-gray-700">
+                    <li>
+                      <strong>적절한 사용량:</strong> 2-3번 스프레이 (과도한
+                      사용은 오히려 지속력을 떨어뜨릴 수 있습니다)
+                    </li>
+                    <li>
+                      <strong>스프레이 위치:</strong> 목, 손목, 귀 뒤 등 혈관이
+                      많은 부위
+                    </li>
+                    <li>
+                      <strong>사용 시기:</strong> 샤워 후 깨끗한 피부에 사용
+                    </li>
+                    <li>
+                      <strong>보관 방법:</strong> 직사광선을 피하고 서늘한 곳에
+                      보관
+                    </li>
+                    <li>
+                      <strong>레이어링:</strong> 같은 라인의 바디워시나 로션과
+                      함께 사용
+                    </li>
+                  </ol>
+                </div>
+
+                <h4 class="font-semibold text-gray-800 mt-6 mb-2">
+                  🌱 봄철 사용 팁
+                </h4>
+                <p>
+                  봄철에는 습도가 낮아 향이 더 오래 지속되는 경향이 있습니다.
+                  특히 디어 무드 퍼퓸의 플로럴 노트는 봄의 분위기와 잘 어울려
+                  더욱 만족스러운 향 경험을 제공할 것입니다.
+                </p>
+
+                <div class="bg-yellow-50 border-l-4 border-yellow-400 p-4 mt-6">
+                  <p class="text-yellow-800 text-sm">
+                    <strong>💡 추가 팁:</strong> 향을 더 오래 즐기고 싶으시다면,
+                    같은 향의 미니 퍼퓸을 휴대하시면 언제든지 향을 보충하실 수
+                    있습니다!
+                  </p>
+                </div>
+
+                <p class="mt-6">
+                  추가로 궁금한 점이 있으시면 언제든 문의해 주세요! 😊
+                </p>
+
+                <p class="text-sm text-gray-600 mt-4">
+                  <strong>Rêve 고객센터</strong><br />
+                  전화: 1588-1234 | 이메일: cs@reve.com
+                </p>
+              </div>
+            </div>
+          </div>
+
+          <!-- Navigation Buttons -->
+          <div class="flex items-center justify-between mb-8">
+            <a
+              href="/board/qna/list"
+              class="flex items-center space-x-2 px-4 py-2 border border-gray-300 rounded-md hover:bg-gray-50 transition-colors"
+            >
+              <i class="fas fa-list"></i>
+              <span>목록으로</span>
+            </a>
+
+            <div class="flex items-center space-x-2">
+              <a
+                href="#"
+                class="flex items-center space-x-2 px-4 py-2 border border-gray-300 rounded-md hover:bg-gray-50 transition-colors"
+              >
+                <i class="fas fa-chevron-left"></i>
+                <span>이전글</span>
+              </a>
+              <a
+                href="#"
+                class="flex items-center space-x-2 px-4 py-2 border border-gray-300 rounded-md hover:bg-gray-50 transition-colors"
+              >
+                <span>다음글</span>
+                <i class="fas fa-chevron-right"></i>
+              </a>
+            </div>
+          </div>
+
+          <!-- Related Q&A -->
+          <div class="bg-white rounded-lg shadow-sm p-6">
+            <h3 class="text-lg font-semibold text-gray-800 mb-4">관련 Q&A</h3>
+            <div class="space-y-3">
+              <a
+                href="#"
+                class="flex items-center justify-between p-3 border border-gray-200 rounded-md hover:bg-gray-50 transition-colors"
+              >
+                <div class="flex items-center space-x-3">
+                  <span
+                    class="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-blue-100 text-blue-800"
+                  >
+                    상품문의
+                  </span>
+                  <span
+                    class="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-green-100 text-green-800"
+                  >
+                    답변완료
+                  </span>
+                  <span class="text-gray-800"
+                    >베스크 퍼퓸의 향조가 궁금합니다</span
+                  >
+                </div>
+                <span class="text-sm text-gray-500">2025.02.14</span>
+              </a>
+
+              <a
+                href="#"
+                class="flex items-center justify-between p-3 border border-gray-200 rounded-md hover:bg-gray-50 transition-colors"
+              >
+                <div class="flex items-center space-x-3">
+                  <span
+                    class="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-blue-100 text-blue-800"
+                  >
+                    상품문의
+                  </span>
+                  <span
+                    class="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-green-100 text-green-800"
+                  >
+                    답변완료
+                  </span>
+                  <span class="text-gray-800"
+                    >두벨라 퍼퓸의 사용법을 알려주세요</span
+                  >
+                </div>
+                <span class="text-sm text-gray-500">2025.02.11</span>
+              </a>
+
+              <a
+                href="#"
+                class="flex items-center justify-between p-3 border border-gray-200 rounded-md hover:bg-gray-50 transition-colors"
+              >
+                <div class="flex items-center space-x-3">
+                  <span
+                    class="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-blue-100 text-blue-800"
+                  >
+                    상품문의
+                  </span>
+                  <span
+                    class="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-yellow-100 text-yellow-800"
+                  >
+                    답변대기
+                  </span>
+                  <span class="text-gray-800"
+                    >퍼퓸 보관 방법에 대해 문의드립니다</span
+                  >
+                </div>
+                <span class="text-sm text-gray-500">2025.02.10</span>
+              </a>
+            </div>
+          </div>
+
+          <!-- Quick Actions -->
+          <div class="mt-8 grid md:grid-cols-3 gap-4">
+            <a
+              href="/board/qna/form"
+              class="flex items-center justify-center p-4 bg-white rounded-lg shadow-sm hover:shadow-md transition-shadow"
+            >
+              <div class="text-center">
+                <i class="fas fa-pen text-2xl text-blue-500 mb-2"></i>
+                <p class="font-medium text-gray-800">새 문의하기</p>
+                <p class="text-sm text-gray-600">궁금한 점을 문의해보세요</p>
+              </div>
+            </a>
+
+            <a
+              href="/board/qna/list"
+              class="flex items-center justify-center p-4 bg-white rounded-lg shadow-sm hover:shadow-md transition-shadow"
+            >
+              <div class="text-center">
+                <i class="fas fa-list text-2xl text-green-500 mb-2"></i>
+                <p class="font-medium text-gray-800">Q&A 목록</p>
+                <p class="text-sm text-gray-600">
+                  다른 문의사항도 확인해보세요
+                </p>
+              </div>
+            </a>
+
+            <a
+              href="/member/login"
+              class="flex items-center justify-center p-4 bg-white rounded-lg shadow-sm hover:shadow-md transition-shadow"
+            >
+              <div class="text-center">
+                <i class="fas fa-headset text-2xl text-purple-500 mb-2"></i>
+                <p class="font-medium text-gray-800">고객센터</p>
+                <p class="text-sm text-gray-600">1:1 문의 및 상담</p>
+              </div>
+            </a>
+          </div>
+        </div>
+      </div>
+    </main>
+
+    <!-- Footer Fragment -->
+    <div th:replace="~{fragments/footer :: footer}"></div>
+
+    <!-- Login Modal Fragment -->
+    <div th:replace="~{fragments/modal :: loginModal}"></div>
+
+    <script src="/js/script.js"></script>
+    <script>
+      // Share functionality
+      document
+        .querySelector('button:has(.fa-share)')
+        .addEventListener('click', function () {
+          if (navigator.share) {
+            navigator.share({
+              title: '디어 무드 퍼퓸의 지속력이 궁금합니다 - Rêve Q&A',
+              text: 'Rêve Q&A에서 유용한 정보를 확인해보세요!',
+              url: window.location.href,
+            });
+          } else {
+            // Fallback for browsers that don't support Web Share API
+            const url = window.location.href;
+            navigator.clipboard.writeText(url).then(() => {
+              alert('링크가 클립보드에 복사되었습니다.');
+            });
+          }
+        });
+
+      // Scrap functionality
+      document
+        .querySelector('button:has(.fa-heart)')
+        .addEventListener('click', function () {
+          const icon = this.querySelector('i');
+          if (icon.classList.contains('far')) {
+            icon.classList.remove('far');
+            icon.classList.add('fas');
+            icon.style.color = '#ef4444';
+            this.querySelector('span').textContent = '스크랩됨';
+          } else {
+            icon.classList.remove('fas');
+            icon.classList.add('far');
+            icon.style.color = '';
+            this.querySelector('span').textContent = '스크랩';
+          }
+        });
+
+      // File download simulation
+      document.querySelectorAll('a[href="#"]').forEach((link) => {
+        if (link.querySelector('.fa-file-image')) {
+          link.addEventListener('click', function (e) {
+            e.preventDefault();
+            const fileName = this.querySelector('span').textContent;
+            alert(`${fileName} 다운로드를 시작합니다.`);
+          });
+        }
+      });
+    </script>
+  </body>
+</html>

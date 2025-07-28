@@ -1,0 +1,543 @@
+<!DOCTYPE html>
+<html lang="ko" xmlns:th="http://www.thymeleaf.org">
+  <head th:replace="~{fragments/header :: head}">
+    <title>장바구니 - Rêve</title>
+  </head>
+  <body class="font-sans text-gray-800">
+    <!-- Header Fragment -->
+    <div th:replace="~{fragments/header :: header}"></div>
+
+    <!-- Main Content -->
+    <main class="pt-20">
+      <div class="min-h-screen bg-gray-50 py-12">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <!-- Page Title -->
+          <div class="mb-8">
+            <h1 class="text-3xl font-bold text-gray-800 mb-2">장바구니</h1>
+            <p class="text-gray-600">선택하신 상품들을 확인하고 주문해보세요</p>
+          </div>
+
+          <div class="grid lg:grid-cols-3 gap-8">
+            <!-- Cart Items -->
+            <div class="lg:col-span-2">
+              <div class="bg-white rounded-lg shadow-sm">
+                <!-- Cart Header -->
+                <div class="p-6 border-b border-gray-200">
+                  <div class="flex items-center justify-between">
+                    <h2 class="text-lg font-semibold text-gray-800">
+                      상품 목록
+                    </h2>
+                    <button class="text-sm text-gray-500 hover:text-gray-700">
+                      전체 삭제
+                    </button>
+                  </div>
+                </div>
+
+                <!-- Cart Items List -->
+                <div class="divide-y divide-gray-200">
+                  <!-- Cart Item 1 -->
+                  <div class="p-6">
+                    <div class="flex items-center space-x-4">
+                      <!-- Checkbox -->
+                      <label>
+                        <input
+                          type="checkbox"
+                          class="w-4 h-4 text-gray-800 border-gray-300 rounded focus:ring-gray-800"
+                          checked
+                        />
+                      </label>
+
+                      <!-- Product Image -->
+                      <div class="flex-shrink-0">
+                        <img
+                          src="/images/product/product1.jpg"
+                          alt="디어 무드 멀티 퍼퓸 70ml"
+                          class="w-20 h-20 object-cover rounded-md"
+                        />
+                      </div>
+
+                      <!-- Product Info -->
+                      <div class="flex-1 min-w-0">
+                        <h3 class="text-sm font-medium text-gray-800 truncate">
+                          디어 무드 멀티 퍼퓸 70ml
+                        </h3>
+                        <p class="text-sm text-gray-500">70ml</p>
+                        <div class="flex items-center mt-1">
+                          <span class="text-red-500 font-bold text-sm"
+                            >37%할인</span
+                          >
+                          <span class="text-lg font-bold ml-2">24,600원</span>
+                          <span class="text-gray-400 line-through text-sm ml-2"
+                            >39,000원</span
+                          >
+                        </div>
+                      </div>
+
+                      <!-- Quantity Control -->
+                      <div class="flex items-center space-x-2">
+                        <button
+                          class="w-8 h-8 border border-gray-300 rounded-md flex items-center justify-center hover:bg-gray-50"
+                        >
+                          <i class="fas fa-minus text-xs"></i>
+                        </button>
+                        <label>
+                          <input
+                            type="number"
+                            value="1"
+                            min="1"
+                            class="w-12 h-8 border border-gray-300 rounded-md text-center text-sm"
+                          />
+                        </label>
+                        <button
+                          class="w-8 h-8 border border-gray-300 rounded-md flex items-center justify-center hover:bg-gray-50"
+                        >
+                          <i class="fas fa-plus text-xs"></i>
+                        </button>
+                      </div>
+
+                      <!-- Actions -->
+                      <div class="flex flex-col items-end space-y-2">
+                        <button class="text-gray-400 hover:text-gray-600">
+                          <i class="fas fa-trash text-sm"></i>
+                        </button>
+                        <div class="text-right">
+                          <p class="text-lg font-bold text-gray-800">
+                            24,600원
+                          </p>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+
+                  <!-- Cart Item 2 -->
+                  <div class="p-6">
+                    <div class="flex items-center space-x-4">
+                      <!-- Checkbox -->
+                      <label>
+                        <input
+                          type="checkbox"
+                          class="w-4 h-4 text-gray-800 border-gray-300 rounded focus:ring-gray-800"
+                          checked
+                        />
+                      </label>
+
+                      <!-- Product Image -->
+                      <div class="flex-shrink-0">
+                        <img
+                          src="/images/product/product2.jpg"
+                          alt="베스크 멀티 퍼퓸 70ml"
+                          class="w-20 h-20 object-cover rounded-md"
+                        />
+                      </div>
+
+                      <!-- Product Info -->
+                      <div class="flex-1 min-w-0">
+                        <h3 class="text-sm font-medium text-gray-800 truncate">
+                          베스크 멀티 퍼퓸 70ml
+                        </h3>
+                        <p class="text-sm text-gray-500">70ml</p>
+                        <div class="flex items-center mt-1">
+                          <span class="text-red-500 font-bold text-sm"
+                            >37%할인</span
+                          >
+                          <span class="text-lg font-bold ml-2">24,600원</span>
+                          <span class="text-gray-400 line-through text-sm ml-2"
+                            >39,000원</span
+                          >
+                        </div>
+                      </div>
+
+                      <!-- Quantity Control -->
+                      <div class="flex items-center space-x-2">
+                        <button
+                          class="w-8 h-8 border border-gray-300 rounded-md flex items-center justify-center hover:bg-gray-50"
+                        >
+                          <i class="fas fa-minus text-xs"></i>
+                        </button>
+                        <label>
+                          <input
+                            type="number"
+                            value="2"
+                            min="1"
+                            class="w-12 h-8 border border-gray-300 rounded-md text-center text-sm"
+                          />
+                        </label>
+                        <button
+                          class="w-8 h-8 border border-gray-300 rounded-md flex items-center justify-center hover:bg-gray-50"
+                        >
+                          <i class="fas fa-plus text-xs"></i>
+                        </button>
+                      </div>
+
+                      <!-- Actions -->
+                      <div class="flex flex-col items-end space-y-2">
+                        <button class="text-gray-400 hover:text-gray-600">
+                          <i class="fas fa-trash text-sm"></i>
+                        </button>
+                        <div class="text-right">
+                          <p class="text-lg font-bold text-gray-800">
+                            49,200원
+                          </p>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+
+                  <!-- Cart Item 3 -->
+                  <div class="p-6">
+                    <div class="flex items-center space-x-4">
+                      <!-- Checkbox -->
+                      <label>
+                        <input
+                          type="checkbox"
+                          class="w-4 h-4 text-gray-800 border-gray-300 rounded focus:ring-gray-800"
+                          checked
+                        />
+                      </label>
+
+                      <!-- Product Image -->
+                      <div class="flex-shrink-0">
+                        <img
+                          src="/images/product/product1.jpg"
+                          alt="두벨라 멀티 퍼퓸 70ml"
+                          class="w-20 h-20 object-cover rounded-md"
+                        />
+                      </div>
+
+                      <!-- Product Info -->
+                      <div class="flex-1 min-w-0">
+                        <h3 class="text-sm font-medium text-gray-800 truncate">
+                          두벨라 멀티 퍼퓸 70ml
+                        </h3>
+                        <p class="text-sm text-gray-500">70ml</p>
+                        <div class="flex items-center mt-1">
+                          <span class="text-red-500 font-bold text-sm"
+                            >37%할인</span
+                          >
+                          <span class="text-lg font-bold ml-2">24,600원</span>
+                          <span class="text-gray-400 line-through text-sm ml-2"
+                            >39,000원</span
+                          >
+                        </div>
+                      </div>
+
+                      <!-- Quantity Control -->
+                      <div class="flex items-center space-x-2">
+                        <button
+                          class="w-8 h-8 border border-gray-300 rounded-md flex items-center justify-center hover:bg-gray-50"
+                        >
+                          <i class="fas fa-minus text-xs"></i>
+                        </button>
+                        <label>
+                          <input
+                            type="number"
+                            value="1"
+                            min="1"
+                            class="w-12 h-8 border border-gray-300 rounded-md text-center text-sm"
+                          />
+                        </label>
+                        <button
+                          class="w-8 h-8 border border-gray-300 rounded-md flex items-center justify-center hover:bg-gray-50"
+                        >
+                          <i class="fas fa-plus text-xs"></i>
+                        </button>
+                      </div>
+
+                      <!-- Actions -->
+                      <div class="flex flex-col items-end space-y-2">
+                        <button class="text-gray-400 hover:text-gray-600">
+                          <i class="fas fa-trash text-sm"></i>
+                        </button>
+                        <div class="text-right">
+                          <p class="text-lg font-bold text-gray-800">
+                            24,600원
+                          </p>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+                <!-- Empty Cart State (Hidden by default) -->
+                <div class="hidden p-12 text-center">
+                  <i
+                    class="fas fa-shopping-cart text-4xl text-gray-300 mb-4"
+                  ></i>
+                  <h3 class="text-lg font-medium text-gray-800 mb-2">
+                    장바구니가 비어있습니다
+                  </h3>
+                  <p class="text-gray-500 mb-6">
+                    원하시는 상품을 장바구니에 담아보세요
+                  </p>
+                  <a
+                    href="/shop/list"
+                    class="inline-block bg-gray-800 text-white py-2 px-6 rounded-md hover:bg-gray-700 transition-colors"
+                  >
+                    쇼핑 계속하기
+                  </a>
+                </div>
+              </div>
+            </div>
+
+            <!-- Order Summary -->
+            <div class="lg:col-span-1">
+              <div class="bg-white rounded-lg shadow-sm p-6 sticky top-8">
+                <h2 class="text-lg font-semibold text-gray-800 mb-4">
+                  주문 요약
+                </h2>
+
+                <!-- Price Breakdown -->
+                <div class="space-y-3 mb-6">
+                  <div class="flex justify-between text-sm">
+                    <span class="text-gray-600">상품 금액</span>
+                    <span class="text-gray-800">98,400원</span>
+                  </div>
+                  <div class="flex justify-between text-sm">
+                    <span class="text-gray-600">할인 금액</span>
+                    <span class="text-red-500">-43,200원</span>
+                  </div>
+                  <div class="flex justify-between text-sm">
+                    <span class="text-gray-600">배송비</span>
+                    <span class="text-gray-800">무료</span>
+                  </div>
+                  <div class="border-t pt-3">
+                    <div class="flex justify-between text-lg font-bold">
+                      <span>총 결제금액</span>
+                      <span class="text-gray-800">55,200원</span>
+                    </div>
+                  </div>
+                </div>
+
+                <!-- Coupon Section -->
+                <div class="mb-6">
+                  <h3 class="text-sm font-medium text-gray-700 mb-2">
+                    쿠폰/포인트
+                  </h3>
+                  <div class="space-y-2">
+                    <label>
+                      <select
+                        class="w-full border border-gray-300 rounded-md px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-gray-800 focus:border-transparent"
+                      >
+                        <option>쿠폰을 선택하세요</option>
+                        <option>신규가입 10% 할인</option>
+                        <option>무료배송 쿠폰</option>
+                      </select>
+                    </label>
+                    <label>
+                      <input
+                        type="text"
+                        placeholder="포인트 사용 (보유: 1,000P)"
+                        class="w-full border border-gray-300 rounded-md px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-gray-800 focus:border-transparent"
+                      />
+                    </label>
+                  </div>
+                </div>
+
+                <!-- Checkout Buttons -->
+                <div class="space-y-3">
+                  <button
+                    class="w-full bg-gray-800 text-white py-3 px-6 rounded-md hover:bg-gray-700 transition-colors font-medium"
+                  >
+                    선택 상품 주문
+                  </button>
+                  <button
+                    class="w-full border border-gray-300 text-gray-700 py-3 px-6 rounded-md hover:bg-gray-50 transition-colors font-medium"
+                  >
+                    전체 상품 주문
+                  </button>
+                </div>
+
+                <!-- Additional Info -->
+                <div class="mt-6 pt-6 border-t border-gray-200">
+                  <div class="text-xs text-gray-500 space-y-1">
+                    <p>• 무료배송 기준: 50,000원 이상 구매 시</p>
+                    <p>• 배송 예정일: 결제 완료 후 1-2일 내</p>
+                    <p>• 반품/교환: 배송 완료 후 7일 이내</p>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Related Products -->
+          <div class="mt-12">
+            <h2 class="text-2xl font-bold text-gray-800 mb-6">
+              함께 구매하면 좋은 상품
+            </h2>
+            <div class="grid md:grid-cols-4 gap-6">
+              <!-- Related Product 1 -->
+              <div class="bg-white rounded-lg shadow-sm overflow-hidden group">
+                <div class="relative overflow-hidden">
+                  <img
+                    src="/images/product/product2.jpg"
+                    alt="관련 상품"
+                    class="w-full h-48 object-cover group-hover:scale-105 transition-transform duration-300"
+                  />
+                </div>
+                <div class="p-4">
+                  <h3 class="text-sm font-medium text-gray-800 mb-2">
+                    관련 상품명
+                  </h3>
+                  <div class="flex items-center mb-2">
+                    <span class="text-red-500 font-bold text-sm">20%할인</span>
+                    <span class="text-lg font-bold ml-2">32,000원</span>
+                    <span class="text-gray-400 line-through text-sm ml-2"
+                      >40,000원</span
+                    >
+                  </div>
+                  <button
+                    class="w-full bg-gray-800 text-white py-2 px-4 rounded-md hover:bg-gray-700 transition-colors text-sm"
+                  >
+                    장바구니 담기
+                  </button>
+                </div>
+              </div>
+
+              <!-- Related Product 2 -->
+              <div class="bg-white rounded-lg shadow-sm overflow-hidden group">
+                <div class="relative overflow-hidden">
+                  <img
+                    src="/images/product/product1.jpg"
+                    alt="관련 상품"
+                    class="w-full h-48 object-cover group-hover:scale-105 transition-transform duration-300"
+                  />
+                </div>
+                <div class="p-4">
+                  <h3 class="text-sm font-medium text-gray-800 mb-2">
+                    관련 상품명
+                  </h3>
+                  <div class="flex items-center mb-2">
+                    <span class="text-red-500 font-bold text-sm">15%할인</span>
+                    <span class="text-lg font-bold ml-2">34,000원</span>
+                    <span class="text-gray-400 line-through text-sm ml-2"
+                      >40,000원</span
+                    >
+                  </div>
+                  <button
+                    class="w-full bg-gray-800 text-white py-2 px-4 rounded-md hover:bg-gray-700 transition-colors text-sm"
+                  >
+                    장바구니 담기
+                  </button>
+                </div>
+              </div>
+
+              <!-- Related Product 3 -->
+              <div class="bg-white rounded-lg shadow-sm overflow-hidden group">
+                <div class="relative overflow-hidden">
+                  <img
+                    src="/images/product/product2.jpg"
+                    alt="관련 상품"
+                    class="w-full h-48 object-cover group-hover:scale-105 transition-transform duration-300"
+                  />
+                </div>
+                <div class="p-4">
+                  <h3 class="text-sm font-medium text-gray-800 mb-2">
+                    관련 상품명
+                  </h3>
+                  <div class="flex items-center mb-2">
+                    <span class="text-red-500 font-bold text-sm">25%할인</span>
+                    <span class="text-lg font-bold ml-2">30,000원</span>
+                    <span class="text-gray-400 line-through text-sm ml-2"
+                      >40,000원</span
+                    >
+                  </div>
+                  <button
+                    class="w-full bg-gray-800 text-white py-2 px-4 rounded-md hover:bg-gray-700 transition-colors text-sm"
+                  >
+                    장바구니 담기
+                  </button>
+                </div>
+              </div>
+
+              <!-- Related Product 4 -->
+              <div class="bg-white rounded-lg shadow-sm overflow-hidden group">
+                <div class="relative overflow-hidden">
+                  <img
+                    src="/images/product/product1.jpg"
+                    alt="관련 상품"
+                    class="w-full h-48 object-cover group-hover:scale-105 transition-transform duration-300"
+                  />
+                </div>
+                <div class="p-4">
+                  <h3 class="text-sm font-medium text-gray-800 mb-2">
+                    관련 상품명
+                  </h3>
+                  <div class="flex items-center mb-2">
+                    <span class="text-red-500 font-bold text-sm">30%할인</span>
+                    <span class="text-lg font-bold ml-2">28,000원</span>
+                    <span class="text-gray-400 line-through text-sm ml-2"
+                      >40,000원</span
+                    >
+                  </div>
+                  <button
+                    class="w-full bg-gray-800 text-white py-2 px-4 rounded-md hover:bg-gray-700 transition-colors text-sm"
+                  >
+                    장바구니 담기
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </main>
+
+    <!-- Footer Fragment -->
+    <div th:replace="~{fragments/footer :: footer}"></div>
+
+    <!-- Login Modal Fragment -->
+    <div th:replace="~{fragments/modal :: loginModal}"></div>
+
+    <script src="/js/script.js"></script>
+    <script>
+      // Quantity control functionality
+      document.querySelectorAll('.fa-plus').forEach((button) => {
+        button.addEventListener('click', function () {
+          const input = this.parentElement.previousElementSibling;
+          input.value = parseInt(input.value) + 1;
+          updateItemTotal(this);
+        });
+      });
+
+      document.querySelectorAll('.fa-minus').forEach((button) => {
+        button.addEventListener('click', function () {
+          const input = this.parentElement.nextElementSibling;
+          if (parseInt(input.value) > 1) {
+            input.value = parseInt(input.value) - 1;
+            updateItemTotal(this);
+          }
+        });
+      });
+
+      // Update item total when quantity changes
+      function updateItemTotal(button) {
+        const itemContainer = button.closest('.p-6');
+        const quantity = parseInt(
+          itemContainer.querySelector('input[type="number"]').value
+        );
+        const pricePerItem = 24600; // This should come from data
+        const totalElement = itemContainer.querySelector('.text-lg.font-bold');
+        totalElement.textContent =
+          (quantity * pricePerItem).toLocaleString() + '원';
+
+        updateOrderSummary();
+      }
+
+      // Update order summary
+      function updateOrderSummary() {
+        // This would calculate totals from all checked items
+        // For now, just a placeholder
+        console.log('Order summary updated');
+      }
+
+      // Checkbox functionality
+      document
+        .querySelectorAll('input[type="checkbox"]')
+        .forEach((checkbox) => {
+          checkbox.addEventListener('change', function () {
+            updateOrderSummary();
+          });
+        });
+    </script>
+  </body>
+</html>

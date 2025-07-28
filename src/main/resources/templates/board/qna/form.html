@@ -1,0 +1,415 @@
+<!DOCTYPE html>
+<html lang="ko" xmlns:th="http://www.thymeleaf.org">
+  <head th:replace="~{fragments/header :: head}">
+    <title>Q&A 작성 - Rêve</title>
+  </head>
+  <body class="font-sans text-gray-800">
+    <!-- Header Fragment -->
+    <div th:replace="~{fragments/header :: header}"></div>
+
+    <!-- Main Content -->
+    <main class="pt-20">
+      <div class="min-h-screen bg-gray-50 py-12">
+        <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
+          <!-- Breadcrumb -->
+          <nav class="mb-6">
+            <ol class="flex items-center space-x-2 text-sm text-gray-600">
+              <li><a href="/" class="hover:text-gray-800">홈</a></li>
+              <li><i class="fas fa-chevron-right text-xs"></i></li>
+              <li>
+                <a href="/board/qna/list" class="hover:text-gray-800">Q&A</a>
+              </li>
+              <li><i class="fas fa-chevron-right text-xs"></i></li>
+              <li class="text-gray-800">문의하기</li>
+            </ol>
+          </nav>
+
+          <!-- Page Title -->
+          <div class="mb-8">
+            <h1 class="text-3xl font-bold text-gray-800 mb-2">문의하기</h1>
+            <p class="text-gray-600">
+              궁금한 점이 있으시면 언제든 문의해 주세요
+            </p>
+          </div>
+
+          <!-- Q&A Form -->
+          <div class="bg-white rounded-lg shadow-sm p-8">
+            <form class="space-y-8">
+              <!-- Category Selection -->
+              <div>
+                <label class="block text-sm font-medium text-gray-700 mb-3">
+                  문의 분류 <span class="text-red-500">*</span>
+                </label>
+                <label>
+                  <select
+                    class="w-full border border-gray-300 rounded-md px-4 py-3 focus:outline-none focus:ring-2 focus:ring-gray-800 focus:border-transparent"
+                  >
+                    <option value="">문의 분류를 선택해주세요</option>
+                    <option value="product">상품문의</option>
+                    <option value="delivery">배송문의</option>
+                    <option value="payment">결제문의</option>
+                    <option value="return">반품/교환</option>
+                    <option value="other">기타</option>
+                  </select>
+                </label>
+              </div>
+
+              <!-- Title -->
+              <div>
+                <label class="block text-sm font-medium text-gray-700 mb-3">
+                  제목 <span class="text-red-500">*</span>
+                </label>
+                <label>
+                  <input
+                    type="text"
+                    placeholder="문의 제목을 입력해주세요"
+                    class="w-full border border-gray-300 rounded-md px-4 py-3 focus:outline-none focus:ring-2 focus:ring-gray-800 focus:border-transparent"
+                    maxlength="100"
+                  />
+                </label>
+                <p class="text-sm text-gray-500 mt-1">
+                  최대 100자까지 입력 가능합니다
+                </p>
+              </div>
+
+              <!-- Content -->
+              <div>
+                <label class="block text-sm font-medium text-gray-700 mb-3">
+                  문의 내용 <span class="text-red-500">*</span>
+                </label>
+                <label>
+<textarea
+  placeholder="문의하실 내용을 자세히 작성해주세요"
+  rows="10"
+  class="w-full border border-gray-300 rounded-md px-4 py-3 focus:outline-none focus:ring-2 focus:ring-gray-800 focus:border-transparent resize-none"
+  maxlength="2000"
+></textarea>
+                </label>
+                <div class="flex justify-between items-center mt-1">
+                  <p class="text-sm text-gray-500">
+                    최대 2,000자까지 입력 가능합니다
+                  </p>
+                  <p class="text-sm text-gray-500">
+                    <span id="charCount">0</span>/2,000
+                  </p>
+                </div>
+              </div>
+
+              <!-- File Upload -->
+              <div>
+                <label class="block text-sm font-medium text-gray-700 mb-3">
+                  첨부파일
+                </label>
+                <div
+                  class="border-2 border-dashed border-gray-300 rounded-lg p-6 text-center hover:border-gray-400 transition-colors"
+                >
+                  <div class="space-y-4">
+                    <i
+                      class="fas fa-cloud-upload-alt text-3xl text-gray-400"
+                    ></i>
+                    <div>
+                      <p class="text-sm text-gray-600 mb-2">
+                        파일을 드래그하여 업로드하거나 클릭하여 선택하세요
+                      </p>
+                      <p class="text-xs text-gray-500">
+                        최대 5개 파일, 각 파일 10MB 이하 (JPG, PNG, PDF, DOC,
+                        DOCX)
+                      </p>
+                    </div>
+                    <input
+                      type="file"
+                      multiple
+                      accept=".jpg,.jpeg,.png,.pdf,.doc,.docx"
+                      class="hidden"
+                      id="fileInput"
+                    />
+                    <button
+                      type="button"
+                      onclick="document.getElementById('fileInput').click()"
+                      class="inline-flex items-center px-4 py-2 border border-gray-300 rounded-md text-sm font-medium text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-gray-800 focus:border-transparent"
+                    >
+                      <i class="fas fa-folder-open mr-2"></i>
+                      파일 선택
+                    </button>
+                  </div>
+                </div>
+                <!-- File List -->
+                <div id="fileList" class="mt-4 space-y-2"></div>
+              </div>
+
+              <!-- Privacy Settings -->
+              <div class="space-y-4">
+                <label class="block text-sm font-medium text-gray-700">
+                  공개 설정
+                </label>
+                <div class="space-y-3">
+                  <label class="flex items-center">
+                    <input
+                      type="radio"
+                      name="privacy"
+                      value="public"
+                      class="w-4 h-4 text-gray-800 border-gray-300 focus:ring-gray-800"
+                      checked
+                    />
+                    <span class="ml-3 text-sm text-gray-700">전체 공개</span>
+                  </label>
+                  <label class="flex items-center">
+                    <input
+                      type="radio"
+                      name="privacy"
+                      value="private"
+                      class="w-4 h-4 text-gray-800 border-gray-300 focus:ring-gray-800"
+                    />
+                    <span class="ml-3 text-sm text-gray-700"
+                      >비밀글 (본인만 확인 가능)</span
+                    >
+                  </label>
+                </div>
+              </div>
+
+              <!-- Additional Options -->
+              <div class="space-y-4">
+                <label class="block text-sm font-medium text-gray-700">
+                  추가 옵션
+                </label>
+                <div class="space-y-3">
+                  <label class="flex items-center">
+                    <input
+                      type="checkbox"
+                      class="w-4 h-4 text-gray-800 border-gray-300 rounded focus:ring-gray-800"
+                    />
+                    <span class="ml-3 text-sm text-gray-700"
+                      >답변 완료 시 이메일로 알림 받기</span
+                    >
+                  </label>
+                  <label class="flex items-center">
+                    <input
+                      type="checkbox"
+                      class="w-4 h-4 text-gray-800 border-gray-300 rounded focus:ring-gray-800"
+                    />
+                    <span class="ml-3 text-sm text-gray-700"
+                      >SMS로 답변 완료 알림 받기</span
+                    >
+                  </label>
+                </div>
+              </div>
+
+              <!-- Contact Information -->
+              <div class="bg-gray-50 p-6 rounded-lg">
+                <h3 class="text-lg font-semibold text-gray-800 mb-4">
+                  연락처 정보
+                </h3>
+                <div class="grid md:grid-cols-2 gap-4">
+                  <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-2">
+                      이메일
+                    </label>
+                    <label>
+                      <input
+                        type="email"
+                        placeholder="example@email.com"
+                        class="w-full border border-gray-300 rounded-md px-4 py-3 focus:outline-none focus:ring-2 focus:ring-gray-800 focus:border-transparent"
+                      />
+                    </label>
+                  </div>
+                  <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-2">
+                      연락처
+                    </label>
+                    <label>
+                      <input
+                        type="tel"
+                        placeholder="010-0000-0000"
+                        class="w-full border border-gray-300 rounded-md px-4 py-3 focus:outline-none focus:ring-2 focus:ring-gray-800 focus:border-transparent"
+                      />
+                    </label>
+                  </div>
+                </div>
+                <p class="text-sm text-gray-500 mt-3">
+                  * 연락처 정보는 답변 전달 및 추가 문의 시에만 사용됩니다.
+                </p>
+              </div>
+
+              <!-- Notice -->
+              <div class="bg-blue-50 border-l-4 border-blue-400 p-4">
+                <div class="flex">
+                  <i class="fas fa-info-circle text-blue-500 mt-1 mr-3"></i>
+                  <div class="text-sm text-blue-700">
+                    <p class="font-medium mb-1">문의 작성 시 주의사항</p>
+                    <ul class="list-disc list-inside space-y-1">
+                      <li>
+                        개인정보(주민등록번호, 계좌번호 등)는 포함하지 마세요
+                      </li>
+                      <li>욕설, 비방, 광고성 내용은 삭제될 수 있습니다</li>
+                      <li>답변은 평일 1-2일 내에 등록됩니다</li>
+                      <li>긴급한 문의는 고객센터(1588-1234)로 연락해 주세요</li>
+                    </ul>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Submit Buttons -->
+              <div
+                class="flex items-center justify-between pt-6 border-t border-gray-200"
+              >
+                <a
+                  href="/board/qna/list"
+                  class="inline-flex items-center px-6 py-3 border border-gray-300 rounded-md text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-gray-800 focus:border-transparent font-medium"
+                >
+                  <i class="fas fa-arrow-left mr-2"></i>
+                  목록으로
+                </a>
+                <div class="flex space-x-3">
+                  <button
+                    type="button"
+                    class="inline-flex items-center px-6 py-3 border border-gray-300 rounded-md text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-gray-800 focus:border-transparent font-medium"
+                  >
+                    임시저장
+                  </button>
+                  <button
+                    type="submit"
+                    class="inline-flex items-center px-6 py-3 bg-gray-800 text-white rounded-md hover:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-gray-800 focus:border-transparent font-medium"
+                  >
+                    <i class="fas fa-paper-plane mr-2"></i>
+                    문의 등록
+                  </button>
+                </div>
+              </div>
+            </form>
+          </div>
+
+          <!-- Quick Links -->
+          <div class="mt-8 grid md:grid-cols-3 gap-4">
+            <a
+              href="/board/qna/list"
+              class="flex items-center justify-center p-4 bg-white rounded-lg shadow-sm hover:shadow-md transition-shadow"
+            >
+              <div class="text-center">
+                <i class="fas fa-list text-2xl text-blue-500 mb-2"></i>
+                <p class="font-medium text-gray-800">Q&A 목록</p>
+                <p class="text-sm text-gray-600">
+                  다른 문의사항도 확인해보세요
+                </p>
+              </div>
+            </a>
+
+            <a
+              href="/board/notice/list"
+              class="flex items-center justify-center p-4 bg-white rounded-lg shadow-sm hover:shadow-md transition-shadow"
+            >
+              <div class="text-center">
+                <i class="fas fa-bullhorn text-2xl text-green-500 mb-2"></i>
+                <p class="font-medium text-gray-800">공지사항</p>
+                <p class="text-sm text-gray-600">
+                  중요한 안내사항을 확인하세요
+                </p>
+              </div>
+            </a>
+
+            <a
+              href="/member/login"
+              class="flex items-center justify-center p-4 bg-white rounded-lg shadow-sm hover:shadow-md transition-shadow"
+            >
+              <div class="text-center">
+                <i class="fas fa-headset text-2xl text-purple-500 mb-2"></i>
+                <p class="font-medium text-gray-800">고객센터</p>
+                <p class="text-sm text-gray-600">1:1 문의 및 상담</p>
+              </div>
+            </a>
+          </div>
+        </div>
+      </div>
+    </main>
+
+    <!-- Footer Fragment -->
+    <div th:replace="~{fragments/footer :: footer}"></div>
+
+    <!-- Login Modal Fragment -->
+    <div th:replace="~{fragments/modal :: loginModal}"></div>
+
+    <script src="/js/script.js"></script>
+    <script>
+      // Character count for textarea
+      const textarea = document.querySelector('textarea');
+      const charCount = document.getElementById('charCount');
+
+      textarea.addEventListener('input', function () {
+        const length = this.value.length;
+        charCount.textContent = length.toString();
+
+        if (length > 1900) {
+          charCount.classList.add('text-red-500');
+        } else {
+          charCount.classList.remove('text-red-500');
+        }
+      });
+
+      // File upload functionality
+      const fileInput = document.getElementById('fileInput');
+      const fileList = document.getElementById('fileList');
+
+      fileInput.addEventListener('change', function () {
+        fileList.innerHTML = '';
+        const files = Array.from(this.files);
+
+        files.forEach((file, index) => {
+          const fileItem = document.createElement('div');
+          fileItem.className =
+            'flex items-center justify-between p-3 bg-gray-50 rounded-md';
+          fileItem.innerHTML = `
+            <div class="flex items-center space-x-3">
+              <i class="fas fa-file text-gray-500"></i>
+              <span class="text-sm text-gray-700">${file.name}</span>
+              <span class="text-xs text-gray-500">(${(
+                file.size /
+                1024 /
+                1024
+              ).toFixed(2)}MB)</span>
+            </div>
+            <button type="button" onclick="removeFile(${index})" class="text-red-500 hover:text-red-700">
+              <i class="fas fa-times"></i>
+            </button>
+          `;
+          fileList.appendChild(fileItem);
+        });
+      });
+
+      function removeFile(index) {
+        const dt = new DataTransfer();
+        const files = Array.from(fileInput.files);
+        files.splice(index, 1);
+        files.forEach((file) => dt.items.add(file));
+        fileInput.files = dt.files;
+        fileInput.dispatchEvent(new Event('change'));
+      }
+
+      // Form validation
+      document.querySelector('form').addEventListener('submit', function (e) {
+        e.preventDefault();
+
+        const category = document.querySelector('select').value;
+        const title = document.querySelector('input[type="text"]').value;
+        const content = document.querySelector('textarea').value;
+
+        if (!category) {
+          alert('문의 분류를 선택해주세요.');
+          return;
+        }
+
+        if (!title.trim()) {
+          alert('제목을 입력해주세요.');
+          return;
+        }
+
+        if (!content.trim()) {
+          alert('문의 내용을 입력해주세요.');
+          return;
+        }
+
+        // Form submission logic would go here
+        alert('문의가 성공적으로 등록되었습니다.');
+        window.location.href = '/board/qna/list';
+      });
+    </script>
+  </body>
+</html>

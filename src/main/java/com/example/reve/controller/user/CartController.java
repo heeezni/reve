@@ -10,6 +10,6 @@ public class CartController {
 
   @GetMapping
   public String cart() {
-    return "user/cart/cart";
+    return "cart/cart";
   }
 }

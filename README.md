@@ -1,6 +1,7 @@
 # 향수 쇼핑몰 클론 프로젝트
 
 ## 프로젝트 구조
+
 ```
 src/                       # 소스 코드 및 리소스 파일
     ├───main/                  # 메인 애플리케이션 소스
@@ -25,8 +26,6 @@ src/                       # 소스 코드 및 리소스 파일
     │   └───resources/           # 애플리케이션 리소스 파일
     │       ├───application.properties # Spring Boot 설정 파일 (포트, DB 연결 등)
     │       ├───static/          # 정적 리소스 (CSS, JS, 이미지 등)
-    │       │   ├───css/         # CSS 스타일시트
-    │       │   │   └───.gitkeep # 빈 디렉토리 유지를 위한 더미 파일
     │       │   ├───image/       # 이미지 파일
     │       │   │   └───.gitkeep # 빈 디렉토리 유지를 위한 더미 파일
     │       │   └───js/          # JavaScript 파일

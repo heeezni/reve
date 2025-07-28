@@ -1,10 +1,55 @@
 <!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <title>Title</title>
-</head>
-<body>
-브랜드 소개
-</body>
+<html lang="ko" xmlns:th="http://www.thymeleaf.org">
+  <head th:replace="~{fragments/header :: head}">
+    <title>About - Rêve</title>
+  </head>
+  <body class="font-sans text-gray-800">
+    <!-- Header Fragment -->
+    <div th:replace="~{fragments/header :: header}"></div>
+
+    <!-- Main Content -->
+    <main class="pt-20">
+      <!-- About Section -->
+      <section class="py-20 bg-white">
+        <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div class="grid lg:grid-cols-2 gap-16 items-center">
+            <!-- Left: Image -->
+            <div class="order-2 lg:order-1">
+              <img
+                src="/images/about/about.png"
+                alt="About Rêve"
+                class="w-full h-96 object-cover rounded-lg"
+              />
+            </div>
+
+            <!-- Right: Text Content -->
+            <div class="order-1 lg:order-2">
+              <h1 class="text-4xl font-bold mb-6">
+                For Your Mood, From The Other Mood
+              </h1>
+              <p class="text-lg text-gray-600 leading-relaxed">
+                THE OTHER MOOD는 향을 통해 감정을 기록하고, 기억을 완성하는
+                브랜드입니다. 하나의 향이 당신의 하루를 바꾸고, 어떤 향은 그날의
+                분위기를 정의합니다. 때로는 따뜻하게, 때로는 신비롭게.
+              </p>
+              <p class="text-lg text-gray-600 leading-relaxed mt-4">
+                우리는 향을 통해 기분을 입고, 감정을 남깁니다. 그날의 기분은
+                무엇인가요? 어떤 날은 산뜻한 시트러스가, 어떤 날은 부드러운
+                머스크가 어울릴지도 모릅니다. THE OTHER MOOD는 당신이 원하는
+                감정을 향으로 완성합니다.
+              </p>
+            </div>
+          </div>
+        </div>
+      </section>
+    </main>
+
+    <!-- Footer Fragment -->
+    <div th:replace="~{fragments/footer :: footer}"></div>
+
+    <!-- Login Modal Fragment -->
+    <div th:replace="~{fragments/modal :: loginModal}"></div>
+
+    <script src="/js/script.js"></script>
+  </body>
 </html>

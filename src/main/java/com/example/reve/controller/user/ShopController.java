@@ -10,11 +10,11 @@ public class ShopController {
 
   @GetMapping("/list")
   public String productList() {
-    return "user/shop/list";
+    return "shop/list";
   }
 
   @GetMapping("/detail")
   public String productDetail() {
-    return "user/shop/detail";
+    return "shop/detail";
   }
 }

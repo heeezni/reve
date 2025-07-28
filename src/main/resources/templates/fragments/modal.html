@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="ko">
+  <head>
+    <meta charset="UTF-8" />
+    <title></title>
+  </head>
+  <body>
+    <!-- Login Modal Fragment -->
+    <div
+      th:fragment="loginModal"
+      id="loginModal"
+      class="modal fixed inset-0 z-50 bg-black/50"
+    >
+      <div
+        class="modal-content bg-white rounded-lg p-10 max-w-md mx-auto mt-20 relative"
+      >
+        <span
+          class="close absolute top-4 right-6 text-2xl font-bold cursor-pointer hover:text-gray-600"
+          >&times;</span
+        >
+        <h2 class="text-2xl font-bold text-center mb-8">로그인</h2>
+
+        <div class="text-center mb-8 pb-8 border-b border-gray-200">
+          <p class="text-gray-600 mb-6">카카오로 1초 만에 로그인 하세요.</p>
+          <button
+            class="kakao-login bg-yellow-400 text-gray-800 border-none px-8 py-3 rounded-md font-medium mx-2 hover:bg-yellow-500 transition-colors"
+          >
+            카카오 1초 로그인
+          </button>
+        </div>
+
+        <div class="form-login">
+          <h3 class="text-lg font-bold text-center mb-6">회원로그인</h3>
+          <form>
+            <div class="mb-4">
+              <label>
+                <input
+                  type="text"
+                  placeholder="아이디"
+                  required
+                  class="w-full px-4 py-3 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-gray-800"
+                />
+              </label>
+            </div>
+            <div class="mb-6">
+              <label>
+                <input
+                  type="password"
+                  placeholder="비밀번호"
+                  required
+                  class="w-full px-4 py-3 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-gray-800"
+                />
+              </label>
+            </div>
+            <button
+              type="submit"
+              class="login-submit w-full bg-gray-800 text-white border-none py-3 rounded-md text-lg cursor-pointer hover:bg-gray-700 transition-colors mb-6"
+            >
+              로그인
+            </button>
+          </form>
+          <div class="text-center">
+            <a
+              href="/member/signup"
+              class="text-gray-600 hover:underline mx-3 text-sm"
+              >회원가입</a
+            >
+          </div>
+        </div>
+      </div>
+    </div>
+  </body>
+</html>

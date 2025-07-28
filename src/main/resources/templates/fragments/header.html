@@ -1,0 +1,141 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="ko">
+  <head>
+    <meta charset="UTF-8" />
+    <title></title>
+  </head>
+  <body>
+    <!-- Header Fragment -->
+    <header
+      th:fragment="header"
+      id="header"
+      class="fixed top-0 left-0 right-0 z-50 transition-all duration-300 bg-transparent"
+    >
+      <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div class="flex justify-between items-center py-4">
+          <!-- Left Navigation -->
+          <nav class="hidden md:flex space-x-8">
+            <a
+              href="/info/about"
+              class="text-gray-800 font-medium hover:text-gray-600 transition-colors"
+              >ABOUT</a
+            >
+            <a
+              href="/shop/list"
+              class="text-gray-800 font-medium hover:text-gray-600 transition-colors"
+              >SHOP</a
+            >
+            <a
+              href="/board/notice/list"
+              class="text-gray-800 font-medium hover:text-gray-600 transition-colors"
+              >NOTICE</a
+            >
+            <a
+              href="/board/qna/list"
+              class="text-gray-800 font-medium hover:text-gray-600 transition-colors"
+              >Q&A</a
+            >
+          </nav>
+
+          <!-- Center Logo -->
+          <div class="logo flex-1 flex justify-center">
+            <a href="/" class="text-2xl font-bold text-gray-800">Rêve</a>
+          </div>
+
+          <!-- Right Side -->
+          <div class="flex items-center space-x-6">
+            <!-- Login/Join -->
+            <div class="flex space-x-4">
+              <a
+                href="/member/login"
+                class="login-btn text-gray-800 font-medium hover:text-gray-600 transition-colors"
+                >Login</a
+              >
+              <a
+                href="/member/signup"
+                class="text-gray-800 font-medium hover:text-gray-600 transition-colors"
+                >Join</a
+              >
+            </div>
+
+            <!-- Icons -->
+            <div class="flex items-center space-x-4">
+              <a
+                href="/shop/list"
+                class="text-gray-800 hover:text-gray-600 transition-colors"
+              >
+                <i class="fas fa-search text-lg"></i>
+              </a>
+              <a
+                href="/shop/mypage/wishlist"
+                class="text-gray-800 hover:text-gray-600 transition-colors"
+              >
+                <i class="far fa-heart text-lg"></i>
+              </a>
+              <a
+                href="/cart"
+                class="text-gray-800 hover:text-gray-600 transition-colors relative"
+              >
+                <i class="fas fa-shopping-cart text-lg"></i>
+                <span
+                  id="cart-count"
+                  class="absolute -top-2 -right-2 bg-red-500 text-white text-xs rounded-full w-5 h-5 flex items-center justify-center"
+                  >0</span
+                >
+              </a>
+            </div>
+          </div>
+        </div>
+      </div>
+    </header>
+
+    <!-- Common Head Fragment -->
+    <head th:fragment="head">
+      <meta charset="UTF-8" />
+      <meta
+        name="viewport"
+        content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0"
+      />
+      <meta http-equiv="X-UA-Compatible" content="ie=edge" />
+      <title>Rêve</title>
+      <!-- Tailwind CSS CDN -->
+      <script src="https://cdn.tailwindcss.com"></script>
+      <!-- Custom CSS -->
+      <link rel="stylesheet" href="/css/style.css" />
+      <link
+        rel="stylesheet"
+        href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css"
+      />
+
+      <!-- Header JavaScript -->
+      <script src="/js/header.js"></script>
+
+      <!-- Tailwind Config -->
+      <script>
+        tailwind.config = {
+          theme: {
+            extend: {
+              fontFamily: {
+                sans: ['Pretendard', 'system-ui', 'sans-serif'],
+              },
+              colors: {
+                mood: {
+                  50: '#f9f9f9',
+                  100: '#f5f5f5',
+                  200: '#e5e5e5',
+                  300: '#d4d4d4',
+                  400: '#a3a3a3',
+                  500: '#737373',
+                  600: '#525252',
+                  700: '#404040',
+                  800: '#262626',
+                  900: '#171717',
+                },
+              },
+            },
+          },
+        };
+      </script>
+    </head>
+  </body>
+</html>

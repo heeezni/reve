@@ -10,26 +10,26 @@ public class BoardController {
 
   @GetMapping("/notice/list")
   public String noticeList() {
-    return "user/board/notice/list";
+    return "board/notice/list";
   }
 
   @GetMapping("/notice/detail")
   public String noticeDetail() {
-    return "user/board/notice/detail";
+    return "board/notice/detail";
   }
 
   @GetMapping("/qna/list")
   public String qnaList() {
-    return "user/board/qna/list";
+    return "board/qna/list";
   }
 
   @GetMapping("/qna/detail")
   public String qnaDetail() {
-    return "user/board/qna/detail";
+    return "board/qna/detail";
   }
 
   @GetMapping("/qna/form")
   public String qnaForm() {
-    return "user/board/qna/form";
+    return "board/qna/form";
   }
 }

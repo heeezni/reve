@@ -1,59 +1,167 @@
 <!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
+<html lang="ko" xmlns:th="http://www.thymeleaf.org">
+  <head th:replace="~{fragments/header :: head}">
     <title>Rêve</title>
-</head>
-<body>
-메인 홈 (루트 URL)
-<h1> Rêve 프로젝트 페이지 흐름도</h1>
+  </head>
+  <body class="font-sans text-gray-800">
+    <!-- Header Fragment -->
+    <div th:replace="~{fragments/header :: header}"></div>
 
-<h2>공통</h2>
-<ul>
-    <li><a th:href="@{/member/login}">회원 로그인</a></li>
-    <li><a th:href="@{/member/signup}">회원 가입</a></li>
-</ul>
+    <!-- Main Banner Slider -->
+    <section class="relative h-screen overflow-hidden">
+      <!-- 왼쪽 화살표 -->
+      <button
+        class="banner-arrow left absolute top-1/2 left-8 z-20 -translate-y-1/2 focus:outline-none"
+        type="button"
+      >
+        <i
+          class="fas fa-chevron-left text-4xl text-black hover:text-gray-600 transition-colors"
+        ></i>
+      </button>
+      <!-- 오른쪽 화살표 -->
+      <button
+        class="banner-arrow right absolute top-1/2 right-8 z-20 -translate-y-1/2 focus:outline-none"
+        type="button"
+      >
+        <i
+          class="fas fa-chevron-right text-4xl text-black hover:text-gray-600 transition-colors"
+        ></i>
+      </button>
+      <div class="banner-slider h-full relative">
+        <div class="banner-slide active absolute inset-0">
+          <img
+            src="/images/main/banner1.jpg"
+            alt="Rêve Banner 1"
+            class="w-full h-full object-cover"
+          />
+          <div class="absolute inset-0 bg-black/30"></div>
+          <div class="absolute bottom-20 left-20 text-white z-10">
+            <h1 class="text-5xl md:text-6xl font-bold mb-4 leading-tight">
+              For Your Dreams,<br />From Rêve
+            </h1>
+            <a href="/shop/list" class="text-xl hover:underline"
+              >지금 보러가기</a
+            >
+          </div>
+        </div>
+        <div class="banner-slide absolute inset-0">
+          <img
+            src="/images/main/banner2.jpg"
+            alt="Rêve Banner 2"
+            class="w-full h-full object-cover"
+          />
+          <div class="absolute inset-0 bg-black/30"></div>
+          <div class="absolute bottom-20 left-20 text-white z-10">
+            <h1 class="text-5xl md:text-6xl font-bold mb-4 leading-tight">
+              For Your Dreams,<br />From Rêve
+            </h1>
+            <a href="/shop/list" class="text-xl hover:underline"
+              >지금 보러가기</a
+            >
+          </div>
+        </div>
+      </div>
+      <div
+        class="absolute bottom-8 left-1/2 transform -translate-x-1/2 flex space-x-3"
+      >
+        <span
+          class="dot active w-3 h-3 bg-white/50 rounded-full cursor-pointer transition-all duration-300"
+          data-slide="0"
+        ></span>
+        <span
+          class="dot w-3 h-3 bg-white/50 rounded-full cursor-pointer transition-all duration-300"
+          data-slide="1"
+        ></span>
+      </div>
+    </section>
 
-<h2>유저 영역</h2>
-<ul>
-    <li><a th:href="@{/shop/list}">상품 목록</a></li>
-    <li><a th:href="@{/shop/detail}">상품 상세</a></li>
-    <li><a th:href="@{/cart}">장바구니</a></li>
-    <li><a th:href="@{/shop/mypage}">마이페이지 대시보드</a></li>
-    <li><a th:href="@{/shop/mypage/wishlist}">위시리스트</a></li>
-    <li><a th:href="@{/shop/mypage/order}">주문 내역</a></li>
-    <li><a th:href="@{/shop/mypage/account}">계정 정보</a></li>
-    <li><a th:href="@{/shop/order/checkout}">결제 페이지</a></li>
-    <li><a th:href="@{/shop/order/confirmation}">결제 완료</a></li>
-    <li><a th:href="@{/board/notice/list}">공지사항 목록</a></li>
-    <li><a th:href="@{/board/notice/detail}">공지사항 상세</a></li>
-    <li><a th:href="@{/board/qna/list}">Q&A 목록</a></li>
-    <li><a th:href="@{/board/qna/detail}">Q&A 상세</a></li>
-    <li><a th:href="@{/board/qna/form}">Q&A 작성</a></li>
-</ul>
+    <!-- Product Section -->
+    <section class="py-20 bg-white">
+      <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div class="grid md:grid-cols-3 gap-8">
+          <!-- Product 1 -->
+          <a href="/shop/detail" class="product-item group block">
+            <div class="relative overflow-hidden mb-4">
+              <img
+                src="/images/product/product2.jpg"
+                alt="디어 무드 멀티 퍼퓸 70ml"
+                class="absolute inset-0 w-full h-80 object-cover opacity-0 group-hover:opacity-100 transition-opacity duration-300"
+              />
+              <img
+                src="/images/product/product1.jpg"
+                alt="디어 무드 멀티 퍼퓸 70ml"
+                class="w-full h-80 object-cover transition-transform duration-300 group-hover:scale-105"
+              />
+            </div>
+            <div class="text-left">
+              <h3 class="text-base font-normal mb-2">
+                디어 무드 멀티 퍼퓸 70ml
+              </h3>
+              <div class="flex items-center space-x-2 mb-2">
+                <span class="text-red-500 font-bold text-sm">37%할인</span>
+                <span class="text-lg font-bold">판매가 : 24,600원</span>
+                <span class="text-gray-400 line-through text-sm">39,000원</span>
+              </div>
+            </div>
+          </a>
 
-<h2>관리자 영역</h2>
-<ul>
-    <li><a th:href="@{/admin/dashboard}">관리자 대시보드</a></li>
-    <li><a th:href="@{/admin/product/list}">상품 관리</a></li>
-    <li><a th:href="@{/admin/product/add}">상품 등록</a></li>
-    <li><a th:href="@{/admin/product/edit}">상품 수정</a></li>
-    <li><a th:href="@{/admin/order/list}">주문 관리</a></li>
-    <li><a th:href="@{/admin/member/list}">회원 관리</a></li>
-    <li><a th:href="@{/admin/board/notice/list}">공지사항 관리</a></li>
-    <li><a th:href="@{/admin/board/notice/form}">공지사항 작성</a></li>
-    <li><a th:href="@{/admin/board/qna/list}">Q&A 답변 관리</a></li>
-    <li><a th:href="@{/admin/board/qna/reply}">Q&A 답변 작성</a></li>
-    <li><a th:href="@{/admin/coupon/add}">쿠폰 등록</a></li>
-    <li><a th:href="@{/admin/coupon/edit}">쿠폰 수정</a></li>
-    <li><a th:href="@{/admin/coupon/list}">쿠폰 목록</a></li>
-</ul>
-<h2>정보</h2>
-<ul>
-    <li><a th:href="@{/info/about}">소개</a></li>
-    <li><a th:href="@{/info/terms}">이용약관</a></li>
-    <li><a th:href="@{/info/policy}">개인정보처리방침</a></li>
-</ul>
+          <!-- Product 2 -->
+          <a href="/shop/detail" class="product-item group block">
+            <div class="relative overflow-hidden mb-4">
+              <img
+                src="/images/product/product2.jpg"
+                alt="베스크 멀티 퍼퓸 70ml"
+                class="absolute inset-0 w-full h-80 object-cover opacity-0 group-hover:opacity-100 transition-opacity duration-300"
+              />
+              <img
+                src="/images/product/product1.jpg"
+                alt="베스크 멀티 퍼퓸 70ml"
+                class="w-full h-80 object-cover transition-transform duration-300 group-hover:scale-105"
+              />
+            </div>
+            <div class="text-left">
+              <h3 class="text-base font-normal mb-2">베스크 멀티 퍼퓸 70ml</h3>
+              <div class="flex items-center space-x-2 mb-2">
+                <span class="text-red-500 font-bold text-sm">37%할인</span>
+                <span class="text-lg font-bold">판매가 : 24,600원</span>
+                <span class="text-gray-400 line-through text-sm">39,000원</span>
+              </div>
+            </div>
+          </a>
 
-</body>
+          <!-- Product 3 -->
+          <a href="/shop/detail" class="product-item group block">
+            <div class="relative overflow-hidden mb-4">
+              <img
+                src="/images/product/product2.jpg"
+                alt="두벨라 멀티 퍼퓸 70ml"
+                class="absolute inset-0 w-full h-80 object-cover opacity-0 group-hover:opacity-100 transition-opacity duration-300"
+              />
+              <img
+                src="/images/product/product1.jpg"
+                alt="두벨라 멀티 퍼퓸 70ml"
+                class="w-full h-80 object-cover transition-transform duration-300 group-hover:scale-105"
+              />
+            </div>
+            <div class="text-left">
+              <h3 class="text-base font-normal mb-2">두벨라 멀티 퍼퓸 70ml</h3>
+              <div class="flex items-center space-x-2 mb-2">
+                <span class="text-red-500 font-bold text-sm">37%할인</span>
+                <span class="text-lg font-bold">판매가 : 24,600원</span>
+                <span class="text-gray-400 line-through text-sm">39,000원</span>
+              </div>
+            </div>
+          </a>
+        </div>
+      </div>
+    </section>
+
+    <!-- Footer Fragment -->
+    <div th:replace="~{fragments/footer :: footer}"></div>
+
+    <!-- Login Modal Fragment -->
+    <div th:replace="~{fragments/modal :: loginModal}"></div>
+
+    <script src="/js/script.js"></script>
+  </body>
 </html>

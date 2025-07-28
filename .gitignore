@@ -69,3 +69,5 @@ keys/
 *.bat
 *.cmd
 *.command
+
+*.application-dev.properties

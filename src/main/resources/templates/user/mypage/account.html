@@ -1,10 +1,538 @@
 <!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <title>Title</title>
-</head>
-<body>
-회원정보 + 비밀번호 변경
-</body>
+<html lang="ko" xmlns:th="http://www.thymeleaf.org">
+  <head th:replace="~{fragments/header :: head}">
+    <title>회원정보 - Rêve</title>
+  </head>
+  <body class="font-sans text-gray-800">
+    <!-- Header Fragment -->
+    <div th:replace="~{fragments/header :: header}"></div>
+
+    <!-- Main Content -->
+    <main class="pt-20">
+      <div class="min-h-screen bg-gray-50 py-12">
+        <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
+          <!-- Breadcrumb -->
+          <nav class="mb-6">
+            <ol class="flex items-center space-x-2 text-sm text-gray-600">
+              <li><a href="/" class="hover:text-gray-800">홈</a></li>
+              <li><i class="fas fa-chevron-right text-xs"></i></li>
+              <li>
+                <a href="/mypage" class="hover:text-gray-800">마이페이지</a>
+              </li>
+              <li><i class="fas fa-chevron-right text-xs"></i></li>
+              <li class="text-gray-800">회원정보</li>
+            </ol>
+          </nav>
+
+          <!-- Page Title -->
+          <div class="mb-8">
+            <h1 class="text-3xl font-bold text-gray-800 mb-2">회원정보</h1>
+            <p class="text-gray-600">개인정보를 안전하게 관리하세요</p>
+          </div>
+
+          <!-- Account Management Tabs -->
+          <div class="bg-white rounded-lg shadow-sm">
+            <!-- Tab Navigation -->
+            <div class="border-b border-gray-200">
+              <nav class="flex space-x-8 px-8">
+                <button
+                  class="tab-btn py-4 px-1 border-b-2 border-gray-800 text-gray-800 font-medium text-sm"
+                  data-tab="profile"
+                >
+                  기본정보
+                </button>
+                <button
+                  class="tab-btn py-4 px-1 border-b-2 border-transparent text-gray-500 hover:text-gray-700 font-medium text-sm"
+                  data-tab="password"
+                >
+                  비밀번호 변경
+                </button>
+                <button
+                  class="tab-btn py-4 px-1 border-b-2 border-transparent text-gray-500 hover:text-gray-700 font-medium text-sm"
+                  data-tab="privacy"
+                >
+                  개인정보 설정
+                </button>
+              </nav>
+            </div>
+
+            <!-- Tab Content -->
+            <div class="p-8">
+              <!-- Profile Tab -->
+              <div id="profile" class="tab-content">
+                <div class="space-y-8">
+                  <!-- Profile Image -->
+                  <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-4"
+                      >프로필 이미지</label
+                    >
+                    <div class="flex items-center space-x-6">
+                      <div
+                        class="w-24 h-24 bg-gray-200 rounded-full flex items-center justify-center"
+                      >
+                        <i class="fas fa-user text-3xl text-gray-400"></i>
+                      </div>
+                      <div class="space-y-3">
+                        <button
+                          class="px-4 py-2 border border-gray-300 rounded-md text-gray-700 hover:bg-gray-50 transition-colors text-sm"
+                        >
+                          이미지 변경
+                        </button>
+                        <p class="text-sm text-gray-500">
+                          JPG, PNG 파일만 업로드 가능 (최대 5MB)
+                        </p>
+                      </div>
+                    </div>
+                  </div>
+
+                  <!-- Basic Information -->
+                  <div class="space-y-6">
+                    <h3 class="text-lg font-semibold text-gray-800">
+                      기본 정보
+                    </h3>
+
+                    <div class="grid md:grid-cols-2 gap-6">
+                      <div>
+                        <label
+                          class="block text-sm font-medium text-gray-700 mb-2"
+                        >
+                          이름 <span class="text-red-500">*</span>
+                        </label>
+                        <label>
+                          <input
+                            type="text"
+                            value="김향수"
+                            class="w-full border border-gray-300 rounded-md px-4 py-3 focus:outline-none focus:ring-2 focus:ring-gray-800 focus:border-transparent"
+                          />
+                        </label>
+                      </div>
+
+                      <div>
+                        <label
+                          class="block text-sm font-medium text-gray-700 mb-2"
+                        >
+                          닉네임
+                        </label>
+                        <label>
+                          <input
+                            type="text"
+                            value="향수러버"
+                            class="w-full border border-gray-300 rounded-md px-4 py-3 focus:outline-none focus:ring-2 focus:ring-gray-800 focus:border-transparent"
+                          />
+                        </label>
+                      </div>
+
+                      <div>
+                        <label
+                          class="block text-sm font-medium text-gray-700 mb-2"
+                        >
+                          이메일 <span class="text-red-500">*</span>
+                        </label>
+                        <label>
+                          <input
+                            type="email"
+                            value="향수@gmail.com"
+                            class="w-full border border-gray-300 rounded-md px-4 py-3 focus:outline-none focus:ring-2 focus:ring-gray-800 focus:border-transparent"
+                            readonly
+                          />
+                        </label>
+                        <p class="text-sm text-gray-500 mt-1">
+                          이메일은 변경할 수 없습니다
+                        </p>
+                      </div>
+
+                      <div>
+                        <label
+                          class="block text-sm font-medium text-gray-700 mb-2"
+                        >
+                          생년월일
+                        </label>
+                        <label>
+                          <input
+                            type="date"
+                            value="1990-01-01"
+                            class="w-full border border-gray-300 rounded-md px-4 py-3 focus:outline-none focus:ring-2 focus:ring-gray-800 focus:border-transparent"
+                          />
+                        </label>
+                      </div>
+                    </div>
+                  </div>
+
+                  <!-- Contact Information -->
+                  <div class="space-y-6">
+                    <h3 class="text-lg font-semibold text-gray-800">
+                      연락처 정보
+                    </h3>
+
+                    <div class="grid md:grid-cols-2 gap-6">
+                      <div>
+                        <label
+                          class="block text-sm font-medium text-gray-700 mb-2"
+                        >
+                          휴대전화 <span class="text-red-500">*</span>
+                        </label>
+                        <div class="flex space-x-2">
+                          <label>
+                            <input
+                              type="tel"
+                              value="010-1234-5678"
+                              class="flex-1 border border-gray-300 rounded-md px-4 py-3 focus:outline-none focus:ring-2 focus:ring-gray-800 focus:border-transparent"
+                            />
+                          </label>
+                          <button
+                            class="px-4 py-3 border border-gray-300 rounded-md text-gray-700 hover:bg-gray-50 transition-colors text-sm whitespace-nowrap"
+                          >
+                            인증
+                          </button>
+                        </div>
+                      </div>
+
+                      <div>
+                        <label
+                          class="block text-sm font-medium text-gray-700 mb-2"
+                        >
+                          일반전화
+                        </label>
+                        <label>
+                          <input
+                            type="tel"
+                            value="02-1234-5678"
+                            class="w-full border border-gray-300 rounded-md px-4 py-3 focus:outline-none focus:ring-2 focus:ring-gray-800 focus:border-transparent"
+                          />
+                        </label>
+                      </div>
+                    </div>
+                  </div>
+
+                  <!-- Address Information -->
+                  <div class="space-y-6">
+                    <h3 class="text-lg font-semibold text-gray-800">
+                      주소 정보
+                    </h3>
+
+                    <div class="space-y-4">
+                      <div>
+                        <label
+                          class="block text-sm font-medium text-gray-700 mb-2"
+                        >
+                          기본주소 <span class="text-red-500">*</span>
+                        </label>
+                        <div class="flex space-x-2 mb-2">
+                          <label>
+                            <input
+                              type="text"
+                              placeholder="우편번호"
+                              value="12345"
+                              class="w-32 border border-gray-300 rounded-md px-4 py-3 focus:outline-none focus:ring-2 focus:ring-gray-800 focus:border-transparent"
+                              readonly
+                            />
+                          </label>
+                          <button
+                            class="px-4 py-3 border border-gray-300 rounded-md text-gray-700 hover:bg-gray-50 transition-colors text-sm"
+                          >
+                            주소검색
+                          </button>
+                        </div>
+                        <label>
+                          <input
+                            type="text"
+                            placeholder="기본주소"
+                            value="서울특별시 강남구 테헤란로 123"
+                            class="w-full border border-gray-300 rounded-md px-4 py-3 focus:outline-none focus:ring-2 focus:ring-gray-800 focus:border-transparent mb-2"
+                            readonly
+                          />
+                        </label>
+                        <label>
+                          <input
+                            type="text"
+                            placeholder="상세주소"
+                            value="456동 789호"
+                            class="w-full border border-gray-300 rounded-md px-4 py-3 focus:outline-none focus:ring-2 focus:ring-gray-800 focus:border-transparent"
+                          />
+                        </label>
+                      </div>
+                    </div>
+                  </div>
+
+                  <!-- Save Button -->
+                  <div class="flex justify-end pt-6 border-t border-gray-200">
+                    <button
+                      class="px-6 py-3 bg-gray-800 text-white rounded-md hover:bg-gray-700 transition-colors font-medium"
+                    >
+                      정보 수정
+                    </button>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Password Tab -->
+              <div id="password" class="tab-content hidden">
+                <div class="space-y-8">
+                  <div class="max-w-md">
+                    <h3 class="text-lg font-semibold text-gray-800 mb-6">
+                      비밀번호 변경
+                    </h3>
+
+                    <div class="space-y-6">
+                      <div>
+                        <label
+                          class="block text-sm font-medium text-gray-700 mb-2"
+                        >
+                          현재 비밀번호 <span class="text-red-500">*</span>
+                        </label>
+                        <label>
+                          <input
+                            type="password"
+                            placeholder="현재 비밀번호를 입력하세요"
+                            class="w-full border border-gray-300 rounded-md px-4 py-3 focus:outline-none focus:ring-2 focus:ring-gray-800 focus:border-transparent"
+                          />
+                        </label>
+                      </div>
+
+                      <div>
+                        <label
+                          class="block text-sm font-medium text-gray-700 mb-2"
+                        >
+                          새 비밀번호 <span class="text-red-500">*</span>
+                        </label>
+                        <label>
+                          <input
+                            type="password"
+                            placeholder="새 비밀번호를 입력하세요"
+                            class="w-full border border-gray-300 rounded-md px-4 py-3 focus:outline-none focus:ring-2 focus:ring-gray-800 focus:border-transparent"
+                          />
+                        </label>
+                        <p class="text-sm text-gray-500 mt-1">
+                          영문 대소문자, 숫자, 특수문자 중 2가지 이상 조합,
+                          10~16자
+                        </p>
+                      </div>
+
+                      <div>
+                        <label
+                          class="block text-sm font-medium text-gray-700 mb-2"
+                        >
+                          새 비밀번호 확인 <span class="text-red-500">*</span>
+                        </label>
+                        <label>
+                          <input
+                            type="password"
+                            placeholder="새 비밀번호를 다시 입력하세요"
+                            class="w-full border border-gray-300 rounded-md px-4 py-3 focus:outline-none focus:ring-2 focus:ring-gray-800 focus:border-transparent"
+                          />
+                        </label>
+                      </div>
+
+                      <div class="pt-6">
+                        <button
+                          class="w-full px-6 py-3 bg-gray-800 text-white rounded-md hover:bg-gray-700 transition-colors font-medium"
+                        >
+                          비밀번호 변경
+                        </button>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Privacy Tab -->
+              <div id="privacy" class="tab-content hidden">
+                <div class="space-y-8">
+                  <h3 class="text-lg font-semibold text-gray-800">
+                    개인정보 설정
+                  </h3>
+
+                  <div class="space-y-6">
+                    <div class="bg-gray-50 p-6 rounded-lg">
+                      <h4 class="font-medium text-gray-800 mb-4">
+                        마케팅 정보 수신
+                      </h4>
+                      <div class="space-y-4">
+                        <label class="flex items-center">
+                          <input
+                            type="checkbox"
+                            checked
+                            class="w-4 h-4 text-gray-800 border-gray-300 rounded focus:ring-gray-800"
+                          />
+                          <span class="ml-3 text-sm text-gray-700"
+                            >SMS 수신 동의</span
+                          >
+                        </label>
+                        <label class="flex items-center">
+                          <input
+                            type="checkbox"
+                            checked
+                            class="w-4 h-4 text-gray-800 border-gray-300 rounded focus:ring-gray-800"
+                          />
+                          <span class="ml-3 text-sm text-gray-700"
+                            >이메일 수신 동의</span
+                          >
+                        </label>
+                        <label class="flex items-center">
+                          <input
+                            type="checkbox"
+                            class="w-4 h-4 text-gray-800 border-gray-300 rounded focus:ring-gray-800"
+                          />
+                          <span class="ml-3 text-sm text-gray-700"
+                            >앱 푸시 알림 동의</span
+                          >
+                        </label>
+                      </div>
+                    </div>
+
+                    <div class="bg-gray-50 p-6 rounded-lg">
+                      <h4 class="font-medium text-gray-800 mb-4">
+                        개인정보 제공
+                      </h4>
+                      <div class="space-y-4">
+                        <label class="flex items-center">
+                          <input
+                            type="checkbox"
+                            checked
+                            class="w-4 h-4 text-gray-800 border-gray-300 rounded focus:ring-gray-800"
+                          />
+                          <span class="ml-3 text-sm text-gray-700"
+                            >개인정보 제3자 제공 동의</span
+                          >
+                        </label>
+                        <p class="text-sm text-gray-600">
+                          서비스 제공을 위해 필요한 최소한의 개인정보만
+                          제공됩니다.
+                        </p>
+                      </div>
+                    </div>
+
+                    <div class="pt-6">
+                      <button
+                        class="px-6 py-3 bg-gray-800 text-white rounded-md hover:bg-gray-700 transition-colors font-medium"
+                      >
+                        설정 저장
+                      </button>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Account Actions -->
+          <div class="mt-8 bg-white rounded-lg shadow-sm p-6">
+            <h3 class="text-lg font-semibold text-gray-800 mb-4">계정 관리</h3>
+            <div class="space-y-4">
+              <div
+                class="flex items-center justify-between p-4 border border-gray-200 rounded-lg"
+              >
+                <div>
+                  <h4 class="font-medium text-gray-800">회원 탈퇴</h4>
+                  <p class="text-sm text-gray-600">
+                    계정을 영구적으로 삭제합니다
+                  </p>
+                </div>
+                <button
+                  class="px-4 py-2 border border-red-300 text-red-600 rounded-md hover:bg-red-50 transition-colors text-sm"
+                >
+                  탈퇴하기
+                </button>
+              </div>
+
+              <div
+                class="flex items-center justify-between p-4 border border-gray-200 rounded-lg"
+              >
+                <div>
+                  <h4 class="font-medium text-gray-800">로그인 기록</h4>
+                  <p class="text-sm text-gray-600">
+                    최근 로그인 활동을 확인합니다
+                  </p>
+                </div>
+                <button
+                  class="px-4 py-2 border border-gray-300 text-gray-700 rounded-md hover:bg-gray-50 transition-colors text-sm"
+                >
+                  확인하기
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </main>
+
+    <!-- Footer Fragment -->
+    <div th:replace="~{fragments/footer :: footer}"></div>
+
+    <!-- Login Modal Fragment -->
+    <div th:replace="~{fragments/modal :: loginModal}"></div>
+
+    <script src="/js/script.js"></script>
+    <script>
+      // Tab functionality
+      const tabBtns = document.querySelectorAll('.tab-btn');
+      const tabContents = document.querySelectorAll('.tab-content');
+
+      tabBtns.forEach((btn) => {
+        btn.addEventListener('click', function () {
+          const targetTab = this.getAttribute('data-tab');
+
+          // Remove active class from all tabs
+          tabBtns.forEach((b) => {
+            b.classList.remove('border-gray-800', 'text-gray-800');
+            b.classList.add('border-transparent', 'text-gray-500');
+          });
+
+          // Add active class to clicked tab
+          this.classList.remove('border-transparent', 'text-gray-500');
+          this.classList.add('border-gray-800', 'text-gray-800');
+
+          // Hide all tab contents
+          tabContents.forEach((content) => {
+            content.classList.add('hidden');
+          });
+
+          // Show target tab content
+          document.getElementById(targetTab).classList.remove('hidden');
+        });
+      });
+
+      // Form validation
+      document.querySelectorAll('form').forEach((form) => {
+        form.addEventListener('submit', function (e) {
+          e.preventDefault();
+
+          // Add validation logic here
+          alert('정보가 성공적으로 수정되었습니다.');
+        });
+      });
+
+      // Password change validation
+      const passwordInputs = document.querySelectorAll(
+        'input[type="password"]'
+      );
+      passwordInputs.forEach((input) => {
+        input.addEventListener('input', function () {
+          // Add password validation logic here
+        });
+      });
+
+      // Address search functionality
+      Array.from(document.querySelectorAll('button'))
+        .find((button) => button.textContent.includes('주소검색'))
+        .addEventListener('click', function () {
+          // Add address search logic here
+          alert('주소 검색 기능이 실행됩니다.');
+        });
+
+      // Account deletion confirmation
+      Array.from(document.querySelectorAll('button'))
+        .find((button) => button.textContent.includes('탈퇴하기'))
+        .addEventListener('click', function () {
+          if (
+            confirm(
+              '정말로 회원 탈퇴를 하시겠습니까?\n탈퇴 시 모든 데이터가 삭제되며 복구할 수 없습니다.'
+            )
+          ) {
+            // Add account deletion logic here
+            alert('회원 탈퇴가 처리되었습니다.');
+          }
+        });
+    </script>
+  </body>
 </html>

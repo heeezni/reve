@@ -5,7 +5,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 
 @Controller
-@RequestMapping("/shop/mypage")
+@RequestMapping("/mypage")
 public class MypageController {
 
   @GetMapping

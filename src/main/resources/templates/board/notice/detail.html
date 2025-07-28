@@ -1,0 +1,403 @@
+<!DOCTYPE html>
+<html lang="ko" xmlns:th="http://www.thymeleaf.org">
+  <head th:replace="~{fragments/header :: head}">
+    <title>공지사항 상세 - Rêve</title>
+  </head>
+  <body class="font-sans text-gray-800">
+    <!-- Header Fragment -->
+    <div th:replace="~{fragments/header :: header}"></div>
+
+    <!-- Main Content -->
+    <main class="pt-20">
+      <div class="min-h-screen bg-gray-50 py-12">
+        <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
+          <!-- Breadcrumb -->
+          <nav class="mb-6">
+            <ol class="flex items-center space-x-2 text-sm text-gray-600">
+              <li><a href="/" class="hover:text-gray-800">홈</a></li>
+              <li><i class="fas fa-chevron-right text-xs"></i></li>
+              <li>
+                <a href="/board/notice/list" class="hover:text-gray-800"
+                  >공지사항</a
+                >
+              </li>
+              <li><i class="fas fa-chevron-right text-xs"></i></li>
+              <li class="text-gray-800">상세보기</li>
+            </ol>
+          </nav>
+
+          <!-- Article Header -->
+          <div class="bg-white rounded-lg shadow-sm p-8 mb-6">
+            <div class="border-b border-gray-200 pb-6 mb-6">
+              <!-- Category and Title -->
+              <div class="flex items-center space-x-3 mb-4">
+                <span
+                  class="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium bg-blue-100 text-blue-800"
+                >
+                  이벤트
+                </span>
+                <span
+                  class="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium bg-red-100 text-red-800"
+                >
+                  공지
+                </span>
+              </div>
+
+              <h1 class="text-3xl font-bold text-gray-800 mb-4 leading-tight">
+                [이벤트] 봄맞이 신상품 출시 기념 할인 이벤트 안내
+              </h1>
+
+              <!-- Article Meta -->
+              <div
+                class="flex items-center justify-between text-sm text-gray-600"
+              >
+                <div class="flex items-center space-x-6">
+                  <span>작성일: 2025.02.18</span>
+                  <span>조회수: 1,234</span>
+                  <span>첨부파일: 2개</span>
+                </div>
+                <div class="flex items-center space-x-4">
+                  <button
+                    class="flex items-center space-x-1 text-gray-500 hover:text-gray-700"
+                  >
+                    <i class="far fa-heart"></i>
+                    <span>스크랩</span>
+                  </button>
+                  <button
+                    class="flex items-center space-x-1 text-gray-500 hover:text-gray-700"
+                  >
+                    <i class="fas fa-share"></i>
+                    <span>공유</span>
+                  </button>
+                </div>
+              </div>
+            </div>
+
+            <!-- Article Content -->
+            <article class="prose prose-lg max-w-none">
+              <div class="text-gray-800 leading-relaxed space-y-6">
+                <p class="text-lg">
+                  안녕하세요, Rêve를 사랑해주시는 고객님들께 봄맞이 특별한
+                  소식을 전해드립니다.
+                </p>
+
+                <h2 class="text-2xl font-bold text-gray-800 mt-8 mb-4">
+                  🎉 봄맞이 신상품 출시 기념 할인 이벤트
+                </h2>
+
+                <p>
+                  새로운 봄을 맞이하여 Rêve의 새로운 컬렉션이 출시되었습니다.
+                  봄의 신선함과 따뜻함을 담은 새로운 향기들과 함께 특별한 할인
+                  혜택을 준비했습니다.
+                </p>
+
+                <div class="bg-blue-50 border-l-4 border-blue-400 p-6 my-6">
+                  <h3 class="text-lg font-semibold text-blue-800 mb-2">
+                    📅 이벤트 기간
+                  </h3>
+                  <p class="text-blue-700">
+                    2025년 2월 20일 ~ 3월 31일 (40일간)
+                  </p>
+                </div>
+
+                <h3 class="text-xl font-bold text-gray-800 mt-8 mb-4">
+                  🎁 할인 혜택
+                </h3>
+                <ul class="list-disc list-inside space-y-2 text-gray-700">
+                  <li>
+                    <strong>신상품 전체 20% 할인</strong> - 봄 시즌 신상품 전
+                    품목
+                  </li>
+                  <li><strong>기존 상품 15% 할인</strong> - 베스트셀러 포함</li>
+                  <li><strong>무료배송</strong> - 30,000원 이상 구매 시</li>
+                  <li>
+                    <strong>사은품 증정</strong> - 50,000원 이상 구매 시 미니
+                    퍼퓸 증정
+                  </li>
+                </ul>
+
+                <h3 class="text-xl font-bold text-gray-800 mt-8 mb-4">
+                  🌸 신상품 라인업
+                </h3>
+                <div class="grid md:grid-cols-2 gap-6 my-6">
+                  <div class="bg-gray-50 p-4 rounded-lg">
+                    <h4 class="font-semibold text-gray-800 mb-2">
+                      벚꽃 향기 컬렉션
+                    </h4>
+                    <p class="text-sm text-gray-600">
+                      봄의 설렘을 담은 벚꽃 향기로 시작하는 새로운 하루
+                    </p>
+                  </div>
+                  <div class="bg-gray-50 p-4 rounded-lg">
+                    <h4 class="font-semibold text-gray-800 mb-2">
+                      시트러스 프레시 컬렉션
+                    </h4>
+                    <p class="text-sm text-gray-600">
+                      상쾌한 시트러스 향으로 활력을 불어넣는 하루
+                    </p>
+                  </div>
+                </div>
+
+                <h3 class="text-xl font-bold text-gray-800 mt-8 mb-4">
+                  📋 이벤트 참여 방법
+                </h3>
+                <ol class="list-decimal list-inside space-y-2 text-gray-700">
+                  <li>Rêve 공식 웹사이트 또는 모바일 앱 접속</li>
+                  <li>이벤트 페이지에서 원하는 상품 선택</li>
+                  <li>할인가로 주문 완료</li>
+                  <li>배송 완료 후 리뷰 작성 시 추가 할인 쿠폰 증정</li>
+                </ol>
+
+                <div class="bg-yellow-50 border-l-4 border-yellow-400 p-6 my-6">
+                  <h3 class="text-lg font-semibold text-yellow-800 mb-2">
+                    ⚠️ 주의사항
+                  </h3>
+                  <ul class="text-yellow-700 space-y-1 text-sm">
+                    <li>• 이벤트 기간 내 주문 건에만 적용됩니다.</li>
+                    <li>• 다른 할인 쿠폰과 중복 사용이 불가능합니다.</li>
+                    <li>• 사은품은 재고 소진 시 조기 종료될 수 있습니다.</li>
+                    <li>
+                      • 환불/교환 시 할인 혜택이 적용되지 않을 수 있습니다.
+                    </li>
+                  </ul>
+                </div>
+
+                <h3 class="text-xl font-bold text-gray-800 mt-8 mb-4">
+                  📞 문의사항
+                </h3>
+                <p>
+                  이벤트 관련 문의사항이 있으시면 고객센터로 연락해 주세요.<br />
+                  <strong>고객센터:</strong> 1588-1234 (평일 09:00-18:00)<br />
+                  <strong>이메일:</strong> cs@reve.com
+                </p>
+
+                <div class="bg-green-50 border-l-4 border-green-400 p-6 my-6">
+                  <h3 class="text-lg font-semibold text-green-800 mb-2">
+                    💝 특별 혜택
+                  </h3>
+                  <p class="text-green-700">
+                    이벤트 기간 동안 구매하신 모든 고객님께 다음 달 출시 예정인
+                    <strong>여름 시즌 컬렉션 프리뷰 초대권</strong>을 특별히
+                    드립니다!
+                  </p>
+                </div>
+
+                <p class="text-center text-lg font-medium text-gray-700 mt-8">
+                  봄의 새로운 시작을 Rêve와 함께하세요! 🌸
+                </p>
+              </div>
+            </article>
+
+            <!-- Attachments -->
+            <div class="mt-8 pt-6 border-t border-gray-200">
+              <h3 class="text-lg font-semibold text-gray-800 mb-4">첨부파일</h3>
+              <div class="space-y-2">
+                <a
+                  href="#"
+                  class="flex items-center space-x-3 p-3 border border-gray-200 rounded-md hover:bg-gray-50 transition-colors"
+                >
+                  <i class="fas fa-file-pdf text-red-500"></i>
+                  <span class="text-gray-800">봄맞이_이벤트_안내서.pdf</span>
+                  <span class="text-sm text-gray-500">(2.3MB)</span>
+                </a>
+                <a
+                  href="#"
+                  class="flex items-center space-x-3 p-3 border border-gray-200 rounded-md hover:bg-gray-50 transition-colors"
+                >
+                  <i class="fas fa-file-image text-blue-500"></i>
+                  <span class="text-gray-800">신상품_라인업_이미지.jpg</span>
+                  <span class="text-sm text-gray-500">(1.8MB)</span>
+                </a>
+              </div>
+            </div>
+          </div>
+
+          <!-- Navigation Buttons -->
+          <div class="flex items-center justify-between mb-8">
+            <a
+              href="/board/notice/list"
+              class="flex items-center space-x-2 px-4 py-2 border border-gray-300 rounded-md hover:bg-gray-50 transition-colors"
+            >
+              <i class="fas fa-list"></i>
+              <span>목록으로</span>
+            </a>
+
+            <div class="flex items-center space-x-2">
+              <a
+                href="#"
+                class="flex items-center space-x-2 px-4 py-2 border border-gray-300 rounded-md hover:bg-gray-50 transition-colors"
+              >
+                <i class="fas fa-chevron-left"></i>
+                <span>이전글</span>
+              </a>
+              <a
+                href="#"
+                class="flex items-center space-x-2 px-4 py-2 border border-gray-300 rounded-md hover:bg-gray-50 transition-colors"
+              >
+                <span>다음글</span>
+                <i class="fas fa-chevron-right"></i>
+              </a>
+            </div>
+          </div>
+
+          <!-- Related Notices -->
+          <div class="bg-white rounded-lg shadow-sm p-6">
+            <h3 class="text-lg font-semibold text-gray-800 mb-4">
+              관련 공지사항
+            </h3>
+            <div class="space-y-3">
+              <a
+                href="#"
+                class="flex items-center justify-between p-3 border border-gray-200 rounded-md hover:bg-gray-50 transition-colors"
+              >
+                <div class="flex items-center space-x-3">
+                  <span
+                    class="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-green-100 text-green-800"
+                  >
+                    배송
+                  </span>
+                  <span class="text-gray-800"
+                    >배송 시스템 점검 안내 (2025년 2월 20일)</span
+                  >
+                </div>
+                <span class="text-sm text-gray-500">2025.02.17</span>
+              </a>
+
+              <a
+                href="#"
+                class="flex items-center justify-between p-3 border border-gray-200 rounded-md hover:bg-gray-50 transition-colors"
+              >
+                <div class="flex items-center space-x-3">
+                  <span
+                    class="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-gray-100 text-gray-800"
+                  >
+                    일반
+                  </span>
+                  <span class="text-gray-800">Rêve 회원 등급 혜택 안내</span>
+                </div>
+                <span class="text-sm text-gray-500">2025.02.16</span>
+              </a>
+
+              <a
+                href="#"
+                class="flex items-center justify-between p-3 border border-gray-200 rounded-md hover:bg-gray-50 transition-colors"
+              >
+                <div class="flex items-center space-x-3">
+                  <span
+                    class="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-purple-100 text-purple-800"
+                  >
+                    시스템
+                  </span>
+                  <span class="text-gray-800"
+                    >웹사이트 개편 및 서비스 개선 안내</span
+                  >
+                </div>
+                <span class="text-sm text-gray-500">2025.02.15</span>
+              </a>
+            </div>
+          </div>
+
+          <!-- Quick Actions -->
+          <div class="mt-8 grid md:grid-cols-3 gap-4">
+            <a
+              href="/board/qna/list"
+              class="flex items-center justify-center p-4 bg-white rounded-lg shadow-sm hover:shadow-md transition-shadow"
+            >
+              <div class="text-center">
+                <i
+                  class="fas fa-question-circle text-2xl text-blue-500 mb-2"
+                ></i>
+                <p class="font-medium text-gray-800">자주 묻는 질문</p>
+                <p class="text-sm text-gray-600">FAQ에서 답변을 찾아보세요</p>
+              </div>
+            </a>
+
+            <a
+              href="/member/login"
+              class="flex items-center justify-center p-4 bg-white rounded-lg shadow-sm hover:shadow-md transition-shadow"
+            >
+              <div class="text-center">
+                <i class="fas fa-headset text-2xl text-green-500 mb-2"></i>
+                <p class="font-medium text-gray-800">고객센터</p>
+                <p class="text-sm text-gray-600">1:1 문의 및 상담</p>
+              </div>
+            </a>
+
+            <a
+              href="/shop/list"
+              class="flex items-center justify-center p-4 bg-white rounded-lg shadow-sm hover:shadow-md transition-shadow"
+            >
+              <div class="text-center">
+                <i
+                  class="fas fa-shopping-bag text-2xl text-purple-500 mb-2"
+                ></i>
+                <p class="font-medium text-gray-800">쇼핑하기</p>
+                <p class="text-sm text-gray-600">Rêve 상품 둘러보기</p>
+              </div>
+            </a>
+          </div>
+        </div>
+      </div>
+    </main>
+
+    <!-- Footer Fragment -->
+    <div th:replace="~{fragments/footer :: footer}"></div>
+
+    <!-- Login Modal Fragment -->
+    <div th:replace="~{fragments/modal :: loginModal}"></div>
+
+    <script src="/js/script.js"></script>
+    <script>
+      // Share functionality
+      document
+        .querySelector('button:has(.fa-share)')
+        .addEventListener('click', function () {
+          if (navigator.share) {
+            navigator.share({
+              title: '[이벤트] 봄맞이 신상품 출시 기념 할인 이벤트 안내',
+              text: 'Rêve 봄맞이 특별 이벤트를 확인해보세요!',
+              url: window.location.href,
+            });
+          } else {
+            // Fallback for browsers that don't support Web Share API
+            const url = window.location.href;
+            navigator.clipboard.writeText(url).then(() => {
+              alert('링크가 클립보드에 복사되었습니다.');
+            });
+          }
+        });
+
+      // Scrap functionality
+      document
+        .querySelector('button:has(.fa-heart)')
+        .addEventListener('click', function () {
+          const icon = this.querySelector('i');
+          if (icon.classList.contains('far')) {
+            icon.classList.remove('far');
+            icon.classList.add('fas');
+            icon.style.color = '#ef4444';
+            this.querySelector('span').textContent = '스크랩됨';
+          } else {
+            icon.classList.remove('fas');
+            icon.classList.add('far');
+            icon.style.color = '';
+            this.querySelector('span').textContent = '스크랩';
+          }
+        });
+
+      // File download simulation
+      document.querySelectorAll('a[href="#"]').forEach((link) => {
+        if (
+          link.querySelector('.fa-file-pdf') ||
+          link.querySelector('.fa-file-image')
+        ) {
+          link.addEventListener('click', function (e) {
+            e.preventDefault();
+            const fileName = this.querySelector('span').textContent;
+            alert(`${fileName} 다운로드를 시작합니다.`);
+          });
+        }
+      });
+    </script>
+  </body>
+</html>

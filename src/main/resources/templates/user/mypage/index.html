@@ -1,10 +1,614 @@
 <!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <title>Title</title>
-</head>
-<body>
-마이페이지 대시보드 (최근 주문 ~건, 프로필, 적립금, 쿠폰, 배송 현황 같은 요약 정보)
-</body>
+<html lang="ko" xmlns:th="http://www.thymeleaf.org">
+  <head th:replace="~{fragments/header :: head}">
+    <title>마이페이지 - Rêve</title>
+  </head>
+  <body class="font-sans text-gray-800">
+    <!-- Header Fragment -->
+    <div th:replace="~{fragments/header :: header}"></div>
+
+    <!-- Main Content -->
+    <main class="pt-20">
+      <div class="min-h-screen bg-gray-50 py-12">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <!-- Page Title -->
+          <div class="mb-8">
+            <h1 class="text-3xl font-bold text-gray-800 mb-2">마이페이지</h1>
+            <p class="text-gray-600">
+              Rêve와 함께하는 특별한 시간을 관리하세요
+            </p>
+          </div>
+
+          <!-- User Profile Section -->
+          <div class="bg-white rounded-lg shadow-sm p-6 mb-8">
+            <div class="flex items-center space-x-6">
+              <div
+                class="w-20 h-20 bg-gray-200 rounded-full flex items-center justify-center"
+              >
+                <i class="fas fa-user text-3xl text-gray-400"></i>
+              </div>
+              <div class="flex-1">
+                <div class="flex items-center space-x-3 mb-2">
+                  <h2 class="text-xl font-bold text-gray-800">김향수님</h2>
+                  <span
+                    class="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-purple-100 text-purple-800"
+                  >
+                    VIP 회원
+                  </span>
+                </div>
+                <p class="text-gray-600 mb-3">향수@gmail.com</p>
+                <div class="flex items-center space-x-6 text-sm text-gray-500">
+                  <span>가입일: 2023.01.15</span>
+                  <span>최근 로그인: 2024.01.18</span>
+                </div>
+              </div>
+              <div class="flex space-x-3">
+                <a
+                  href="/mypage/account"
+                  class="px-4 py-2 border border-gray-300 rounded-md text-gray-700 hover:bg-gray-50 transition-colors text-sm"
+                >
+                  프로필 수정
+                </a>
+                <a
+                  href="/member/logout"
+                  class="px-4 py-2 bg-gray-800 text-white rounded-md hover:bg-gray-700 transition-colors text-sm"
+                >
+                  로그아웃
+                </a>
+              </div>
+            </div>
+          </div>
+
+          <!-- Quick Stats -->
+          <div class="grid md:grid-cols-4 gap-6 mb-8">
+            <div class="bg-white rounded-lg shadow-sm p-6">
+              <div class="flex items-center justify-between">
+                <div>
+                  <p class="text-sm font-medium text-gray-600">적립금</p>
+                  <p class="text-2xl font-bold text-gray-800">12,500원</p>
+                </div>
+                <div
+                  class="w-12 h-12 bg-blue-100 rounded-full flex items-center justify-center"
+                >
+                  <i class="fas fa-coins text-blue-600"></i>
+                </div>
+              </div>
+              <a
+                href="/mypage/points"
+                class="text-sm text-blue-600 hover:underline mt-2 inline-block"
+              >
+                적립내역 보기 →
+              </a>
+            </div>
+
+            <div class="bg-white rounded-lg shadow-sm p-6">
+              <div class="flex items-center justify-between">
+                <div>
+                  <p class="text-sm font-medium text-gray-600">쿠폰</p>
+                  <p class="text-2xl font-bold text-gray-800">3장</p>
+                </div>
+                <div
+                  class="w-12 h-12 bg-green-100 rounded-full flex items-center justify-center"
+                >
+                  <i class="fas fa-ticket-alt text-green-600"></i>
+                </div>
+              </div>
+              <a
+                href="/mypage/coupons"
+                class="text-sm text-green-600 hover:underline mt-2 inline-block"
+              >
+                쿠폰함 보기 →
+              </a>
+            </div>
+
+            <div class="bg-white rounded-lg shadow-sm p-6">
+              <div class="flex items-center justify-between">
+                <div>
+                  <p class="text-sm font-medium text-gray-600">위시리스트</p>
+                  <p class="text-2xl font-bold text-gray-800">8개</p>
+                </div>
+                <div
+                  class="w-12 h-12 bg-red-100 rounded-full flex items-center justify-center"
+                >
+                  <i class="far fa-heart text-red-600"></i>
+                </div>
+              </div>
+              <a
+                href="/mypage/wishlist"
+                class="text-sm text-red-600 hover:underline mt-2 inline-block"
+              >
+                위시리스트 보기 →
+              </a>
+            </div>
+
+            <div class="bg-white rounded-lg shadow-sm p-6">
+              <div class="flex items-center justify-between">
+                <div>
+                  <p class="text-sm font-medium text-gray-600">배송중</p>
+                  <p class="text-2xl font-bold text-gray-800">2건</p>
+                </div>
+                <div
+                  class="w-12 h-12 bg-yellow-100 rounded-full flex items-center justify-center"
+                >
+                  <i class="fas fa-truck text-yellow-600"></i>
+                </div>
+              </div>
+              <a
+                href="/mypage/order"
+                class="text-sm text-yellow-600 hover:underline mt-2 inline-block"
+              >
+                주문내역 보기 →
+              </a>
+            </div>
+          </div>
+
+          <!-- Main Content Grid -->
+          <div class="grid lg:grid-cols-3 gap-8">
+            <!-- Recent Orders -->
+            <div class="lg:col-span-2">
+              <div class="bg-white rounded-lg shadow-sm">
+                <div class="p-6 border-b border-gray-200">
+                  <div class="flex items-center justify-between">
+                    <h3 class="text-lg font-semibold text-gray-800">
+                      최근 주문
+                    </h3>
+                    <a
+                      href="/mypage/order"
+                      class="text-sm text-blue-600 hover:underline"
+                      >전체보기</a
+                    >
+                  </div>
+                </div>
+                <div class="p-6">
+                  <div class="space-y-4">
+                    <!-- Order Item 1 -->
+                    <div
+                      class="flex items-center space-x-4 p-4 border border-gray-200 rounded-lg"
+                    >
+                      <img
+                        src="/images/product/product1.jpg"
+                        alt="디어 무드 퍼퓸"
+                        class="w-16 h-16 object-cover rounded-md"
+                      />
+                      <div class="flex-1">
+                        <h4 class="font-medium text-gray-800 mb-1">
+                          디어 무드 멀티 퍼퓸 70ml
+                        </h4>
+                        <p class="text-sm text-gray-600 mb-2">
+                          주문번호: 20240118001
+                        </p>
+                        <div class="flex items-center justify-between">
+                          <span class="text-sm text-gray-500"
+                            >2024.01.18 주문</span
+                          >
+                          <span
+                            class="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-green-100 text-green-800"
+                          >
+                            배송완료
+                          </span>
+                        </div>
+                      </div>
+                      <div class="text-right">
+                        <p class="font-medium text-gray-800">24,600원</p>
+                        <button
+                          class="text-sm text-blue-600 hover:underline mt-1"
+                        >
+                          리뷰작성
+                        </button>
+                      </div>
+                    </div>
+
+                    <!-- Order Item 2 -->
+                    <div
+                      class="flex items-center space-x-4 p-4 border border-gray-200 rounded-lg"
+                    >
+                      <img
+                        src="/images/product/product2.jpg"
+                        alt="베스크 퍼퓸"
+                        class="w-16 h-16 object-cover rounded-md"
+                      />
+                      <div class="flex-1">
+                        <h4 class="font-medium text-gray-800 mb-1">
+                          베스크 멀티 퍼퓸 70ml
+                        </h4>
+                        <p class="text-sm text-gray-600 mb-2">
+                          주문번호: 20240117002
+                        </p>
+                        <div class="flex items-center justify-between">
+                          <span class="text-sm text-gray-500"
+                            >2024.01.17 주문</span
+                          >
+                          <span
+                            class="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-yellow-100 text-yellow-800"
+                          >
+                            배송중
+                          </span>
+                        </div>
+                      </div>
+                      <div class="text-right">
+                        <p class="font-medium text-gray-800">29,250원</p>
+                        <a
+                          href="/mypage/order/detail"
+                          class="text-sm text-blue-600 hover:underline mt-1"
+                          >배송조회</a
+                        >
+                      </div>
+                    </div>
+
+                    <!-- Order Item 3 -->
+                    <div
+                      class="flex items-center space-x-4 p-4 border border-gray-200 rounded-lg"
+                    >
+                      <img
+                        src="/images/product/product1.jpg"
+                        alt="두벨라 퍼퓸"
+                        class="w-16 h-16 object-cover rounded-md"
+                      />
+                      <div class="flex-1">
+                        <h4 class="font-medium text-gray-800 mb-1">
+                          두벨라 멀티 퍼퓸 70ml
+                        </h4>
+                        <p class="text-sm text-gray-600 mb-2">
+                          주문번호: 20240116003
+                        </p>
+                        <div class="flex items-center justify-between">
+                          <span class="text-sm text-gray-500"
+                            >2024.01.16 주문</span
+                          >
+                          <span
+                            class="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-blue-100 text-blue-800"
+                          >
+                            상품준비중
+                          </span>
+                        </div>
+                      </div>
+                      <div class="text-right">
+                        <p class="font-medium text-gray-800">39,000원</p>
+                        <a
+                          href="/mypage/order/detail"
+                          class="text-sm text-blue-600 hover:underline mt-1"
+                          >주문상세</a
+                        >
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Recent Activities -->
+              <div class="bg-white rounded-lg shadow-sm mt-8">
+                <div class="p-6 border-b border-gray-200">
+                  <h3 class="text-lg font-semibold text-gray-800">최근 활동</h3>
+                </div>
+                <div class="p-6">
+                  <div class="space-y-4">
+                    <div class="flex items-start space-x-3">
+                      <div
+                        class="w-8 h-8 bg-blue-100 rounded-full flex items-center justify-center flex-shrink-0"
+                      >
+                        <i
+                          class="fas fa-shopping-cart text-blue-600 text-sm"
+                        ></i>
+                      </div>
+                      <div class="flex-1">
+                        <p class="text-sm text-gray-800">
+                          새로운 주문이 완료되었습니다.
+                        </p>
+                        <p class="text-xs text-gray-500">2024.01.18 14:30</p>
+                      </div>
+                    </div>
+
+                    <div class="flex items-start space-x-3">
+                      <div
+                        class="w-8 h-8 bg-green-100 rounded-full flex items-center justify-center flex-shrink-0"
+                      >
+                        <i class="fas fa-star text-green-600 text-sm"></i>
+                      </div>
+                      <div class="flex-1">
+                        <p class="text-sm text-gray-800">
+                          리뷰 작성으로 500원 적립되었습니다.
+                        </p>
+                        <p class="text-xs text-gray-500">2024.01.17 16:45</p>
+                      </div>
+                    </div>
+
+                    <div class="flex items-start space-x-3">
+                      <div
+                        class="w-8 h-8 bg-purple-100 rounded-full flex items-center justify-center flex-shrink-0"
+                      >
+                        <i class="fas fa-gift text-purple-600 text-sm"></i>
+                      </div>
+                      <div class="flex-1">
+                        <p class="text-sm text-gray-800">
+                          생일 축하 쿠폰이 발급되었습니다.
+                        </p>
+                        <p class="text-xs text-gray-500">2024.01.15 09:00</p>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Sidebar -->
+            <div class="space-y-8">
+              <!-- Quick Actions -->
+              <div class="bg-white rounded-lg shadow-sm">
+                <div class="p-6 border-b border-gray-200">
+                  <h3 class="text-lg font-semibold text-gray-800">빠른 메뉴</h3>
+                </div>
+                <div class="p-6">
+                  <div class="space-y-3">
+                    <a
+                      href="/mypage/order"
+                      class="flex items-center space-x-3 p-3 rounded-md hover:bg-gray-50 transition-colors"
+                    >
+                      <i class="fas fa-shopping-bag text-gray-600"></i>
+                      <span class="text-gray-800">주문내역</span>
+                    </a>
+                    <a
+                      href="/mypage/wishlist"
+                      class="flex items-center space-x-3 p-3 rounded-md hover:bg-gray-50 transition-colors"
+                    >
+                      <i class="far fa-heart text-gray-600"></i>
+                      <span class="text-gray-800">위시리스트</span>
+                    </a>
+                    <a
+                      href="/mypage/points"
+                      class="flex items-center space-x-3 p-3 rounded-md hover:bg-gray-50 transition-colors"
+                    >
+                      <i class="fas fa-coins text-gray-600"></i>
+                      <span class="text-gray-800">적립금</span>
+                    </a>
+                    <a
+                      href="/mypage/coupons"
+                      class="flex items-center space-x-3 p-3 rounded-md hover:bg-gray-50 transition-colors"
+                    >
+                      <i class="fas fa-ticket-alt text-gray-600"></i>
+                      <span class="text-gray-800">쿠폰함</span>
+                    </a>
+                    <a
+                      href="/mypage/account"
+                      class="flex items-center space-x-3 p-3 rounded-md hover:bg-gray-50 transition-colors"
+                    >
+                      <i class="fas fa-user-edit text-gray-600"></i>
+                      <span class="text-gray-800">회원정보</span>
+                    </a>
+                    <a
+                      href="/board/qna/list"
+                      class="flex items-center space-x-3 p-3 rounded-md hover:bg-gray-50 transition-colors"
+                    >
+                      <i class="fas fa-question-circle text-gray-600"></i>
+                      <span class="text-gray-800">1:1 문의</span>
+                    </a>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Delivery Status -->
+              <div class="bg-white rounded-lg shadow-sm">
+                <div class="p-6 border-b border-gray-200">
+                  <h3 class="text-lg font-semibold text-gray-800">배송 현황</h3>
+                </div>
+                <div class="p-6">
+                  <div class="space-y-4">
+                    <div class="flex items-center justify-between">
+                      <span class="text-sm text-gray-600">배송준비중</span>
+                      <span class="text-sm font-medium text-gray-800">1건</span>
+                    </div>
+                    <div class="flex items-center justify-between">
+                      <span class="text-sm text-gray-600">배송중</span>
+                      <span class="text-sm font-medium text-gray-800">2건</span>
+                    </div>
+                    <div class="flex items-center justify-between">
+                      <span class="text-sm text-gray-600">배송완료</span>
+                      <span class="text-sm font-medium text-gray-800"
+                        >15건</span
+                      >
+                    </div>
+                    <div class="pt-3 border-t border-gray-200">
+                      <a
+                        href="/mypage/order"
+                        class="text-sm text-blue-600 hover:underline"
+                      >
+                        전체 배송현황 보기 →
+                      </a>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Customer Service -->
+              <div class="bg-white rounded-lg shadow-sm">
+                <div class="p-6 border-b border-gray-200">
+                  <h3 class="text-lg font-semibold text-gray-800">고객센터</h3>
+                </div>
+                <div class="p-6">
+                  <div class="space-y-4">
+                    <div class="text-center">
+                      <div class="text-2xl font-bold text-gray-800 mb-1">
+                        1588-1234
+                      </div>
+                      <p class="text-sm text-gray-600">평일 09:00 - 18:00</p>
+                    </div>
+                    <div class="space-y-2">
+                      <a
+                        href="/board/qna/list"
+                        class="block text-sm text-blue-600 hover:underline"
+                      >
+                        <i class="fas fa-comment mr-2"></i>1:1 문의하기
+                      </a>
+                      <a
+                        href="/board/notice/list"
+                        class="block text-sm text-blue-600 hover:underline"
+                      >
+                        <i class="fas fa-bullhorn mr-2"></i>공지사항
+                      </a>
+                      <a
+                        href="/board/qna/list"
+                        class="block text-sm text-blue-600 hover:underline"
+                      >
+                        <i class="fas fa-question-circle mr-2"></i>자주묻는질문
+                      </a>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Recommended Products -->
+          <div class="mt-12">
+            <h3 class="text-2xl font-bold text-gray-800 mb-6">추천 상품</h3>
+            <div class="grid md:grid-cols-4 gap-6">
+              <div class="bg-white rounded-lg shadow-sm overflow-hidden group">
+                <div class="relative overflow-hidden">
+                  <img
+                    src="/images/product/product2.jpg"
+                    alt="시크릿 가든 미니 퍼퓸"
+                    class="w-full h-48 object-cover group-hover:scale-105 transition-transform duration-300"
+                  />
+                  <div class="absolute top-2 right-2">
+                    <span
+                      class="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-red-500 text-white"
+                    >
+                      20% 할인
+                    </span>
+                  </div>
+                </div>
+                <div class="p-4">
+                  <h4 class="font-medium text-gray-800 mb-2">
+                    시크릿 가든 미니 퍼퓸 30ml
+                  </h4>
+                  <div class="flex items-center justify-between">
+                    <span class="font-bold text-gray-800">19,200원</span>
+                    <span class="text-sm text-gray-400 line-through"
+                      >24,000원</span
+                    >
+                  </div>
+                </div>
+              </div>
+
+              <div class="bg-white rounded-lg shadow-sm overflow-hidden group">
+                <div class="relative overflow-hidden">
+                  <img
+                    src="/images/product/product1.jpg"
+                    alt="로맨틱 가든 퍼퓸"
+                    class="w-full h-48 object-cover group-hover:scale-105 transition-transform duration-300"
+                  />
+                </div>
+                <div class="p-4">
+                  <h4 class="font-medium text-gray-800 mb-2">
+                    로맨틱 가든 퍼퓸 50ml
+                  </h4>
+                  <div class="flex items-center justify-between">
+                    <span class="font-bold text-gray-800">32,000원</span>
+                  </div>
+                </div>
+              </div>
+
+              <div class="bg-white rounded-lg shadow-sm overflow-hidden group">
+                <div class="relative overflow-hidden">
+                  <img
+                    src="/images/product/product2.jpg"
+                    alt="스프링 블라썸 퍼퓸"
+                    class="w-full h-48 object-cover group-hover:scale-105 transition-transform duration-300"
+                  />
+                  <div class="absolute top-2 right-2">
+                    <span
+                      class="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-blue-500 text-white"
+                    >
+                      NEW
+                    </span>
+                  </div>
+                </div>
+                <div class="p-4">
+                  <h4 class="font-medium text-gray-800 mb-2">
+                    스프링 블라썸 퍼퓸 70ml
+                  </h4>
+                  <div class="flex items-center justify-between">
+                    <span class="font-bold text-gray-800">42,000원</span>
+                  </div>
+                </div>
+              </div>
+
+              <div class="bg-white rounded-lg shadow-sm overflow-hidden group">
+                <div class="relative overflow-hidden">
+                  <img
+                    src="/images/product/product1.jpg"
+                    alt="오토뮤 퍼퓸"
+                    class="w-full h-48 object-cover group-hover:scale-105 transition-transform duration-300"
+                  />
+                  <div class="absolute top-2 right-2">
+                    <span
+                      class="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-red-500 text-white"
+                    >
+                      15% 할인
+                    </span>
+                  </div>
+                </div>
+                <div class="p-4">
+                  <h4 class="font-medium text-gray-800 mb-2">
+                    오토뮤 퍼퓸 100ml
+                  </h4>
+                  <div class="flex items-center justify-between">
+                    <span class="font-bold text-gray-800">51,000원</span>
+                    <span class="text-sm text-gray-400 line-through"
+                      >60,000원</span
+                    >
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </main>
+
+    <!-- Footer Fragment -->
+    <div th:replace="~{fragments/footer :: footer}"></div>
+
+    <!-- Login Modal Fragment -->
+    <div th:replace="~{fragments/modal :: loginModal}"></div>
+
+    <script src="/js/script.js"></script>
+    <script>
+      // Update stats periodically (simulate real-time updates)
+      function updateStats() {
+        // This would typically fetch data from the server
+        console.log('Stats updated');
+      }
+
+      // Auto-refresh stats every 30 seconds
+      setInterval(updateStats, 30000);
+
+      // Quick action buttons
+      document.querySelectorAll('a[href*="/mypage/"]').forEach((link) => {
+        link.addEventListener('click', function () {
+          // Add loading state if needed
+          console.log('Navigating to:', this.href);
+        });
+      });
+
+      // Review button functionality
+      Array.from(document.querySelectorAll('button'))
+        .filter((button) => button.textContent.includes('리뷰작성'))
+        .forEach((btn) => {
+          btn.addEventListener('click', function () {
+            const productName =
+              this.closest('.flex').querySelector('h4').textContent;
+            alert(`"${productName}" 리뷰 작성 페이지로 이동합니다.`);
+          });
+        });
+
+      // Logout confirmation
+      document
+        .querySelector('a[href="/member/logout"]')
+        .addEventListener('click', function (e) {
+          if (!confirm('로그아웃 하시겠습니까?')) {
+            e.preventDefault();
+          }
+        });
+    </script>
+  </body>
 </html>

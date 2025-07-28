@@ -1,10 +1,532 @@
 <!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <title>Title</title>
-</head>
-<body>
-개인정보 처리방침
-</body>
+<html lang="ko" xmlns:th="http://www.thymeleaf.org">
+  <head th:replace="~{fragments/header :: head}">
+    <title>개인정보처리방침 - Rêve</title>
+  </head>
+  <body class="font-sans text-gray-800">
+    <!-- Header Fragment -->
+    <div th:replace="~{fragments/header :: header}"></div>
+
+    <!-- Main Content -->
+    <main class="pt-20">
+      <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
+        <h1 class="text-3xl font-bold mb-4">개인정보처리방침</h1>
+        <p class="text-sm text-gray-600 mb-8">시행일 : 2025-02-18</p>
+
+        <div class="prose prose-sm max-w-none">
+          <p class="mb-6">
+            이 개인정보 처리방침은 ㈜Rêve(이하 "회사"라 합니다)가 운영하는
+            웹사이트 reve.co.kr 및 모바일 앱 등(이하 "사이트"라 합니다)에서
+            제공하는 인터넷 관련 서비스, 회사 또는 회사와 제휴된 매장 운영 및
+            회원제 서비스 (이하 "서비스"라 합니다)를 이용함에 있어 이용자 또는
+            회원(이하 "이용자"라 합니다)이 제공하는 개인정보의 수집, 이용, 제공,
+            보유, 처리에 대해서 규정함을 목적으로 합니다.
+          </p>
+
+          <p class="mb-8">
+            회사는 개인정보 처리방침을 사이트 첫 화면에 공개함으로써 이용자들이
+            언제나 쉽게 보실 수 있도록 조치하고 있습니다.
+          </p>
+
+          <h2 class="text-xl font-bold mb-4">
+            ■ 수집 및 이용하는 개인정보 항목 및 수집방법
+          </h2>
+
+          <h3 class="text-lg font-semibold mb-3">
+            1. 개인정보의 수집 및 이용항목
+          </h3>
+          <p class="mb-4">
+            회사는 개인정보를 수집함에 있어 이용자의 유형별로 서비스 제공에
+            필요한 최소한의 개인정보를 "필수항목"으로, 그 외 개인정보는
+            "선택항목"으로 구분하여 이에 대해 개별적으로 동의할 수 있는 절차를
+            마련합니다.
+          </p>
+
+          <p class="mb-6">
+            회사는 이용자가 필요한 최소한의 개인정보 이외의 개인정보를 수집에
+            동의하지 않는다는 이유로 본질적인 서비스의 제공을 거부하지 않으나,
+            "선택항목" 수집 및 이용에 동의하지 않는 경우 서비스 제공에 일정한
+            제약이 발생할 수 있습니다.
+          </p>
+
+          <div class="mb-6">
+            <h4 class="text-base font-semibold mb-2">1) 온라인 사이트 회원</h4>
+            <div class="ml-4">
+              <p class="mb-2"><strong>ㄱ. 회원가입 시</strong></p>
+              <ul class="list-disc ml-6 mb-3">
+                <li>
+                  필수사항: 성명, 아이디(이메일주소), 비밀번호, 본인확인기관에서
+                  제공하는 본인인증 결과값(CI), 생년월일, 휴대전화번호
+                </li>
+                <li>선택사항: 마케팅 정보 수신 동의 여부(SMS, 이메일)</li>
+              </ul>
+              <p class="mb-2"><strong>ㄴ. 재화 또는 서비스 제공 시</strong></p>
+              <ul class="list-disc ml-6 mb-3">
+                <li>
+                  필수사항: (주문자) 성명, 전화번호(휴대전화번호 포함),
+                  이메일주소, (수령자) 성명, 전화번호(휴대전화번호 포함), 주소,
+                  전자우편주소, 마케팅 정보 수신 동의 여부(SMS, 이메일)
+                </li>
+                <li>
+                  선택사항: 은행계좌정보, 휴대폰 결제 시 휴대전화번호,
+                  현금영수증 신청 시 현금영수증 정보 및 결제정보, 배송관련 추가
+                  휴대전화번호, 기타 서비스 이용 내역
+                </li>
+              </ul>
+              <p class="text-sm text-gray-600">
+                ※ 대금결제 시 수집하는 개인정보는 결제대행업체(PG)사에서 수집 및
+                저장하고 있으며, 회사는 결제대행업체에서 제공하는 거래내역 만을
+                제공받고 있습니다.
+              </p>
+            </div>
+          </div>
+
+          <div class="mb-6">
+            <h4 class="text-base font-semibold mb-2">
+              2) 온라인 사이트 비회원 (주문)
+            </h4>
+            <ul class="list-disc ml-6 mb-3">
+              <li>
+                필수사항: (주문자이자 수령자) 성명, 전화번호(휴대전화번호 포함),
+                주소, 이메일주소
+              </li>
+              <li>
+                선택사항: 은행계좌정보, 휴대폰 결제 시 휴대전화번호, 현금영수증
+                신청 시 현금영수증 정보(성명, 휴대전화번호), 결제정보, 구매이력,
+                배송정보, 배송관련 추가 휴대전화번호, 상담내역, 기타 서비스 이용
+                내역
+              </li>
+            </ul>
+            <p class="text-sm text-gray-600">
+              ※ 대금결제 시 수집하는 개인정보는 결제대행업체(PG)사에서 수집 및
+              저장하고 있으며, 회사는 결제대행업체에서 제공하는 거래내역 만을
+              제공받고 있습니다.
+            </p>
+          </div>
+
+          <div class="mb-6">
+            <h4 class="text-base font-semibold mb-2">
+              3) 서비스 이용과정에서 수집 및 이용하는 개인정보 항목
+            </h4>
+            <div class="ml-4">
+              <p class="mb-2">
+                <strong>ㄱ. 문의 및 고충처리:</strong> 소비자의 문의 및
+                불만처리, 분쟁 해결을 위한 고객센터 운영을 위한 민원인의 신원
+                확인, 민원사항 확인, 사실조사를 위한 연락, 통지, 처리결과 통보,
+                요금추심 등 기타 문의 및 불만처리, 분쟁해결을 위한 기록 보존 및
+                원활한 의사소통 경로의 확보
+              </p>
+              <ul class="list-disc ml-6 mb-3">
+                <li>
+                  필수사항: 성명, 아이디(이메일주소), 전화번호(휴대전화번호
+                  포함), 주소, 전자우편주소
+                </li>
+                <li>
+                  선택사항: 성별, 생년월일, 구매이력, 배송정보, 환불/반품,
+                  상담내역, 서비스 이용 내역
+                </li>
+              </ul>
+              <p class="mb-2">
+                <strong>ㄴ. 카카오(싱크) 간편 로그인 서비스 이용 시</strong>
+              </p>
+              <p class="ml-6">
+                필수사항: 카카오 이용자 식별 ID, CI, 이름, 이메일, 휴대전화번호
+              </p>
+            </div>
+          </div>
+
+          <h3 class="text-lg font-semibold mb-3">2. 개인정보 수집 방법</h3>
+          <ol class="list-decimal ml-6 mb-6">
+            <li class="mb-2">
+              회사는 사이트 회원가입 및 서비스 이용 과정 또는 매장에서 이용자가
+              개인정보 수집에 동의를 하고 직접 정보를 입력하는 경우, 해당
+              개인정보를 수집합니다.
+            </li>
+            <li class="mb-2">
+              고객센터를 통한 상담 과정에서 웹페이지, 메일, 팩스, 전화 등을 통해
+              이용자의 개인정보가 수집될 수 있습니다.
+            </li>
+            <li class="mb-2">
+              온/오프라인 이벤트나 경품 행사 등에서 전자적 방식 또는 서면으로
+              개인정보가 수집될 수 있습니다.
+            </li>
+            <li class="mb-2">
+              회사와 제휴한 업체나 단체로부터 개인정보를 제공받을 수 있으며,
+              이러한 경우에는 개인정보 보호법에 따라 제휴사에서 이용자에게
+              개인정보 제공 동의 등을 받을 후 회사에 제공합니다.
+            </li>
+            <li class="mb-2">
+              접속로그, 쿠키, IP정보, 기기정보 등의 생성정보는 PC웹, 모바일웹
+              이용과정에서 로그 분석 수집툴을 통해 자동으로 생성되어 수집될 수
+              있습니다.
+            </li>
+          </ol>
+
+          <h2 class="text-xl font-bold mb-4">■ 개인정보의 수집 및 이용 목적</h2>
+          <p class="mb-4">
+            회사는 수집한 개인정보를 다음의 목적을 위해 활용합니다.
+          </p>
+
+          <ol class="list-decimal ml-6 mb-6">
+            <li class="mb-2">
+              <strong
+                >서비스 제공에 관한 계약 이행 및 서비스 제공에 따른
+                요금정산</strong
+              ><br />
+              콘텐츠 제공, 구매 및 요금 결제, 물품배송 또는 청구지 등 발송,
+              금융거래 본인 인증 및 금융 서비스
+            </li>
+            <li class="mb-2">
+              <strong>회원 관리</strong><br />
+              회원제 서비스 이용에 따른 본인확인, 개인 식별, 불량회원의 부정
+              이용 방지와 비인가 사용 방지, 가입 의사 확인, 연령확인, 불만처리
+              등 민원처리, 고지사항 전달
+            </li>
+            <li class="mb-2">
+              <strong>마케팅 및 광고에 활용</strong><br />
+              이벤트 등 광고성 정보 전달, 접속 빈도 파악 또는 회원의 서비스
+              이용에 대한 통계
+            </li>
+            <li class="mb-2">
+              <strong>문의 및 CS처리:</strong> 구매유형에 따른 소비자의 각종
+              문의 및 불만처리, 분쟁 해결을 위한 고객센터 운영을 위한 민원인의
+              신원 확인, 민원사항 확인, 사실조사를 위한 연락, 통지, 처리결과
+              통보, 요금추심 등 기타 문의 및 불만처리, 분쟁해결을 위한 기록 보존
+              및 원활한 의사소통 경로의 확보
+            </li>
+          </ol>
+
+          <h2 class="text-xl font-bold mb-4">■ 개인정보의 처리 및 보유기간</h2>
+          <p class="mb-4">
+            원칙적으로, 개인정보 수집 및 이용목적이 달성된 후에는 해당 정보를
+            지체 없이 파기합니다. 단, 다음의 정보에 대해서는 아래의 이유로
+            명시한 기간 동안 보존합니다.
+          </p>
+
+          <div class="mb-6">
+            <h3 class="text-lg font-semibold mb-3">
+              1) 회사 내부방침에 의한 정보보유 사유
+            </h3>
+            <p class="mb-4">
+              회원이 탈퇴한 경우에도 불량회원의 부정한 이용의 재발을 방지,
+              분쟁해결 및 수사기관의 요청에 따른 협조를 위하여, 이용계약
+              해지일로부터 1년간 회원의 정보를 보유할 수 있습니다.
+            </p>
+          </div>
+
+          <div class="mb-6">
+            <h3 class="text-lg font-semibold mb-3">
+              2) 관련 법령에 의한 정보 보유 사유
+            </h3>
+            <p class="mb-4">
+              전자상거래등에서의소비자보호에관한법률 등 관계법령의 규정에 의하여
+              보존할 필요가 있는 경우 회사는 아래와 같이 관계법령에서 정한
+              일정한 기간 동안 회원정보를 보관합니다.
+            </p>
+
+            <ul class="space-y-3">
+              <li class="flex items-start">
+                <span class="font-semibold mr-2">•</span>
+                <div>
+                  <strong
+                    >계약 또는 청약철회, 대금결제 및 재화 등의 공급에 관한
+                    기록</strong
+                  ><br />
+                  보존이유: 전자상거래등에서의 소비자보호에 관한 법률<br />
+                  보존기간: 5년
+                </div>
+              </li>
+              <li class="flex items-start">
+                <span class="font-semibold mr-2">•</span>
+                <div>
+                  <strong>소비자의 불만 또는 분쟁처리에 관한 기록</strong><br />
+                  보존이유: 전자상거래등에서의 소비자보호에 관한 법률<br />
+                  보존기간: 3년
+                </div>
+              </li>
+              <li class="flex items-start">
+                <span class="font-semibold mr-2">•</span>
+                <div>
+                  <strong>표시•광고에 관한 기록</strong><br />
+                  보존이유: 전자상거래등에서의 소비자보호에 관한 법률<br />
+                  보존기간: 6개월
+                </div>
+              </li>
+              <li class="flex items-start">
+                <span class="font-semibold mr-2">•</span>
+                <div>
+                  <strong
+                    >로그기록, IP 등 법원의 영장을 받아 수사기관이 요청 시
+                    제공</strong
+                  ><br />
+                  보존이유: 통신비밀보호법<br />
+                  보존기간: 3개월
+                </div>
+              </li>
+              <li class="flex items-start">
+                <span class="font-semibold mr-2">•</span>
+                <div>
+                  <strong
+                    >기타 법령에 따라 보존되는 개인정보 및 그 보존기간</strong
+                  ><br />
+                  <strong>이용자가 동의한 경우 그 개인정보 및 보존기간</strong>
+                </div>
+              </li>
+            </ul>
+          </div>
+
+          <h2 class="text-xl font-bold mb-4">■ 개인정보의 파기절차 및 방법</h2>
+          <p class="mb-4">
+            회사는 원칙적으로 개인정보 수집 및 이용목적이 달성된 후에는 해당
+            정보를 지체없이 파기합니다. 파기절차 및 방법은 다음과 같습니다.
+          </p>
+
+          <div class="mb-6">
+            <h3 class="text-lg font-semibold mb-3">1) 파기절차</h3>
+            <p class="mb-4">
+              회원님이 회원가입 등을 위해 입력하신 정보는 목적이 달성된 후
+              별도의 DB로 옮겨져(종이의 경우 별도의 서류함) 내부 방침 및 기타
+              관련 법령에 의한 정보보호 사유에 따라(보유 및 이용기간 참조) 일정
+              기간 저장된 후 파기되어집니다.
+            </p>
+            <p class="mb-4">
+              별도 DB로 옮겨진 개인정보는 법률에 의한 경우가 아니고서는
+              보유되어지는 이외의 다른 목적으로 이용되지 않습니다.
+            </p>
+          </div>
+
+          <div class="mb-6">
+            <h3 class="text-lg font-semibold mb-3">2) 파기방법</h3>
+            <p class="mb-4">
+              전자적 파일형태로 저장된 개인정보는 기록을 재생할 수 없는 기술적
+              방법을 사용하여 삭제합니다.
+            </p>
+          </div>
+
+          <h2 class="text-xl font-bold mb-4">■ 개인정보 제공</h2>
+          <p class="mb-4">
+            회사는 이용자의 개인정보를 원칙적으로 외부에 제공하지 않습니다.
+            다만, 아래의 경우에는 예외로 합니다.
+          </p>
+          <ol class="list-decimal ml-6 mb-6">
+            <li class="mb-2">이용자들이 사전에 동의한 경우</li>
+            <li class="mb-2">
+              법령의 규정에 의거하거나, 수사 목적으로 법령에 정해진 절차와
+              방법에 따라 수사기관의 요구가 있는 경우
+            </li>
+          </ol>
+
+          <h2 class="text-xl font-bold mb-4">■ 개인정보 처리위탁</h2>
+          <p class="mb-4">
+            회사는 서비스의 계약이행을 위하여 필요한 개인정보 처리 위탁을 하고
+            있으며 다음에 기재된 위탁업무 수행 목적 외에는 개인정보의 처리를
+            하지 않습니다. 또한 회사는 수탁자의 수탁 받은 사항에 대한 재위탁을
+            제한하고 있습니다. 개인정보의 처리 위탁을 받은 자와 위탁사항 등은
+            다음과 같습니다.
+          </p>
+
+          <div class="overflow-x-auto mb-6">
+            <table
+              class="w-full border-collapse border border-gray-300 text-sm"
+            >
+              <thead>
+                <tr class="bg-gray-100">
+                  <th class="border border-gray-300 p-2 text-left">
+                    개인정보 처리 위탁을 받는 자(수탁자)
+                  </th>
+                  <th class="border border-gray-300 p-2 text-left">
+                    개인정보 처리 위탁을 하는 업무의 내용
+                  </th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td class="border border-gray-300 p-2">CJ 대한통운㈜</td>
+                  <td class="border border-gray-300 p-2">
+                    상품배송 업무 및 배송 위치•도착 정보 등의 서비스 제공
+                  </td>
+                </tr>
+                <tr>
+                  <td class="border border-gray-300 p-2">㈜한진택배</td>
+                  <td class="border border-gray-300 p-2">
+                    상품배송 업무 및 배송 위치•도착 정보 등의 서비스 제공
+                  </td>
+                </tr>
+                <tr>
+                  <td class="border border-gray-300 p-2">㈜ KG모빌리언스</td>
+                  <td class="border border-gray-300 p-2">
+                    결제처리(휴대폰, 무통장 입금, 계좌이체, 신용카드 및 기타
+                    결제수단, 환불계좌 인증) 및 결제도용 방지
+                  </td>
+                </tr>
+                <tr>
+                  <td class="border border-gray-300 p-2">네이버파이낸셜㈜</td>
+                  <td class="border border-gray-300 p-2">
+                    결제처리(계좌이체, 신용카드 및 기타 결제수단) 및 결제도용
+                    방지
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+
+          <h2 class="text-xl font-bold mb-4">
+            ■ 이용자 및 법정대리인의 권리와 그 행사방법
+          </h2>
+          <ol class="list-decimal ml-6 mb-6">
+            <li class="mb-2">
+              이용자는 언제든지 등록되어 있는 자신의 개인정보를 조회하거나
+              수정할 수 있으며 가입해지를 요청할 수도 있습니다.
+            </li>
+            <li class="mb-2">
+              이용자들의 개인정보 조회,수정을 위해서는 "개인정보변경"(또는
+              "회원정보수정" 등)을 가입해지(동의철회)를 위해서는 "회원탈퇴"를
+              클릭하여 본인 확인 절차를 거치신 후 직접 열람, 정정 또는 탈퇴가
+              가능합니다.
+            </li>
+            <li class="mb-2">
+              혹은 개인정보보호책임자에게 서면, 전화 또는 이메일로 연락하시면
+              지체없이 조치하겠습니다.
+            </li>
+            <li class="mb-2">
+              귀하가 개인정보의 오류에 대한 정정을 요청하신 경우에는 정정을
+              완료하기 전까지 당해 개인정보를 이용 또는 제공하지 않습니다. 또한
+              잘못된 개인정보를 제3자에게 이미 제공한 경우에는 정정 처리결과를
+              제3자에게 지체없이 통지하여 정정이 이루어지도록 하겠습니다.
+            </li>
+            <li class="mb-2">
+              회사는 이용자의 요청에 의해 해지 또는 삭제된 개인정보는 "회사가
+              수집하는 개인정보의 보유 및 이용기간"에 명시된 바에 따라 처리하고
+              그 외의 용도로 열람 또는 이용할 수 없도록 처리하고 있습니다.
+            </li>
+          </ol>
+
+          <h2 class="text-xl font-bold mb-4">■ 자동으로 수집, 저장되는 정보</h2>
+          <ol class="list-decimal ml-6 mb-6">
+            <li class="mb-2">
+              회사는 회사가 운영하는 사이트에서 이용자를 위한 개인 맞춤서비스를
+              제공하기 위해 이용자 또는 회원의 정보를 저장하고 수시로 불러오는
+              '쿠키(cookie)'를 사용합니다. 쿠키는 웹사이트를 운영하는데 이용되는
+              서버가 이용자의 브라우저에게 보내는 소량의 정보이며 이용자가
+              사용하는 컴퓨터 내의 하드 디스크, 모바일 디바이스에 저장됩니다.
+            </li>
+            <li class="mb-2">
+              회원이 로그인하여 회원서비스를 이용하기 위해서는 쿠키를 허용하여야
+              합니다. 회사는 회원에게 유용한 서비스를 제공하기 위해서 쿠키를
+              이용하여 ID에 대한 정보를 찾아냅니다. 쿠키는 회원의 컴퓨터 등은
+              식별하지만 회원을 개인적으로 식별하지는 않습니다. 쿠키의 저장을
+              거부하실 수 있으나 거부할 경우에는 로그인이 필요한 일부 서비스는
+              이용할 수 없습니다.
+            </li>
+            <li class="mb-2">쿠키의 저장거부는 방법은 다음과 같습니다.</li>
+          </ol>
+
+          <div class="ml-6 mb-6">
+            <p class="mb-2">
+              가. Internet Explorer의 경우 : 웹 브라우저 상단의 도구 메뉴 >
+              인터넷 옵션 > 개인정보 > 설정
+            </p>
+            <p class="mb-2">
+              나. Chrome의 경우 : 웹 브라우저 우측의 설정 메뉴 > 화면 하단의
+              고급 설정 표시 > 개인정보의 콘텐츠 설정 버튼 > 쿠키
+            </p>
+          </div>
+
+          <p class="mb-6">
+            회사는 관련 법령에 따라 쿠키를 삭제하기 위한 조치를 이행하지만, 회원
+            스스로 회원의 컴퓨터 등에서 쿠키 기록을 삭제하는 등의 방식으로
+            쿠키를 삭제할 수 있습니다.
+          </p>
+
+          <h2 class="text-xl font-bold mb-4">
+            ■ 개인정보의 수집, 이용, 제공, 보유, 처리 등에 대한 동의철회
+          </h2>
+          <p class="mb-6">
+            사이트의 서비스 등을 이용하기 위하여 이용자가 개인정보의 수집, 이용,
+            제공에 대해 동의한 내용은 언제든지 철회할 수 있습니다. 동의철회는
+            『회원정보변경』에서 「회원탈퇴」 등을 클릭하거나 개인정보
+            보호책임자에게 서면, 전자우편, 팩스 등으로 연락하면 즉시 요청하신
+            사항을 위해 필요한 조치를 취합니다.
+          </p>
+
+          <h2 class="text-xl font-bold mb-4">■ 개인정보 보호책임자</h2>
+          <p class="mb-4">
+            회사는 개인정보에 대한 의견수렴 및 불만처리를 담당하는 개인정보
+            보호책임자를 지정하고 있으며, 연락처는 아래와 같습니다.
+          </p>
+
+          <div class="mb-6">
+            <h3 class="text-lg font-semibold mb-3">1) 개인정보 보호책임자</h3>
+            <div class="ml-4">
+              <p class="mb-1">이름 : 김민수</p>
+              <p class="mb-1">전화 : 02-1234-5678</p>
+              <p class="mb-1">e-Mail : privacy@reve.co.kr</p>
+            </div>
+          </div>
+
+          <div class="mb-6">
+            <h3 class="text-lg font-semibold mb-3">
+              2) 개인정보에 관한 민원 서비스 연락처
+            </h3>
+            <div class="ml-4">
+              <p class="mb-1">전화번호 : 02-1234-5678</p>
+              <p class="mb-1">e-Mail : privacy@reve.co.kr</p>
+            </div>
+          </div>
+
+          <h2 class="text-xl font-bold mb-4">
+            ■ 개인정보 침해 관련 상담 및 신고
+          </h2>
+          <p class="mb-4">
+            이용자는 필요한 경우 아래의 기관에 개인정보 침해에 관한 상담,
+            피해구제 등에 대해 문의하실 수 있습니다.
+          </p>
+
+          <ol class="list-decimal ml-6 mb-6">
+            <li class="mb-2">
+              <strong>개인정보침해신고센터 (한국인터넷진흥원 운영)</strong
+              ><br />
+              전화 : (국번없이) 118 / https://privacy.kisa.or.kr
+            </li>
+            <li class="mb-2">
+              <strong>개인정보 분쟁조정위원회</strong><br />
+              전화: (국번없이) 1833-6972 / https://www.kopico.go.kr
+            </li>
+            <li class="mb-2">
+              <strong>대검찰청 사이버범죄수사단</strong><br />
+              전화: (국번없이) 1301 / cid@spo.go.kr / https://www.spo.go.kr
+            </li>
+            <li class="mb-2">
+              <strong>경찰청 사이버안전국</strong><br />
+              전화 : (국번없이) 182 / https://cyberbureau.police.go.kr
+            </li>
+          </ol>
+
+          <h2 class="text-xl font-bold mb-4">■ 개인정보 처리방침 고지의무</h2>
+          <ol class="list-decimal ml-6 mb-6">
+            <li class="mb-2">
+              회사의 개인정보 처리방침은 정부의 법률 및 지침 변경이나 회사의
+              내부 방침변경 등으로 인하여 수시로 변경될 수 있고, 이에 따른
+              개인정보 처리방침의 지속적인 개선을 위하여 필요한 절차를 정하고
+              있습니다.
+            </li>
+            <li class="mb-2">
+              개인정보 처리방침을 개정하는 경우 회사는 개인정보 처리방침 변경
+              시행 7일 전(중요한 변경인 경우 시행 30일 전)부터 사이트의
+              공지사항을 통하여 공지하고 버전번호 및 개정일자 등을 부여하여
+              개정된 사항을 이용자들이 쉽게 알아볼 수 있도록 하고 있습니다.
+            </li>
+          </ol>
+        </div>
+      </div>
+    </main>
+
+    <!-- Footer Fragment -->
+    <div th:replace="~{fragments/footer :: footer}"></div>
+
+    <!-- Login Modal Fragment -->
+    <div th:replace="~{fragments/modal :: loginModal}"></div>
+
+    <script src="/js/script.js"></script>
+  </body>
 </html>
