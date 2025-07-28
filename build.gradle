@@ -29,6 +29,10 @@ dependencies {
     implementation 'org.springframework.boot:spring-boot-starter-thymeleaf'
     // 웹 MVC 기능
     implementation 'org.springframework.boot:spring-boot-starter-web'
+    // Spring Data JPA (데이터베이스 ORM 및 리포지토리 지원)
+    implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
+    // MySQL 드라이버 (MySQL에 접속하기 위한 JDBC 드라이버)
+    runtimeOnly 'com.mysql:mysql-connector-j'
     // 자동 리로딩 도구
     developmentOnly 'org.springframework.boot:spring-boot-devtools'
     // Lombok (컴파일 전용 + 어노테이션 처리)
