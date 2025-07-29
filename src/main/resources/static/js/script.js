@@ -170,14 +170,16 @@ class FormValidation {
   constructor() {
     this.init();
   }
-
   init() {
     const loginForm = document.querySelector('.form-login form');
 
     if (loginForm) {
       loginForm.addEventListener('submit', (e) => {
         e.preventDefault();
-        this.validateForm(loginForm);
+        const isValid = this.validateForm(loginForm);
+        if (isValid) {
+          loginForm.submit();
+        }
       });
     }
   }
@@ -195,22 +197,15 @@ class FormValidation {
       }
     });
 
-    if (isValid) {
-      // Simulate login process
-      this.showSuccess('로그인 처리 중...');
-      setTimeout(() => {
-        this.showSuccess('로그인 성공!');
-      }, 1000);
-    }
+    return isValid;
   }
 
   showError(input, message) {
     this.removeError(input);
 
     const errorDiv = document.createElement('div');
-    errorDiv.className = 'error-message';
-    errorDiv.textContent = message;
     errorDiv.className = 'text-red-500 text-xs mt-1';
+    errorDiv.textContent = message;
 
     input.parentNode.appendChild(errorDiv);
     input.classList.add('border-red-500');
@@ -218,26 +213,12 @@ class FormValidation {
   }
 
   removeError(input) {
-    const existingError = input.parentNode.querySelector('.error-message');
+    const existingError = input.parentNode.querySelector('.text-red-500');
     if (existingError) {
       existingError.remove();
     }
     input.classList.remove('border-red-500');
     input.classList.add('border-gray-300');
-  }
-
-  showSuccess(message) {
-    const successDiv = document.createElement('div');
-    successDiv.className = 'success-message';
-    successDiv.textContent = message;
-    successDiv.className = 'text-green-600 text-center mt-3 font-semibold';
-
-    const form = document.querySelector('.form-login form');
-    form.appendChild(successDiv);
-
-    setTimeout(() => {
-      successDiv.remove();
-    }, 3000);
   }
 }
 

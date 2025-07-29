@@ -44,18 +44,32 @@
 
           <!-- Right Side -->
           <div class="flex items-center space-x-6">
-            <!-- Login/Join -->
-            <div class="flex space-x-4">
-              <a
-                href="/member/login"
-                class="login-btn text-gray-800 font-medium hover:text-gray-600 transition-colors"
-                >Login</a
-              >
-              <a
-                href="/member/signup"
-                class="text-gray-800 font-medium hover:text-gray-600 transition-colors"
-                >Join</a
-              >
+            <!-- 로그인 확인 -->
+            <div th:unless="${session.loginUser != null}">
+              <!-- Login/Join -->
+              <div class="flex space-x-4">
+                <a
+                  href="/member/login"
+                  class="login-btn text-gray-800 font-medium hover:text-gray-600 transition-colors"
+                  >Login</a
+                >
+                <a
+                  href="/member/signup"
+                  class="text-gray-800 font-medium hover:text-gray-600 transition-colors"
+                  >Join</a
+                >
+              </div>
+            <div th:if="${session.loginUser !=null}">
+              <div class="flex space-x-4">
+                <span th:text="${session.loginUser.name}"></span>님
+                <a
+                  href="/user/mypage/index"
+                  class="text-gray-800 font-medium hover:text-gray-600 transition-colors"
+                  >My</a
+                >
+              </div>
+            </div>
+
             </div>
 
             <!-- Icons -->
