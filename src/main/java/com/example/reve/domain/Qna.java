@@ -11,7 +11,7 @@ import lombok.*;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-public class QnA extends BaseEntity {
+public class Qna extends BaseEntity {
 
   @Id
   @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -30,13 +30,17 @@ public class QnA extends BaseEntity {
   @Column(nullable = false)
   private String password;
 
-  // Q&A 작성글에대한 답변
+  // Q&A 작성글에 대한 답변
   @Column(nullable = true, columnDefinition = "TEXT")
   private String answer;
 
   // Q&A 작성 타입(비밀글인지 공개글인지)
   @Column(nullable = false)
   private Boolean isSecret = false;
+
+  // Q&A 문의 분류 (상품문의, 배송문의, 결제문의 등)
+  @Column(nullable = false)
+  private String category;
 
   // 관계 설정
   // Q&A와 유저와의 관계 (N : 1)
