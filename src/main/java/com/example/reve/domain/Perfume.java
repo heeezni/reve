@@ -7,6 +7,9 @@ import jakarta.persistence.*;
 
 import lombok.*;
 
+/*
+상품(향수) 엔터티임.
+ */
 @Entity
 @Table(name = "perfume")
 @Getter
@@ -25,6 +28,10 @@ public class Perfume extends BaseEntity {
   // 향수 이름
   @Column(name = "perfume_name", nullable = false)
   private String perfumeName;
+
+  // 향 종류
+  @Column(name = "scent", nullable = false)
+  private String scent;
 
   // 향수 설명
   @Column(nullable = false)
@@ -49,6 +56,10 @@ public class Perfume extends BaseEntity {
   // 향수 이미지
   @Column(nullable = false)
   private String imageUrl;
+
+  // 향수 호버 이미지
+  @Column(nullable = false)
+  private String hoverImageUrl;
 
   // 관계 설정
   // 향수와 리뷰와의 관계 (1 : N)
