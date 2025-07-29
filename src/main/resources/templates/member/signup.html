@@ -1,5 +1,8 @@
 <!DOCTYPE html>
-<html lang="ko" xmlns:th="http://www.thymeleaf.org">
+<html lang="ko"
+      xmlns:th="http://www.thymeleaf.org"
+      xmlns:sec="http://www.thymeleaf.org/thymeleaf-extras-springsecurity4"
+>
   <head th:replace="~{fragments/header :: head}">
     <title>회원가입 - Rêve</title>
   </head>
@@ -22,15 +25,6 @@
           <!-- Signup Form -->
           <div class="bg-white rounded-lg shadow-sm p-8">
             <!-- Kakao Login -->
-            <div class="mb-8">
-              <button
-                type="button"
-                class="w-full bg-yellow-400 text-gray-800 py-3 px-6 rounded-md hover:bg-yellow-500 transition-colors font-medium flex items-center justify-center"
-              >
-                <i class="fas fa-comment mr-2"></i>
-                카카오 로그인
-              </button>
-            </div>
 
             <!-- Divider -->
             <div class="relative mb-8">
@@ -38,47 +32,11 @@
                 <div class="w-full border-t border-gray-300"></div>
               </div>
               <div class="relative flex justify-center text-sm">
-                <span class="px-2 bg-white text-gray-500">또는</span>
               </div>
             </div>
 
-            <form action="/member/signup" method="post" class="space-y-6">
+            <form th:action="@{/member/signup}" method="post" class="space-y-6">
               <!-- Member Type -->
-              <div>
-                <label class="block text-sm font-medium text-gray-700 mb-2">
-                  회원구분 <span class="text-red-500">*</span>
-                </label>
-                <div class="flex space-x-4">
-                  <label class="flex items-center">
-                    <input
-                      type="radio"
-                      name="memberType"
-                      value="personal"
-                      class="mr-2"
-                      checked
-                    />
-                    <span class="text-sm">개인회원</span>
-                  </label>
-                  <label class="flex items-center">
-                    <input
-                      type="radio"
-                      name="memberType"
-                      value="business"
-                      class="mr-2"
-                    />
-                    <span class="text-sm">사업자회원</span>
-                  </label>
-                  <label class="flex items-center">
-                    <input
-                      type="radio"
-                      name="memberType"
-                      value="foreigner"
-                      class="mr-2"
-                    />
-                    <span class="text-sm">외국인회원</span>
-                  </label>
-                </div>
-              </div>
 
               <!-- Basic Information Section -->
               <div class="border-t pt-6">
@@ -95,7 +53,7 @@
                   <label>
                     <input
                       type="text"
-                      name="username"
+                      name="loginId"
                       required
                       class="w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-gray-800 focus:border-transparent"
                       placeholder="아이디를 입력하세요"
@@ -158,88 +116,16 @@
                 </div>
 
                 <!-- Address -->
-                <div class="mb-4">
-                  <label class="block text-sm font-medium text-gray-700 mb-2">
-                    주소 <span class="text-red-500">*</span>
-                  </label>
-                  <div class="space-y-2">
-                    <div class="flex space-x-2">
-                      <label>
-                        <input
-                          type="text"
-                          name="postcode"
-                          placeholder="우편번호"
-                          class="flex-1 border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-gray-800 focus:border-transparent"
-                          readonly
-                        />
-                      </label>
-                      <button
-                        type="button"
-                        class="px-4 py-2 bg-gray-800 text-white rounded-md hover:bg-gray-700 transition-colors text-sm"
-                      >
-                        주소검색
-                      </button>
-                    </div>
-                    <label>
-                      <input
-                        type="text"
-                        name="address"
-                        placeholder="기본주소"
-                        class="w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-gray-800 focus:border-transparent"
-                        readonly
-                      />
-                    </label>
-                    <label>
-                      <input
-                        type="text"
-                        name="addressDetail"
-                        placeholder="나머지 주소"
-                        class="w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-gray-800 focus:border-transparent"
-                      />
-                    </label>
-                  </div>
-                </div>
 
                 <!-- Phone Numbers -->
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
-                  <div>
-                    <label class="block text-sm font-medium text-gray-700 mb-2">
-                      일반전화
-                    </label>
-                    <div class="flex space-x-2">
-                      <label>
-                        <select
-                          class="border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-gray-800 focus:border-transparent"
-                        >
-                          <option>02</option>
-                          <option>031</option>
-                          <option>032</option>
-                          <option>033</option>
-                        </select>
-                      </label>
-                      <label>
-                        <input
-                          type="text"
-                          class="flex-1 border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-gray-800 focus:border-transparent"
-                          placeholder="-"
-                        />
-                      </label>
-                      <label>
-                        <input
-                          type="text"
-                          class="flex-1 border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-gray-800 focus:border-transparent"
-                          placeholder="-"
-                        />
-                      </label>
-                    </div>
-                  </div>
                   <div>
                     <label class="block text-sm font-medium text-gray-700 mb-2">
                       휴대전화 <span class="text-red-500">*</span>
                     </label>
                     <div class="flex space-x-2">
                       <label>
-                        <select
+                        <select name="firstNum"
                           class="border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-gray-800 focus:border-transparent"
                         >
                           <option>010</option>
@@ -253,6 +139,7 @@
                       <label>
                         <input
                           type="text"
+                          name="middleNum"
                           required
                           class="flex-1 border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-gray-800 focus:border-transparent"
                           placeholder="-"
@@ -261,6 +148,7 @@
                       <label>
                         <input
                           type="text"
+                          name="lastNum"
                           required
                           class="flex-1 border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-gray-800 focus:border-transparent"
                           placeholder="-"
@@ -286,56 +174,6 @@
                   </label>
                 </div>
               </div>
-
-              <!-- Additional Information Section -->
-              <div class="border-t pt-6">
-                <h3 class="text-lg font-semibold text-gray-800 mb-4">
-                  추가정보 (선택)
-                </h3>
-
-                <!-- Refund Account -->
-                <div class="mb-4">
-                  <h4 class="text-sm font-medium text-gray-700 mb-2">
-                    환불계좌 정보
-                  </h4>
-                  <div class="space-y-2">
-                    <label>
-                      <input
-                        type="text"
-                        name="accountHolder"
-                        placeholder="예금주"
-                        class="w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-gray-800 focus:border-transparent"
-                      />
-                    </label>
-                    <label>
-                      <select
-                        name="bankName"
-                        class="w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-gray-800 focus:border-transparent"
-                      >
-                        <option value="">- 은행선택 -</option>
-                        <option value="shinhan">신한은행</option>
-                        <option value="kb">KB국민은행</option>
-                        <option value="woori">우리은행</option>
-                        <option value="hana">하나은행</option>
-                        <option value="nh">NH농협은행</option>
-                        <option value="ibk">IBK기업은행</option>
-                      </select>
-                    </label>
-                    <label>
-                      <input
-                        type="text"
-                        name="accountNumber"
-                        placeholder="계좌번호"
-                        class="w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-gray-800 focus:border-transparent"
-                      />
-                    </label>
-                    <p class="text-xs text-gray-500">
-                      ('-'와 숫자만 입력해주세요.)
-                    </p>
-                  </div>
-                </div>
-              </div>
-
               <!-- Agreement Section -->
               <div class="border-t pt-6">
                 <h3 class="text-lg font-semibold text-gray-800 mb-4">

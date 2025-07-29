@@ -25,6 +25,12 @@ public class User extends BaseEntity {
   // 유저 이름
   private String name;
 
+  // 전화번호
+  private String phone;
+
+  // 이메일
+  private String email;
+
   // 로그인 아이디
   @Column(name = "login_id")
   private String loginId;

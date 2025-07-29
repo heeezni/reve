@@ -25,6 +25,9 @@ repositories {
 }
 
 dependencies {
+    //Security 관련
+    implementation 'org.springframework.boot:spring-boot-starter-security'
+    implementation 'org.thymeleaf.extras:thymeleaf-extras-springsecurity6'
     // Thymeleaf 관련
     implementation 'org.springframework.boot:spring-boot-starter-thymeleaf'
     // 웹 MVC 기능
@@ -41,6 +44,7 @@ dependencies {
     // 테스트용
     testImplementation 'org.springframework.boot:spring-boot-starter-test'
     testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
+    testImplementation 'org.springframework.security:spring-security-test'
 }
 
 tasks.named('test') {
