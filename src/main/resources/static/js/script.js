@@ -243,7 +243,11 @@ class FormValidation {
 
 // Initialize all functionality when DOM is loaded
 document.addEventListener('DOMContentLoaded', () => {
-  new BannerSlider();
+  // 해당 요소가 현재 페이지에 존재할 때만 BannerSlider를 초기화하여
+  // 배너가 없는 페이지에서 발생하는 'undefined' 에러를 방지
+  if (document.querySelector('.banner-slide')) {
+    new BannerSlider();
+  }
   new Modal();
   new FormValidation();
 
