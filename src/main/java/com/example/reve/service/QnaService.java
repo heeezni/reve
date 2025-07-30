@@ -120,10 +120,10 @@ public class QnaService {
     }
   }
 
-  /** 모든 Q&A 게시글을 조회하여 QnaResDto 리스트로 반환 */
+  /** 모든 Q&A 게시글을 최신순으로 조회하여 QnaResDto 리스트로 반환 */
   public List<QnaResDto> selectAll() {
-    // 1. QnaRepository를 사용하여 데이터베이스에서 모든 Qna 엔티티를 가져오기
-    List<Qna> qnaList = qnaRepository.findAll();
+    // 1. QnaRepository를 사용하여 데이터베이스에서 모든 Qna 엔티티를 최신순으로 가져오기
+    List<Qna> qnaList = qnaRepository.findAllByLatest();
 
     // 2. QnaResDto 객체들을 담을 빈 리스트 만들기
     List<QnaResDto> qnaResDtoList = new ArrayList<>();
