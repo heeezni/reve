@@ -27,7 +27,7 @@
 
             <!-- 오른쪽: 수정 삭제 버튼 -->
             <div class="space-x-2 flex items-center">
-              <a th:href="@{/admin/shop/edit(id=${perfume.perfumeId})}"
+              <a th:href="@{/admin/shop/edit/{perfumeId}(perfumeId=${perfume.perfumeId})}"
                  class="px-6 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition text-base">
                 수정
               </a>
