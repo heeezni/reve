@@ -61,6 +61,8 @@
               <!-- Profile Tab -->
               <div id="profile" class="tab-content">
                 <div class="space-y-8">
+                  <form th:action="@{/mypage/account/profile}" method="post" id="updateForm">
+                    <input class="hidden" name="loginId" th:value="${session.loginUser.loginId}">
                   <!-- Profile Image -->
                   <div>
                     <label class="block text-sm font-medium text-gray-700 mb-4"
@@ -73,7 +75,10 @@
                         <i class="fas fa-user text-3xl text-gray-400"></i>
                       </div>
                       <div class="space-y-3">
+                        <input type="file" name="profileUrl" class="hidden" accept=".jpg,.png" />
                         <button
+                                type="button"
+                                name="bt_profile"
                           class="px-4 py-2 border border-gray-300 rounded-md text-gray-700 hover:bg-gray-50 transition-colors text-sm"
                         >
                           이미지 변경
@@ -101,7 +106,8 @@
                         <label>
                           <input
                             type="text"
-                            value="김향수"
+                            name="name"
+                            th:value="${session.loginUser.name}"
                             class="w-full border border-gray-300 rounded-md px-4 py-3 focus:outline-none focus:ring-2 focus:ring-gray-800 focus:border-transparent"
                           />
                         </label>
@@ -116,7 +122,8 @@
                         <label>
                           <input
                             type="text"
-                            value="향수러버"
+                            name="nickname"
+                            th:value="${session.loginUser.nickname != null} ? ${session.loginUser.nickname} : ''"
                             class="w-full border border-gray-300 rounded-md px-4 py-3 focus:outline-none focus:ring-2 focus:ring-gray-800 focus:border-transparent"
                           />
                         </label>
@@ -131,7 +138,7 @@
                         <label>
                           <input
                             type="email"
-                            value="향수@gmail.com"
+                            th:value="${session.loginUser.email}"
                             class="w-full border border-gray-300 rounded-md px-4 py-3 focus:outline-none focus:ring-2 focus:ring-gray-800 focus:border-transparent"
                             readonly
                           />
@@ -150,7 +157,8 @@
                         <label>
                           <input
                             type="date"
-                            value="1990-01-01"
+                            name="birthday"
+                            th:value="${session.loginUser.birthday != null} ? ${session.loginUser.birthday} : ''"
                             class="w-full border border-gray-300 rounded-md px-4 py-3 focus:outline-none focus:ring-2 focus:ring-gray-800 focus:border-transparent"
                           />
                         </label>
@@ -175,7 +183,8 @@
                           <label>
                             <input
                               type="tel"
-                              value="010-1234-5678"
+                              name="phone"
+                              th:value="${session.loginUser.phone}"
                               class="flex-1 border border-gray-300 rounded-md px-4 py-3 focus:outline-none focus:ring-2 focus:ring-gray-800 focus:border-transparent"
                             />
                           </label>
@@ -186,82 +195,19 @@
                           </button>
                         </div>
                       </div>
-
-                      <div>
-                        <label
-                          class="block text-sm font-medium text-gray-700 mb-2"
-                        >
-                          일반전화
-                        </label>
-                        <label>
-                          <input
-                            type="tel"
-                            value="02-1234-5678"
-                            class="w-full border border-gray-300 rounded-md px-4 py-3 focus:outline-none focus:ring-2 focus:ring-gray-800 focus:border-transparent"
-                          />
-                        </label>
-                      </div>
                     </div>
                   </div>
-
-                  <!-- Address Information -->
-                  <div class="space-y-6">
-                    <h3 class="text-lg font-semibold text-gray-800">
-                      주소 정보
-                    </h3>
-
-                    <div class="space-y-4">
-                      <div>
-                        <label
-                          class="block text-sm font-medium text-gray-700 mb-2"
-                        >
-                          기본주소 <span class="text-red-500">*</span>
-                        </label>
-                        <div class="flex space-x-2 mb-2">
-                          <label>
-                            <input
-                              type="text"
-                              placeholder="우편번호"
-                              value="12345"
-                              class="w-32 border border-gray-300 rounded-md px-4 py-3 focus:outline-none focus:ring-2 focus:ring-gray-800 focus:border-transparent"
-                              readonly
-                            />
-                          </label>
-                          <button
-                            class="px-4 py-3 border border-gray-300 rounded-md text-gray-700 hover:bg-gray-50 transition-colors text-sm"
-                          >
-                            주소검색
-                          </button>
-                        </div>
-                        <label>
-                          <input
-                            type="text"
-                            placeholder="기본주소"
-                            value="서울특별시 강남구 테헤란로 123"
-                            class="w-full border border-gray-300 rounded-md px-4 py-3 focus:outline-none focus:ring-2 focus:ring-gray-800 focus:border-transparent mb-2"
-                            readonly
-                          />
-                        </label>
-                        <label>
-                          <input
-                            type="text"
-                            placeholder="상세주소"
-                            value="456동 789호"
-                            class="w-full border border-gray-300 rounded-md px-4 py-3 focus:outline-none focus:ring-2 focus:ring-gray-800 focus:border-transparent"
-                          />
-                        </label>
-                      </div>
-                    </div>
-                  </div>
-
                   <!-- Save Button -->
                   <div class="flex justify-end pt-6 border-t border-gray-200">
                     <button
+                      type="submit"
+                      id="bt_update"
                       class="px-6 py-3 bg-gray-800 text-white rounded-md hover:bg-gray-700 transition-colors font-medium"
                     >
                       정보 수정
                     </button>
                   </div>
+                  </form>
                 </div>
               </div>
 
@@ -274,6 +220,8 @@
                     </h3>
 
                     <div class="space-y-6">
+                      <form th:action="@{/mypage/account/password}" method="post" id="passwordForm">
+                        <input class="hidden" name="loginId" th:value="${session.loginUser.loginId}">
                       <div>
                         <label
                           class="block text-sm font-medium text-gray-700 mb-2"
@@ -283,6 +231,7 @@
                         <label>
                           <input
                             type="password"
+                            name="password"
                             placeholder="현재 비밀번호를 입력하세요"
                             class="w-full border border-gray-300 rounded-md px-4 py-3 focus:outline-none focus:ring-2 focus:ring-gray-800 focus:border-transparent"
                           />
@@ -298,6 +247,7 @@
                         <label>
                           <input
                             type="password"
+                            name="newPassword"
                             placeholder="새 비밀번호를 입력하세요"
                             class="w-full border border-gray-300 rounded-md px-4 py-3 focus:outline-none focus:ring-2 focus:ring-gray-800 focus:border-transparent"
                           />
@@ -325,11 +275,14 @@
 
                       <div class="pt-6">
                         <button
+                          type="submit"
+                          id="bt_password"
                           class="w-full px-6 py-3 bg-gray-800 text-white rounded-md hover:bg-gray-700 transition-colors font-medium"
                         >
                           비밀번호 변경
                         </button>
                       </div>
+                      </form>
                     </div>
                   </div>
                 </div>
@@ -434,22 +387,6 @@
                   탈퇴하기
                 </button>
               </div>
-
-              <div
-                class="flex items-center justify-between p-4 border border-gray-200 rounded-lg"
-              >
-                <div>
-                  <h4 class="font-medium text-gray-800">로그인 기록</h4>
-                  <p class="text-sm text-gray-600">
-                    최근 로그인 활동을 확인합니다
-                  </p>
-                </div>
-                <button
-                  class="px-4 py-2 border border-gray-300 text-gray-700 rounded-md hover:bg-gray-50 transition-colors text-sm"
-                >
-                  확인하기
-                </button>
-              </div>
             </div>
           </div>
         </div>
@@ -460,8 +397,6 @@
     <div th:replace="~{fragments/footer :: footer}"></div>
 
     <!-- Login Modal Fragment -->
-    <div th:replace="~{fragments/modal :: loginModal}"></div>
-
     <script src="/js/script.js"></script>
     <script>
       // Tab functionality
@@ -492,17 +427,38 @@
         });
       });
 
-      // Form validation
-      document.querySelectorAll('form').forEach((form) => {
-        form.addEventListener('submit', function (e) {
-          e.preventDefault();
+      document.getElementById('updateForm').addEventListener('submit', function () {
+      alert('정보가 성공적으로 수정되었습니다.');
+      });
 
-          // Add validation logic here
-          alert('정보가 성공적으로 수정되었습니다.');
-        });
+      document.getElementById('passwordForm').addEventListener('submit', function (e) {
+        const password = document.querySelector('input[name="password"]').value;
+        const newPassword = document.querySelector('input[name="newPassword"]').value;
+        const confirmPassword = document.querySelectorAll('input[type="password"]')[2].value;
+
+        // 비어있는지 확인
+        if (!password || !newPassword || !confirmPassword) {
+          e.preventDefault();
+          alert('모든 항목을 입력해주세요.');
+          return;
+        }
+
+        // 새 비밀번호 일치 확인
+        if (newPassword !== confirmPassword) {
+          e.preventDefault();
+          alert('새 비밀번호가 일치하지 않습니다.');
+          return;
+        }
+
+        // 길이/조합 조건은 여기서 추가 가능
+
+        // 모든 조건 통과 시 alert만 띄우고 제출 계속 진행
+        alert('비밀번호가 변경되었습니다. 다시 로그인 해주세요.');
+        // 제출 막지 않음 → 서버로 전송됨
       });
 
       // Password change validation
+
       const passwordInputs = document.querySelectorAll(
         'input[type="password"]'
       );
@@ -511,6 +467,10 @@
           // Add password validation logic here
         });
       });
+      const passwordForm = document.getElementById('passwordForm');
+      if(passwordForm){
+        const result = [[${result}]];
+      }
 
       // Address search functionality
       Array.from(document.querySelectorAll('button'))

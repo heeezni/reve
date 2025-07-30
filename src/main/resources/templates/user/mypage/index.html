@@ -29,17 +29,17 @@
               </div>
               <div class="flex-1">
                 <div class="flex items-center space-x-3 mb-2">
-                  <h2 class="text-xl font-bold text-gray-800">김향수님</h2>
+                  <h2 class="text-xl font-bold text-gray-800" th:unless="${session.loginUser.nickname !=null}" th:text="${session.loginUser.name} +'님'"></h2>
+                  <h2 class="text-xl font-bold text-gray-800" th:if="${session.loginUser.nickname !=null}" th:text="${session.loginUser.nickname} +'님'"></h2>
                   <span
                     class="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-purple-100 text-purple-800"
                   >
                     VIP 회원
                   </span>
                 </div>
-                <p class="text-gray-600 mb-3">향수@gmail.com</p>
+                <p class="text-gray-600 mb-3" th:text=" ${session.loginUser.email}"></p>
                 <div class="flex items-center space-x-6 text-sm text-gray-500">
-                  <span>가입일: 2023.01.15</span>
-                  <span>최근 로그인: 2024.01.18</span>
+                  <span th:text="'가입날짜 : '+${#temporals.format(session.loginUser.createdAt, 'yyyy-MM-dd')}"></span>
                 </div>
               </div>
               <div class="flex space-x-3">

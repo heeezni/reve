@@ -31,6 +31,15 @@ public class User extends BaseEntity {
   // 이메일
   private String email;
 
+  // 생일
+  private String birthday;
+
+  // 프로필 사진
+  private String profileUrl;
+
+  // 닉네임
+  private String nickname;
+
   // 로그인 아이디
   @Column(name = "login_id")
   private String loginId;
