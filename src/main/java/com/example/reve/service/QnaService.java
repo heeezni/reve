@@ -1,11 +1,14 @@
 package com.example.reve.service;
 
 import java.io.IOException;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
+import java.util.stream.Collectors;
 
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -120,25 +123,22 @@ public class QnaService {
     }
   }
 
-  /** 모든 Q&A 게시글을 최신순으로 조회하여 QnaResDto 리스트로 반환 */
-  public List<QnaResDto> selectAll() {
-    // 1. QnaRepository를 사용하여 데이터베이스에서 모든 Qna 엔티티를 최신순으로 가져오기
-    List<Qna> qnaList = qnaRepository.findAllByLatest();
+  /**
+   * 모든 Q&A 게시글을 최신순으로 페이징하여 조회하고 QnaResDto Page로 반환
+   *
+   * @param pageable 페이징 정보 (페이지 번호, 페이지 크기, 정렬 등)
+   * @return QnaResDto의 Page 객체
+   */
+  public Page<QnaResDto> selectAll(Pageable pageable) {
+    // QnaRepository를 사용하여 데이터베이스에서 Qna 엔티티를 페이징하여 가져오기
+    // findAll(Pageable) 메소드는 Page<Qna>를 반환하며, 정렬 정보는 pageable에 포함되어 있음
+    Page<Qna> qnaPage = qnaRepository.findAll(pageable);
 
-    // 2. QnaResDto 객체들을 담을 빈 리스트 만들기
-    List<QnaResDto> qnaResDtoList = new ArrayList<>();
+    // Page<Qna>를 Page<QnaResDto>로 변환
+    List<QnaResDto> qnaResDtoList =
+        qnaPage.getContent().stream().map(QnaResDto::new).collect(Collectors.toList());
 
-    // 3. 데이터베이스에서 가져온 qnaList의 각 Qna 객체를 순회하며 살펴보기
-    for (Qna qna : qnaList) {
-      // 4. 현재 살펴보고 있는 qna를 가지고 새로운 QnaResDto 객체 만들기
-      QnaResDto qnaResDto = new QnaResDto(qna);
-
-      // 5. 새로 만들어진 QnaResDto 객체를, 아까 만들어둔 빈 리스트에 추가
-      qnaResDtoList.add(qnaResDto);
-    }
-
-    // 6. 모든 Qna 객체를 QnaResDto로 변환하여 담은 리스트 반환
-    return qnaResDtoList;
+    return new PageImpl<>(qnaResDtoList, pageable, qnaPage.getTotalElements());
   }
 
   /** 특정 Q&A 게시글을 ID로 조회하여 QnaResDto로 반환 */

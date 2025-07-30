@@ -1,7 +1,9 @@
 package com.example.reve.controller.user;
 
-import java.util.List;
-
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
+import org.springframework.data.web.PageableDefault;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -39,11 +41,14 @@ public class BoardController {
   }
 
   @GetMapping("/qna/list")
-  public String qnaList(Model model) { // Model 객체 추가
-    // 1. QnaService를 통해 모든 Q&A 목록가져오기
-    List<QnaResDto> qnas = qnaService.selectAll();
-    // 2. 가져온 Q&A 목록을 "qnas"라는 이름으로 모델에 추가
-    model.addAttribute("qnas", qnas);
+  public String qnaList(
+      Model model,
+      @PageableDefault(size = 10, sort = "createdAt", direction = Sort.Direction.DESC)
+          Pageable pageable) {
+    // 1. QnaService를 통해 Q&A 목록을 페이징하여 가져오기
+    Page<QnaResDto> qnaPage = qnaService.selectAll(pageable);
+    // 2. 가져온 Q&A Page 객체를 "qnas"라는 이름으로 모델에 추가 (Thymeleaf에서 qnas로 사용)
+    model.addAttribute("qnas", qnaPage);
     // 3. "board/qna/list.html" 뷰 반환
     return "board/qna/list";
   }
