@@ -175,19 +175,38 @@
 
             <div class="flex items-center space-x-2">
               <a
-                href="#"
+                th:if="${qna.prevQnaId}"
+                th:href="@{/board/qna/detail/{qnaId}(qnaId=${qna.prevQnaId})}"
                 class="flex items-center space-x-2 px-4 py-2 border border-gray-300 rounded-md hover:bg-gray-50 transition-colors"
               >
                 <i class="fas fa-chevron-left"></i>
                 <span>이전글</span>
               </a>
+              <button
+                th:unless="${qna.prevQnaId}"
+                class="flex items-center space-x-2 px-4 py-2 border border-gray-300 rounded-md text-gray-400 cursor-not-allowed"
+                disabled
+              >
+                <i class="fas fa-chevron-left"></i>
+                <span>이전글</span>
+              </button>
+
               <a
-                href="#"
+                th:if="${qna.nextQnaId}"
+                th:href="@{/board/qna/detail/{qnaId}(qnaId=${qna.nextQnaId})}"
                 class="flex items-center space-x-2 px-4 py-2 border border-gray-300 rounded-md hover:bg-gray-50 transition-colors"
               >
                 <span>다음글</span>
                 <i class="fas fa-chevron-right"></i>
               </a>
+              <button
+                th:unless="${qna.nextQnaId}"
+                class="flex items-center space-x-2 px-4 py-2 border border-gray-300 rounded-md text-gray-400 cursor-not-allowed"
+                disabled
+              >
+                <span>다음글</span>
+                <i class="fas fa-chevron-right"></i>
+              </button>
             </div>
           </div>
 

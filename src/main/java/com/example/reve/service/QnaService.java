@@ -169,9 +169,13 @@ public class QnaService {
             .findById(qnaId)
             .orElseThrow(() -> new IllegalArgumentException("해당 Q&A를 찾을 수 없습니다. ID: " + qnaId));
 
+    // 이전/다음 Q&A ID 조회
+    Long prevQnaId = qnaRepository.findPrevQnaId(qnaId).orElse(null);
+    Long nextQnaId = qnaRepository.findNextQnaId(qnaId).orElse(null);
+
     // 공개글이면 바로 반환
     if (!qna.getIsSecret()) {
-      return new QnaResDTO(qna);
+      return new QnaResDTO(qna, prevQnaId, nextQnaId); // prev/next QnaId 포함하여 반환
     }
 
     // 비밀글인 경우, 접근 권한 확인
@@ -184,7 +188,7 @@ public class QnaService {
               .map(user -> user.getRole().equals(Role.ADMIN))
               .orElse(false);
       if (isAdmin) {
-        return new QnaResDTO(qna); // 관리자면 접근 허용
+        return new QnaResDTO(qna, prevQnaId, nextQnaId); // 관리자면 접근 허용
       }
     }
 
@@ -197,6 +201,6 @@ public class QnaService {
     }
 
     // 비밀번호가 일치하면 접근 허용
-    return new QnaResDTO(qna);
+    return new QnaResDTO(qna, prevQnaId, nextQnaId); // prev/next QnaId 포함하여 반환
   }
 }
