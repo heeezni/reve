@@ -33,6 +33,10 @@ public class Perfume extends BaseEntity {
   @Column(name = "scent", nullable = false)
   private String scent;
 
+  // 향수 설명 타이틀 (한 줄 소개)
+  @Column(nullable = false)
+  private String descriptionTitle;
+
   // 향수 설명
   @Column(nullable = false)
   private String description;

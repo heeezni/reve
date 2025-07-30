@@ -12,9 +12,28 @@
       <div class="min-h-screen bg-gray-50 py-12">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <!-- Page Title -->
-          <div class="mb-8">
-            <h1 class="text-3xl font-bold text-gray-800 mb-2">상품 목록</h1>
-            <p class="text-gray-600">Rêve의 프리미엄 향수를 만나보세요</p>
+          <div class="mb-8 flex items-center justify-between">
+            <div>
+              <h1 class="text-3xl font-bold text-gray-800 mb-2">상품 목록</h1>
+              <p class="text-gray-600">Rêve의 프리미엄 향수를 만나보세요</p>
+            </div>
+
+            <!-- 관리자용 버튼 영역 -->
+            <div class="space-x-2">
+              <a
+                      href="/admin/shop/regist"
+                      class="px-4 py-2 bg-blue-600 text-white text-sm rounded-md hover:bg-blue-700 transition"
+              >
+                등록
+              </a>
+              <button
+                      type="button"
+                      id="toggleDeleteModeBtn"
+                      class="px-4 py-2 bg-red-500 text-white text-sm rounded-md hover:bg-red-600 transition"
+              >
+                삭제 모드
+              </button>
+            </div>
           </div>
 
           <!-- Search and Filter Section -->
@@ -70,19 +89,35 @@
                     </select>
                   </label>
                 </form>
-                <button
-                  class="flex items-center space-x-2 px-4 py-2 border border-gray-300 rounded-md hover:bg-gray-50 transition-colors"
-                >
-                  <i class="fas fa-filter text-gray-600"></i>
-                  <span class="text-sm text-gray-700">필터</span>
-                </button>
               </div>
             </div>
           </div>
 
+          <form id="deleteForm" method="post" action="/admin/shop/delete">
+          <!-- 삭제 모드 버튼 영역 여기 넣기 -->
+          <div id="deleteModeButtons" class="hidden space-x-2 mb-6">
+            <button
+                    id="deleteSelectedBtn"
+                    type="submit"
+                    class="px-4 py-2 bg-red-600 text-white rounded-md hover:bg-red-700"
+            >
+              선택 삭제
+            </button>
+            <button
+                    id="cancelDeleteBtn"
+                    type="button"
+                    class="px-4 py-2 bg-gray-300 rounded-md hover:bg-gray-400"
+            >
+              삭제 취소
+            </button>
+          </div>
+
           <!-- Product Grid -->
           <div class="grid md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
-            <div th:each="perfume : ${perfumeList}" class="bg-white rounded-lg shadow-sm overflow-hidden group">
+            <div th:each="perfume : ${perfumeList}" class="bg-white rounded-lg shadow-sm overflow-hidden group relative">
+              <!-- 체크박스 : 오른쪽 위에 위치, 기본 숨김 -->
+              <input type="checkbox" name="perfumeIdList" th:value="${perfume.perfumeId}"
+                     class="delete-checkbox absolute top-2 right-2 w-5 h-5 hidden z-10" />
               <div class="relative overflow-hidden">
                 <img
                         th:src="@{${perfume.imageUrl}}"
@@ -171,6 +206,7 @@
               </div>
             </div>
           </div>
+          </form>
 
           <!-- Pagination -->
           <div class="mt-12 flex items-center justify-center">
@@ -284,6 +320,56 @@
 
     <script src="/js/script.js"></script>
     <script>
+      const toggleDeleteModeBtn = document.getElementById('toggleDeleteModeBtn');
+      const cancelDeleteBtn = document.getElementById('cancelDeleteBtn');
+      const deleteCheckboxes = document.querySelectorAll('.delete-checkbox');
+      const deleteModeButtons = document.getElementById('deleteModeButtons');
+      const deleteForm = document.getElementById('deleteForm');
+      const deleteSelectedBtn = document.getElementById('deleteSelectedBtn');
+
+      deleteForm.addEventListener('submit', (e) => {
+        // 체크된 항목이 없으면 제출 막기
+        const checked = document.querySelectorAll('.delete-checkbox:checked');
+        if (checked.length === 0) {
+          e.preventDefault();
+          alert('삭제할 상품을 선택해주세요.');
+          return;
+        }
+
+        if (!confirm('정말 삭제하시겠습니까?')) {
+          e.preventDefault();
+        }
+      });
+
+      toggleDeleteModeBtn.addEventListener('click', () => {
+        // 체크박스 보이기/숨기기 토글
+        deleteCheckboxes.forEach(cb => cb.classList.toggle('hidden'));
+
+        // 삭제/취소 버튼 영역 보이기/숨기기 토글
+        deleteModeButtons.classList.toggle('hidden');
+
+        // 버튼 텍스트 변경
+        if (deleteModeButtons.classList.contains('hidden')) {
+          toggleDeleteModeBtn.textContent = '삭제 모드';
+        } else {
+          toggleDeleteModeBtn.textContent = '삭제 취소';
+        }
+      });
+
+      cancelDeleteBtn.addEventListener('click', () => {
+        // 체크박스 숨기고 선택 해제
+        deleteCheckboxes.forEach(cb => {
+          cb.classList.add('hidden');
+          cb.checked = false;
+        });
+
+        // 삭제/취소 버튼 숨기기
+        deleteModeButtons.classList.add('hidden');
+
+        // 삭제 모드 버튼 텍스트 초기화
+        toggleDeleteModeBtn.textContent = '삭제 모드';
+      });
+
       // Search functionality
       const searchInput = document.querySelector('input[type="text"]');
       searchInput.addEventListener('input', function () {

@@ -3,7 +3,7 @@ package com.example.reve.dto;
 import lombok.*;
 
 /*
-향수저장에 관한 데이터를 전달하기 위한 DTO임.
+향수저장(요청)에 관한 데이터를 전달하기 위한 DTO임.
  */
 @Getter
 @Setter
@@ -16,6 +16,8 @@ public class PerfumeSaveRequestDto {
   private String perfumeName;
   // 향(예 : 플로럴, 머스크)
   private String scent;
+  // 향수 한 줄 소개
+  private String descriptionTitle;
   // 향수 설명
   private String description;
   // 향수 용량(예 : 70ml)

@@ -23,6 +23,8 @@ public class PerfumeListResponseDto {
   private String perfumeName;
   // 향(예 : 플로럴, 머스크)
   private String scent;
+  // 향수 한 줄 소개
+  private String descriptionTitle;
   // 향수 설명
   private String description;
   // 향수 용량(예 : 70ml)
@@ -45,6 +47,7 @@ public class PerfumeListResponseDto {
 
   // 향수에 대한 정보를 빌더에 저장함.
   public static PerfumeListResponseDto fromEntity(Perfume perfume) {
+    // 리뷰에 관한 로직임.
     List<Review> reviewList = perfume.getReviewList();
     int count = reviewList.size();
     double avgRating = 0.0;
@@ -58,6 +61,7 @@ public class PerfumeListResponseDto {
         .perfumeId(perfume.getPerfumeId())
         .perfumeName(perfume.getPerfumeName())
         .scent(perfume.getScent())
+        .descriptionTitle(perfume.getDescriptionTitle())
         .description(perfume.getDescription())
         .volume(perfume.getVolume())
         .price(perfume.getPrice())

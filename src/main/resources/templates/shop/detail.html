@@ -12,7 +12,7 @@
       <div class="min-h-screen bg-gray-50 py-12">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <!-- Breadcrumb -->
-          <nav class="mb-6">
+          <nav class="mb-6 flex justify-between items-center">
             <ol class="flex items-center space-x-2 text-sm text-gray-600">
               <li><a href="/" class="hover:text-gray-800">홈</a></li>
               <li><i class="fas fa-chevron-right text-xs"></i></li>
@@ -24,6 +24,24 @@
               <li><li class="text-gray-800" th:text="${perfume.perfumeName + ' ' + perfume.volume}">
               </li>
             </ol>
+
+            <!-- 오른쪽: 수정 삭제 버튼 -->
+            <div class="space-x-2 flex items-center">
+              <a th:href="@{/admin/shop/edit(id=${perfume.perfumeId})}"
+                 class="px-6 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition text-base">
+                수정
+              </a>
+
+              <form th:action="@{/admin/shop/delete}" method="post" th:object="${perfume}"
+                    class="inline-flex"
+                    onsubmit="return confirm('정말 삭제하시겠습니까?');">
+                <input type="hidden" name="id" th:value="${perfume.perfumeId}" />
+                <button type="submit"
+                        class="px-6 py-2 bg-red-600 text-white rounded-md hover:bg-red-700 transition text-base">
+                  삭제
+                </button>
+              </form>
+            </div>
           </nav>
 
           <!-- Product Detail Section -->
@@ -36,15 +54,16 @@
                   <img
                     id="mainImage"
                     th:src="@{${perfume.hoverImageUrl}}"
-                    alt="디어 무드 멀티 퍼퓸 70ml"
+                    alt="향수호버이미지"
                     class="w-full h-96 object-cover"
                   />
 
                   <!-- Sale Badge -->
-                  <div class="absolute top-4 left-4" th:with="discountPercent=${(perfume.discount * 100) / perfume.price}">
+                  <div class="absolute top-4 left-4"
+                       th:if="${perfume.discount > 0}"
+                       th:with="discountPercent=${(perfume.discount * 100) / perfume.price}">
                     <span th:text="${#numbers.formatDecimal(discountPercent, 0, 0)} + '% 할인'"
-                      class="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium bg-red-500 text-white"
-                    >
+                          class="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium bg-red-500 text-white">
                     </span>
                   </div>
 
@@ -119,56 +138,59 @@
                   <!-- 상품명 -->
                   <h1 class="text-3xl font-bold text-gray-800 mb-2" th:text="${perfume.perfumeName + ' ' + perfume.volume}">
                   </h1>
-                  <p class="text-lg text-gray-600">
-                    봄의 설렘을 담은 플로럴 향기
-                  </p>
+                  <p class="text-lg text-gray-600" th:text="${perfume.description}"></p>
                 </div>
 
                 <!-- Rating and Reviews -->
-                <div class="flex items-center space-x-4"
-                     th:with="
-       avgRating=${perfume.averageRating},
-       fullStars=${T(java.lang.Math).floor(avgRating)},
-       decimalPart=${avgRating - fullStars},
-       halfStar=${(decimalPart >= 0.3 and decimalPart < 0.8) ? 1 : 0},
-       fullStarsAdjusted=${decimalPart >= 0.8 ? fullStars + 1 : fullStars},
-       totalStars=${fullStarsAdjusted + halfStar},
-       emptyStars=${5 - totalStars}">
+                <div class="flex items-center space-x-1">
+                  <span th:each="i : ${#numbers.sequence(1,5)}"
+                        style="position: relative; display: inline-block; width: 1.25rem; height: 1.25rem;">
 
-                  <!-- 노란 별 (꽉 찬 별) -->
-                  <span th:each="i : ${#numbers.sequence(1, fullStarsAdjusted)}">
-    <i class="fas fa-star text-yellow-400"></i>
-  </span>
+                    <!-- 회색 별 -->
+                    <i class="fas fa-star"
+                       style="color: #d1d5db; position: absolute; top: 0; left: 0; width: 100%; height: 100%;
+                              font-size: 1.25rem; line-height: 1.25rem;"></i>
 
-                  <!-- 반 별 -->
-                  <span th:if="${halfStar == 1}">
-    <i class="fas fa-star-half-alt text-yellow-400"></i>
-  </span>
+                    <!-- 노란 별 -->
+                    <span th:if="${perfume.averageRating >= i}"
+                          style="width: 100%; overflow: hidden; position: absolute; top: 0; left: 0; height: 100%;
+                                 display: block; color: #facc15;">
+                      <i class="fas fa-star"
+                         style="width: 100%; height: 100%; font-size: 1.25rem; line-height: 1.25rem;"></i>
+                    </span>
 
-                  <!-- 회색 별 -->
-                  <span th:each="i : ${#numbers.sequence(1, emptyStars)}">
-    <i class="fas fa-star text-gray-300"></i>
-  </span>
+                    <!-- 반쪽 별 또는 부분별 채우기 -->
+                    <span th:if="${perfume.averageRating < i and perfume.averageRating > (i - 1)}"
+                          th:with="fillPercent=${((perfume.averageRating - (i - 1)) * 100) > 100 ? 100 : ((perfume.averageRating - (i - 1)) * 100 + 10)}"
+                          th:style="'width:' + ${fillPercent} + '%; overflow: hidden; position: absolute; top: 0; left: 0; height: 100%; display: block; color: #facc15;'">
+                      <i class="fas fa-star"
+                         style="width: 100%; height: 100%; font-size: 1.25rem; line-height: 1.25rem;"></i>
+                    </span>
 
-                  <!-- 평점 및 리뷰 -->
+                  </span>
+
                   <span class="ml-2 text-sm text-gray-600"
                         th:text="${perfume.averageRating} + ' (' + ${perfume.reviewCount} + '개 리뷰)'"></span>
                 </div>
 
                 <!-- Price Information -->
-                <div class="space-y-2"
-                     th:with="discountPercent=${(perfume.discount * 100) / perfume.price}">
+                <div class="space-y-2">
 
                   <div class="flex items-baseline space-x-3">
 
-                    <span class="text-3xl font-bold text-gray-800"
-                          th:text="${perfume.price - perfume.discount} + '원'">24,600원</span>
+                    <!-- 실제 가격 -->
+                    <span class="text-3xl font-bold text-gray-800 price"
+                          th:text="${perfume.price - perfume.discount}"></span>
 
-                    <span class="text-xl text-gray-400 line-through"
-                          th:text="${perfume.price} + '원'">39,000원</span>
+                    <!-- 할인 있을 때만 원가와 할인률 보여주기 -->
+                    <span th:if="${perfume.discount > 0}">
+                      <span class="text-xl text-gray-400 line-through price"
+                            th:text="${perfume.price}"></span>
 
-                    <span class="text-lg font-medium text-red-500"
-                          th:text="${#numbers.formatDecimal(discountPercent, 0, 0)} + '% 할인'">37% 할인</span>
+                      <span class="text-lg font-medium text-red-500"
+                            th:with="discountPercent=${(perfume.discount * 100) / perfume.price}"
+                            th:text="${#numbers.formatDecimal(discountPercent, 0, 0)} + '% 할인'"></span>
+                    </span>
 
                   </div>
 
@@ -287,8 +309,8 @@
                 <button
                   class="tab-btn py-4 px-1 border-b-2 border-transparent text-gray-500 hover:text-gray-700 font-medium text-sm"
                   data-tab="review"
+                  th:text="'리뷰 (' + ${perfume.reviewCount} + ')'"
                 >
-                  리뷰 (127)
                 </button>
                 <button
                   class="tab-btn py-4 px-1 border-b-2 border-transparent text-gray-500 hover:text-gray-700 font-medium text-sm"
@@ -569,25 +591,47 @@
             </div>
           </div>
 
-          <!-- Related Products -->
-            <div class="flex items-center justify-between mb-3">
-              <div class="flex items-center space-x-2">
-                <!-- 할인 가격 -->
-                <span class="text-xl font-bold text-gray-800"
-                      th:text="${T(String).format('%,d원', perfume.price - perfume.discount)}">
-      29,000원
-    </span>
-                <!-- 원래 가격 (할인 있을 때만) -->
-                <span class="text-sm text-gray-400 line-through"
-                      th:if="${perfume.discount > 0}"
-                      th:text="${T(String).format('%,d원', perfume.price)}">
-      39,000원
-    </span>
-              </div>
-              <div class="flex items-center space-x-1">
-                <i class="fas fa-star text-yellow-400 text-sm"></i>
-                <span class="text-sm text-gray-600" th:text="${perfume.averageRating}">4.8</span>
-                <span class="text-sm text-gray-500" th:text="'(' + ${perfume.reviewCount} + ')'">(127)</span>
+            <!-- Related Products -->
+            <div class="mt-12">
+              <h3 class="text-2xl font-bold text-gray-800 mb-6">관련 상품</h3>
+              <div class="grid md:grid-cols-4 gap-6">
+                <div
+                        th:each="perfume : ${relatedPerfumes}"
+                        class="bg-white rounded-lg shadow-sm overflow-hidden group"
+                >
+                  <a th:href="@{/shop/detail(id=${perfume.perfumeId})}">
+                    <div class="relative overflow-hidden">
+                      <img
+                              th:src="@{${perfume.imageUrl}}"
+                              th:alt="${perfume.perfumeName}"
+                              class="w-full h-48 object-cover group-hover:scale-105 transition-transform duration-300"
+                      />
+                    </div>
+                    <div class="p-4">
+                      <h4
+                              class="font-medium text-gray-800 mb-2"
+                              th:text="${perfume.perfumeName}"
+                      >
+                        상품 이름
+                      </h4>
+                      <div class="flex items-center justify-between">
+                        <span
+                                class="font-bold text-gray-800"
+                                th:text="|${#numbers.formatInteger(perfume.price - perfume.discount, 3, 'COMMA')}원|"
+                        >
+                          가격
+                        </span>
+                        <span
+                                class="text-sm text-gray-400 line-through"
+                                th:if="${perfume.discount > 0}"
+                                th:text="|${#numbers.formatInteger(perfume.price, 3, 'COMMA')}원|"
+                        >
+                          원래가격
+                        </span>
+                      </div>
+                    </div>
+                  </a>
+                </div>
               </div>
             </div>
           </div>
@@ -610,6 +654,13 @@
       const priceElem = document.getElementById('price');
       const price = parseInt(priceElem.textContent, 10);
       priceElem.textContent = price.toLocaleString() + '원';
+
+      document.querySelectorAll('.price').forEach(elem => {
+        const raw = parseInt(elem.textContent.replace(/[^0-9]/g, ''), 10); // 숫자만 추출
+        if (!isNaN(raw)) {
+          elem.textContent = raw.toLocaleString() + '원';
+        }
+      });
 
       thumbnailBtns.forEach((btn) => {
         btn.addEventListener('click', function () {
