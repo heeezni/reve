@@ -1,5 +1,9 @@
 package com.example.reve.dto;
 
+import java.util.List;
+
+import org.springframework.web.multipart.MultipartFile;
+
 import lombok.Getter;
 import lombok.Setter;
 
@@ -14,4 +18,5 @@ public class QnaReqDto {
   private String category; // QnA 문의 분류
   private Long userId; // 작성자 ID
   private Long perfumeId; // 관련 상품 ID
+  private List<MultipartFile> attachmentFiles; // 첨부 파일 리스트
 }

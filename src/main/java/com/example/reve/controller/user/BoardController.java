@@ -23,7 +23,7 @@ public class BoardController {
   // Q&A 생성 API
   @PostMapping("/qna")
   @ResponseBody // View가 아닌 데이터(JSON)를 반환
-  public ResponseEntity<QnaResDto> createQna(@RequestBody QnaReqDto reqDto) {
+  public ResponseEntity<QnaResDto> createQna(@ModelAttribute QnaReqDto reqDto) {
     QnaResDto qna = qnaService.createQna(reqDto);
     return ResponseEntity.ok(qna); // 성공(200 OK) 응답과 함께 생성된 Q&A 정보 반환
   }

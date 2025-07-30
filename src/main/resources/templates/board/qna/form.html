@@ -392,27 +392,43 @@
       const fileList = $('#fileList');
 
       fileInput.on('change', function () {
-        fileList.empty(); // .empty() 메소드 사용
+        fileList.empty(); // 기존 목록 초기화
         const files = Array.from(this.files);
 
         files.forEach((file, index) => {
-          const fileItem = $('<div></div>'); // jQuery로 요소 생성
-          fileItem.addClass('flex items-center justify-between p-3 bg-gray-50 rounded-md'); // .addClass()
-          fileItem.html(`
-            <div class="flex items-center space-x-3">
-              <i class="fas fa-file text-gray-500"></i>
-              <span class="text-sm text-gray-700">${file.name}</span>
-              <span class="text-xs text-gray-500">(${(
-                file.size /
-                1024 /
-                1024
-              ).toFixed(2)}MB)</span>
-            </div>
-            <button type="button" onclick="removeFile(${index})" class="text-red-500 hover:text-red-700">
-              <i class="fas fa-times"></i>
-            </button>
-          `);
-          fileList.append(fileItem); // .append() 메소드 사용
+          const fileItem = $('<div></div>');
+          fileItem.addClass('flex items-center justify-between p-3 bg-gray-50 rounded-md');
+
+          // 파일 정보를 담을 컨테이너
+          const fileInfoContainer = $('<div></div>').addClass('flex items-center space-x-3');
+
+          // 이미지 파일인 경우 미리보기 생성
+          if (file.type.startsWith('image/')) {
+            const reader = new FileReader();
+            reader.onload = function (e) {
+              const img = $('<img>');
+              img.attr('src', e.target.result);
+              img.addClass('w-16 h-16 object-cover rounded-md');
+              fileInfoContainer.prepend(img); // 이미지 미리보기를 앞에 추가
+            };
+            reader.readAsDataURL(file);
+          } else {
+            // 이미지가 아닌 경우 아이콘 표시
+            fileInfoContainer.append('<i class="fas fa-file text-gray-500 text-2xl w-16 text-center"></i>');
+          }
+
+          // 파일명 및 크기 정보 추가
+          const textInfo = $('<div></div>');
+          textInfo.append(`<span class="text-sm text-gray-700">${file.name}</span>`);
+          textInfo.append(`<br><span class="text-xs text-gray-500">(${(file.size / 1024 / 1024).toFixed(2)}MB)</span>`);
+          fileInfoContainer.append(textInfo);
+
+          // 삭제 버튼
+          const removeBtn = $(`<button type="button" onclick="removeFile(${index})" class="text-red-500 hover:text-red-700"><i class="fas fa-times"></i></button>`);
+
+          fileItem.append(fileInfoContainer);
+          fileItem.append(removeBtn);
+          fileList.append(fileItem);
         });
       });
 
@@ -440,8 +456,8 @@
       // '문의 등록' 버튼 클릭 이벤트
       $('#submit-qna').on('click', function (e) { // .on() 메소드 사용
         // 1. 폼 데이터 가져오기
-        const userId = $('#user-id').val();
-        const perfumeId = $('#perfume-id').val();
+        const userId = $('#user-id').val(); // userId를 함수 내부에서 가져옵니다.
+        const perfumeId = $('#perfume-id').val(); // perfumeId를 함수 내부에서 가져옵니다.
         const title = $('#qna-title').val();
         const content = $('#qna-content').val();
         const isSecret = $('input[name="isSecret"]:checked').val();
@@ -466,31 +482,35 @@
           return;
         }
 
-        // 3. 서버에 보낼 데이터 객체 생성 (QnaReqDto 와 구조 일치)
-        const qnaData = {
-          title: title,
-          content: content,
-          password: isSecret === 'true' ? password : "",
-          isSecret: isSecret === 'true',
-          category: category, // 이 줄 추가
-          userId: parseInt(userId, 10),
-          perfumeId: parseInt(perfumeId, 10),
-        };
+        // 3. FormData 객체 생성
+        const formData = new FormData();
+        formData.append('userId', parseInt(userId, 10));
+        formData.append('perfumeId', parseInt(perfumeId, 10));
+        formData.append('title', title);
+        formData.append('content', content);
+        formData.append('password', isSecret === 'true' ? password : "");
+        formData.append('isSecret', isSecret);
+        formData.append('category', category);
 
-        // 4. 서버에 POST 요청 보내기
+        // 파일 추가
+        const files = fileInput[0].files;
+        for (let i = 0; i < files.length; i++) {
+            formData.append('attachmentFiles', files[i]);
+        }
+
+        // 4. jQuery의 $.ajax()로 서버에 POST 요청 보내기
         $.ajax({
           url: '/board/qna',
           type: 'POST',
-          contentType: 'application/json',
-          data: JSON.stringify(qnaData),
+          data: formData,
+          processData: false,
+          contentType: false,
           success: function (data) {
-            // 5. 성공 처리
             console.log('성공:', data);
             alert('문의가 성공적으로 등록되었습니다.');
             location.href = '/board/qna/list';
           },
           error: function (xhr, status, error) {
-            // 6. 실패 처리
             console.error('Error:', xhr.responseText || error);
             alert('문의 등록에 실패했습니다. 다시 시도해주세요.');
           }
