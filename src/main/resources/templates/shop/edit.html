@@ -1,0 +1,116 @@
+<!DOCTYPE html>
+<html lang="ko" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments/header :: head}">
+    <title>향수 수정 - Rêve 관리자</title>
+</head>
+<body class="font-sans text-gray-800">
+
+<!-- 헤더 -->
+<div th:replace="~{fragments/header :: header}"></div>
+
+<main class="pt-20 pb-20 max-w-3xl mx-auto px-6">
+    <h1 class="text-2xl font-bold mb-6">향수 수정</h1>
+
+    <form th:action="@{'/admin/shop/edit/' + ${perfume.perfumeId}}" method="post" enctype="multipart/form-data" class="space-y-6">
+        <!-- 향수 이름 -->
+        <div>
+            <label for="perfumeName" class="block mb-1 font-semibold">향수 이름</label>
+            <input type="text" id="perfumeName" name="perfumeName" required
+                   class="w-full border border-gray-300 rounded-md px-3 py-2"
+                   th:value="${perfume.perfumeName}" />
+        </div>
+
+        <!-- 향 종류 -->
+        <div>
+            <label for="scent" class="block mb-1 font-semibold">향 종류</label>
+            <select id="scent" name="scent" required
+                    class="w-full border border-gray-300 rounded-md px-3 py-2">
+                <option value="플로럴" th:selected="${perfume.scent == '플로럴'}">플로럴</option>
+                <option value="시트러스" th:selected="${perfume.scent == '시트러스'}">시트러스</option>
+                <option value="우디" th:selected="${perfume.scent == '우디'}">우디</option>
+                <option value="머스크" th:selected="${perfume.scent == '머스크'}">머스크</option>
+            </select>
+        </div>
+
+        <!-- 설명 타이틀 -->
+        <div>
+            <label for="descriptionTitle" class="block mb-1 font-semibold">설명 타이틀</label>
+            <input type="text" id="descriptionTitle" name="descriptionTitle" required
+                   class="w-full border border-gray-300 rounded-md px-3 py-2"
+                   th:value="${perfume.descriptionTitle}" />
+        </div>
+
+        <!-- 향수 설명 -->
+        <div>
+            <label for="description" class="block mb-1 font-semibold">향수 설명</label>
+            <textarea id="description" name="description" rows="4" required
+                      class="w-full border border-gray-300 rounded-md px-3 py-2 resize-none"
+                      th:text="${perfume.description}"></textarea>
+        </div>
+
+        <!-- 용량 -->
+        <div>
+            <label for="volume" class="block mb-1 font-semibold">용량</label>
+            <input type="text" id="volume" name="volume" required
+                   class="w-full border border-gray-300 rounded-md px-3 py-2"
+                   th:value="${perfume.volume}" />
+        </div>
+
+        <!-- 가격 -->
+        <div>
+            <label for="price" class="block mb-1 font-semibold">가격</label>
+            <input type="number" id="price" name="price" min="0" required
+                   class="w-full border border-gray-300 rounded-md px-3 py-2"
+                   th:value="${perfume.price}" />
+        </div>
+
+        <!-- 할인 -->
+        <div>
+            <label for="discount" class="block mb-1 font-semibold">할인 가격</label>
+            <input type="number" id="discount" name="discount" min="0" required
+                   class="w-full border border-gray-300 rounded-md px-3 py-2"
+                   th:value="${perfume.discount}" />
+        </div>
+
+        <!-- 재고 -->
+        <div>
+            <label for="stock" class="block mb-1 font-semibold">재고</label>
+            <input type="number" id="stock" name="stock" min="0" required
+                   class="w-full border border-gray-300 rounded-md px-3 py-2"
+                   th:value="${perfume.stock}" />
+        </div>
+
+        <!-- 기존 대표 이미지 -->
+        <div>
+            <label class="block mb-1 font-semibold">기존 대표 이미지</label>
+            <img th:src="@{${perfume.imageUrl}}" alt="대표 이미지"
+                 class="w-32 h-auto border mb-2" />
+            <input type="file" id="imageFile" name="imageFile" accept="image/*"
+                   class="w-full border border-gray-300 rounded-md px-3 py-2" />
+        </div>
+
+        <!-- 기존 호버 이미지 -->
+        <div>
+            <label class="block mb-1 font-semibold">기존 호버 이미지</label>
+            <img th:src="@{${perfume.hoverImageUrl}}" alt="호버 이미지"
+                 class="w-32 h-auto border mb-2" />
+            <input type="file" id="hoverImageFile" name="hoverImageFile" accept="image/*"
+                   class="w-full border border-gray-300 rounded-md px-3 py-2" />
+        </div>
+
+        <!-- 버튼 -->
+        <div class="flex justify-end space-x-4 pt-4 border-t">
+            <a th:href="@{/shop/detail(id=${perfume.perfumeId})}"
+               class="px-4 py-2 border border-gray-300 rounded-md hover:bg-gray-50 transition">
+                취소
+            </a>
+            <button type="submit" class="px-6 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition">수정</button>
+        </div>
+    </form>
+</main>
+
+<!-- 푸터 -->
+<div th:replace="~{fragments/footer :: footer}"></div>
+
+</body>
+</html>
