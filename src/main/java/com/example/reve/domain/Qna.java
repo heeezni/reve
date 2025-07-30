@@ -27,7 +27,7 @@ public class Qna extends BaseEntity {
   private String content;
 
   // Q&A 작성 비밀번호(Q&A 수정이나 삭제 시 필요)
-  @Column(nullable = false)
+  @Column(nullable = true)
   private String password;
 
   // Q&A 작성글에 대한 답변
@@ -49,7 +49,7 @@ public class Qna extends BaseEntity {
   // 관계 설정
   // Q&A와 유저와의 관계 (N : 1)
   @ManyToOne(fetch = FetchType.LAZY)
-  @JoinColumn(name = "user_id", nullable = false)
+  @JoinColumn(name = "user_id", nullable = true)
   private User user;
 
   // Q&A와 향수와의 관계 (N : 1)

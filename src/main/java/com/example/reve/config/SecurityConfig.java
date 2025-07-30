@@ -38,7 +38,7 @@ public class SecurityConfig {
    * @return new BCryptPasswordEncoder()
    */
   @Bean
-  public PasswordEncoder PasswordEncoder() {
+  public PasswordEncoder passwordEncoder() {
     return new BCryptPasswordEncoder();
   }
 

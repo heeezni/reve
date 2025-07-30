@@ -21,17 +21,17 @@
 
           <!-- Search and Filter Section -->
           <div class="bg-white rounded-lg shadow-sm p-6 mb-6">
-            <div
-              class="flex flex-col md:flex-row md:items-center md:justify-between space-y-4 md:space-y-0"
-            >
+            <form th:action="@{/board/qna/list}" th:method="get" class="flex flex-col md:flex-row md:items-center md:justify-between space-y-4 md:space-y-0">
               <!-- Search Bar -->
               <div class="flex-1 max-w-md">
                 <div class="relative">
                   <label>
                     <input
                       type="text"
+                      name="keyword"
                       placeholder="Q&A 검색..."
                       class="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-gray-800 focus:border-transparent"
+                      th:value="${param.keyword}"
                     />
                   </label>
                   <div
@@ -46,26 +46,31 @@
               <div class="flex items-center space-x-4">
                 <label>
                   <select
+                    name="category"
+                    onchange="this.form.submit()"
                     class="border border-gray-300 rounded-md px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-gray-800 focus:border-transparent"
                   >
-                    <option>전체</option>
-                    <option>상품문의</option>
-                    <option>배송문의</option>
-                    <option>결제문의</option>
-                    <option>반품/교환</option>
-                    <option>기타</option>
+                    <option value="" th:selected="${param.category == null or param.category == ''}">전체</option>
+                    <option value="product" th:selected="${param.category == 'product'}">상품문의</option>
+                    <option value="delivery" th:selected="${param.category == 'delivery'}">배송문의</option>
+                    <option value="payment" th:selected="${param.category == 'payment'}">결제문의</option>
+                    <option value="return" th:selected="${param.category == 'return'}">반품/교환</option>
+                    <option value="etc" th:selected="${param.category == 'etc'}">기타</option>
                   </select>
                 </label>
                 <label>
                   <select
+                    name="status"
+                    onchange="this.form.submit()"
                     class="border border-gray-300 rounded-md px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-gray-800 focus:border-transparent"
                   >
-                    <option>최신순</option>
-                    <option>조회순</option>
-                    <option>답변대기</option>
-                    <option>답변완료</option>
+                    <option value="" th:selected="${param.status == null or param.status == ''}">최신순</option>
+                    <option value="view" th:selected="${param.status == 'view'}">조회순</option>
+                    <option value="pending" th:selected="${param.status == 'pending'}">답변대기</option>
+                    <option value="completed" th:selected="${param.status == 'completed'}">답변완료</option>
                   </select>
                 </label>
+                <button type="submit" class="hidden"></button> <!-- Hidden submit button for search input -->
                 <a
                   href="/board/qna/form"
                   class="inline-flex items-center px-4 py-2 bg-gray-800 text-white rounded-md hover:bg-gray-700 transition-colors font-medium text-sm"
@@ -74,7 +79,7 @@
                   문의하기
                 </a>
               </div>
-            </div>
+            </form>
           </div>
 
           <!-- Q&A List -->
@@ -132,7 +137,7 @@
                   </div>
                   <div class="col-span-5">
                     <a
-                      href="#"
+                      th:href="@{/board/qna/detail/{qnaId}(qnaId=${qna.qnaId})}"
                       class="text-gray-800 hover:text-gray-600 font-medium flex items-center"
                     >
                       <i
@@ -163,42 +168,44 @@
           <div class="mt-8 flex items-center justify-center">
             <nav class="flex items-center space-x-2">
               <!-- Previous Page -->
+              <a
+                th:if="${!qnas.first}"
+                th:href="@{/board/qna/list(page=${qnas.number - 1}, keyword=${param.keyword}, category=${param.category}, status=${param.status})}"
+                class="px-3 py-2 text-sm font-medium text-gray-500 bg-white border border-gray-300 rounded-md hover:bg-gray-50"
+              >
+                <i class="fas fa-chevron-left"></i>
+              </a>
               <button
-                class="px-3 py-2 text-sm font-medium text-gray-500 bg-white border border-gray-300 rounded-md hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed"
+                th:unless="${!qnas.first}"
+                class="px-3 py-2 text-sm font-medium text-gray-500 bg-white border border-gray-300 rounded-md disabled:opacity-50 disabled:cursor-not-allowed"
+                disabled
               >
                 <i class="fas fa-chevron-left"></i>
               </button>
 
               <!-- Page Numbers -->
-              <button
-                class="px-3 py-2 text-sm font-medium text-white bg-gray-800 border border-gray-800 rounded-md"
-              >
-                1
-              </button>
-              <button
-                class="px-3 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-md hover:bg-gray-50"
-              >
-                2
-              </button>
-              <button
-                class="px-3 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-md hover:bg-gray-50"
-              >
-                3
-              </button>
-              <button
-                class="px-3 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-md hover:bg-gray-50"
-              >
-                4
-              </button>
-              <button
-                class="px-3 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-md hover:bg-gray-50"
-              >
-                5
-              </button>
+              <th:block th:each="i : ${#numbers.sequence(0, qnas.totalPages - 1)}">
+                <a
+                  th:href="@{/board/qna/list(page=${i}, keyword=${param.keyword}, category=${param.category}, status=${param.status})}"
+                  th:classappend="${i == qnas.number ? 'text-white bg-gray-800 border-gray-800' : 'text-gray-700 bg-white border-gray-300 hover:bg-gray-50'}"
+                  class="px-3 py-2 text-sm font-medium rounded-md"
+                  th:text="${i + 1}"
+                >
+                </a>
+              </th:block>
 
               <!-- Next Page -->
-              <button
+              <a
+                th:if="${!qnas.last}"
+                th:href="@{/board/qna/list(page=${qnas.number + 1}, keyword=${param.keyword}, category=${param.category}, status=${param.status})}"
                 class="px-3 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-md hover:bg-gray-50"
+              >
+                <i class="fas fa-chevron-right"></i>
+              </a>
+              <button
+                th:unless="${!qnas.last}"
+                class="px-3 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-md disabled:opacity-50 disabled:cursor-not-allowed"
+                disabled
               >
                 <i class="fas fa-chevron-right"></i>
               </button>
@@ -309,85 +316,5 @@
     <div th:replace="~{fragments/modal :: loginModal}"></div>
 
     <script src="/js/script.js"></script>
-    <script>
-      // Search functionality
-      const searchInput = document.querySelector('input[type="text"]');
-      searchInput.addEventListener('input', function () {
-        const searchTerm = this.value.toLowerCase();
-        const qnaItems = document.querySelectorAll('.divide-y > div');
-
-        qnaItems.forEach((item) => {
-          const title = item.querySelector('a').textContent.toLowerCase();
-          if (title.includes(searchTerm)) {
-            item.style.display = '';
-          } else {
-            item.style.display = 'none';
-          }
-        });
-      });
-
-      // Filter functionality
-      const categoryFilter = document.querySelector('select:first-of-type');
-      categoryFilter.addEventListener('change', function () {
-        const selectedCategory = this.value;
-        const qnaItems = document.querySelectorAll('.divide-y > div');
-
-        qnaItems.forEach((item) => {
-          const category = item.querySelector(
-            '.col-span-1:nth-child(2) span'
-          ).textContent;
-          if (selectedCategory === '전체' || category === selectedCategory) {
-            item.style.display = '';
-          } else {
-            item.style.display = 'none';
-          }
-        });
-      });
-
-      // Status filter functionality
-      const statusFilter = document.querySelector('select:last-of-type');
-      statusFilter.addEventListener('change', function () {
-        const selectedStatus = this.value;
-        const qnaItems = document.querySelectorAll('.divide-y > div');
-
-        qnaItems.forEach((item) => {
-          const status = item.querySelector(
-            '.col-span-1:nth-child(3) span'
-          ).textContent;
-          if (
-            selectedStatus === '최신순' ||
-            selectedStatus === '조회순' ||
-            (selectedStatus === '답변대기' && status === '답변대기') ||
-            (selectedStatus === '답변완료' && status === '답변완료')
-          ) {
-            item.style.display = '';
-          } else if (
-            selectedStatus === '답변대기' ||
-            selectedStatus === '답변완료'
-          ) {
-            item.style.display = 'none';
-          }
-        });
-      });
-
-      // Pagination functionality
-      document.querySelectorAll('nav button').forEach((button) => {
-        button.addEventListener('click', function () {
-          // Remove active state from all buttons
-          document.querySelectorAll('nav button').forEach((btn) => {
-            btn.classList.remove(
-              'text-white',
-              'bg-gray-800',
-              'border-gray-800'
-            );
-            btn.classList.add('text-gray-700', 'bg-white', 'border-gray-300');
-          });
-
-          // Add active state to clicked button
-          this.classList.remove('text-gray-700', 'bg-white', 'border-gray-300');
-          this.classList.add('text-white', 'bg-gray-800', 'border-gray-800');
-        });
-      });
-    </script>
   </body>
 </html>

@@ -30,7 +30,7 @@ public class QnaResDto {
     this.isSecret = qna.getIsSecret();
     this.category = qna.getCategory();
     this.attachment = qna.getAttachment();
-    this.userName = qna.getUser().getName();
+    this.userName = (qna.getUser() != null) ? qna.getUser().getName() : "비회원";
     this.perfumeName = qna.getPerfume().getPerfumeName();
     this.createdAt = qna.getCreatedAt();
     this.updatedAt = qna.getUpdatedAt();
