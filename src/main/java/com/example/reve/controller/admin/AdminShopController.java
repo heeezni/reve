@@ -3,9 +3,11 @@ package com.example.reve.controller.admin;
 import java.util.List;
 
 import org.springframework.stereotype.Controller;
+import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
+import com.example.reve.dto.PerfumeDetailResponseDto;
 import com.example.reve.dto.PerfumeSaveRequestDto;
 import com.example.reve.service.PerfumeService;
 
@@ -56,6 +58,27 @@ public class AdminShopController {
     } else if (perfumeId != null) {
       perfumeService.deletePerfume(perfumeId);
     }
+    return "redirect:/shop/list";
+  }
+
+  // 향수 수정폼 가져오기
+  @GetMapping("/edit/{perfumeId}")
+  public String showEditForm(@PathVariable("perfumeId") Long perfumeId, Model model) {
+    PerfumeDetailResponseDto perfume = perfumeService.getPerfumeDetail(perfumeId);
+    model.addAttribute("perfume", perfume);
+    return "shop/edit";
+  }
+
+  // 향수 수정하기
+  @PostMapping("/edit/{perfumeId}")
+  public String updatePerfume(
+      @PathVariable("perfumeId") Long perfumeId,
+      PerfumeSaveRequestDto requestDto,
+      @RequestParam(value = "imageFile", required = false) MultipartFile imageFile,
+      @RequestParam(value = "hoverImageFile", required = false) MultipartFile hoverImageFile) {
+
+    perfumeService.updatePerfume(perfumeId, requestDto, imageFile, hoverImageFile);
+
     return "redirect:/shop/list";
   }
 }
