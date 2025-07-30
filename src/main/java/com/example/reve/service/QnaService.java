@@ -141,10 +141,11 @@ public class QnaService {
    * @param pageable 페이징 정보 (페이지 번호, 페이지 크기, 정렬 등)
    * @return QnaResDTO의 Page 객체
    */
-  public Page<QnaResDTO> selectAll(Pageable pageable) {
+  public Page<QnaResDTO> selectAll(
+      String keyword, String category, String status, Pageable pageable) {
     // QnaRepository를 사용하여 데이터베이스에서 Qna 엔티티를 페이징하여 가져오기
     // findAll(Pageable) 메소드는 Page<Qna>를 반환하며, 정렬 정보는 pageable에 포함되어 있음
-    Page<Qna> qnaPage = qnaRepository.findAll(pageable);
+    Page<Qna> qnaPage = qnaRepository.findFilteredQnas(keyword, category, status, pageable);
 
     // Page<Qna>를 Page<QnaResDTO>로 변환
     List<QnaResDTO> qnaResDtoList =
@@ -154,7 +155,7 @@ public class QnaService {
   }
 
   /**
-   * Q&A 게시글의 접근 권한을 확인하고, 권한이 있는 경우 QnaResDTO를 반환한다.
+   * Q&A 게시글의 접근 권한을 확인하고, 권한이 있는 경우 QnaResDTO를 반환
    *
    * @param qnaId Q&A ID
    * @param principal 현재 로그인한 사용자 정보

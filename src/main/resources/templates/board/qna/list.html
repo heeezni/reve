@@ -50,24 +50,24 @@
                     onchange="this.form.submit()"
                     class="border border-gray-300 rounded-md px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-gray-800 focus:border-transparent"
                   >
-                    <option value="" th:selected="${param.category == null or param.category == ''}">전체</option>
-                    <option value="product" th:selected="${param.category == 'product'}">상품문의</option>
-                    <option value="delivery" th:selected="${param.category == 'delivery'}">배송문의</option>
-                    <option value="payment" th:selected="${param.category == 'payment'}">결제문의</option>
-                    <option value="return" th:selected="${param.category == 'return'}">반품/교환</option>
-                    <option value="etc" th:selected="${param.category == 'etc'}">기타</option>
+                    <option value="" th:selected="${#strings.isEmpty(param.category)}">전체</option>
+                    <option value="product" th:selected="${#strings.equals(param.category, 'product')}">상품문의</option>
+                    <option value="delivery" th:selected="${#strings.equals(param.category, 'delivery')}">배송문의</option>
+                    <option value="payment" th:selected="${#strings.equals(param.category, 'payment')}">결제문의</option>
+                    <option value="return" th:selected="${#strings.equals(param.category, 'return')}">반품/교환</option>
+                    <option value="etc" th:selected="${#strings.equals(param.category, 'etc')}">기타</option>
                   </select>
                 </label>
                 <label>
                   <select
-                    name="status"
+                    name="filterAndSort"
                     onchange="this.form.submit()"
                     class="border border-gray-300 rounded-md px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-gray-800 focus:border-transparent"
                   >
-                    <option value="" th:selected="${param.status == null or param.status == ''}">최신순</option>
-                    <option value="view" th:selected="${param.status == 'view'}">조회순</option>
-                    <option value="pending" th:selected="${param.status == 'pending'}">답변대기</option>
-                    <option value="completed" th:selected="${param.status == 'completed'}">답변완료</option>
+                    <option value="" th:selected="${#strings.isEmpty(param.filterAndSort)}">최신순</option>
+                    <option value="oldest" th:selected="${#strings.equals(param.filterAndSort, 'oldest')}">오래된순</option>
+                    <option value="pending" th:selected="${#strings.equals(param.filterAndSort, 'pending')}">답변대기</option>
+                    <option value="completed" th:selected="${#strings.equals(param.filterAndSort, 'completed')}">답변완료</option>
                   </select>
                 </label>
                 <button type="submit" class="hidden"></button> <!-- Hidden submit button for search input -->
@@ -170,7 +170,7 @@
               <!-- Previous Page -->
               <a
                 th:if="${!qnas.first}"
-                th:href="@{/board/qna/list(page=${qnas.number - 1}, keyword=${param.keyword}, category=${param.category}, status=${param.status})}"
+                th:href="@{/board/qna/list(page=${qnas.number - 1}, keyword=${param.keyword}, category=${param.category}, filterAndSort=${param.filterAndSort})}"
                 class="px-3 py-2 text-sm font-medium text-gray-500 bg-white border border-gray-300 rounded-md hover:bg-gray-50"
               >
                 <i class="fas fa-chevron-left"></i>
@@ -184,9 +184,9 @@
               </button>
 
               <!-- Page Numbers -->
-              <th:block th:each="i : ${#numbers.sequence(0, qnas.totalPages - 1)}">
+              <th:block th:if="${qnas.totalPages > 0}" th:each="i : ${#numbers.sequence(0, qnas.totalPages - 1)}">
                 <a
-                  th:href="@{/board/qna/list(page=${i}, keyword=${param.keyword}, category=${param.category}, status=${param.status})}"
+                  th:href="@{/board/qna/list(page=${i}, keyword=${param.keyword}, category=${param.category}, filterAndSort=${param.filterAndSort})}"
                   th:classappend="${i == qnas.number ? 'text-white bg-gray-800 border-gray-800' : 'text-gray-700 bg-white border-gray-300 hover:bg-gray-50'}"
                   class="px-3 py-2 text-sm font-medium rounded-md"
                   th:text="${i + 1}"
@@ -197,7 +197,7 @@
               <!-- Next Page -->
               <a
                 th:if="${!qnas.last}"
-                th:href="@{/board/qna/list(page=${qnas.number + 1}, keyword=${param.keyword}, category=${param.category}, status=${param.status})}"
+                th:href="@{/board/qna/list(page=${qnas.number + 1}, keyword=${param.keyword}, category=${param.category}, filterAndSort=${param.filterAndSort})}"
                 class="px-3 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-md hover:bg-gray-50"
               >
                 <i class="fas fa-chevron-right"></i>
@@ -223,7 +223,7 @@
                   <h4 class="font-medium text-gray-800 mb-2">
                     Q. 배송은 얼마나 걸리나요?
                   </h4>
-                  <p class="text-sm text-gray-600">
+                  <p class="text-sm text-gray-600 whitespace-normal break-words">
                     주문 완료 후 1-2일 내 배송되며, 배송 완료까지 2-3일
                     소요됩니다.
                   </p>
@@ -232,18 +232,18 @@
                   <h4 class="font-medium text-gray-800 mb-2">
                     Q. 반품/교환이 가능한가요?
                   </h4>
-                  <p class="text-sm text-gray-600">
+                  <p class="text-sm text-gray-600 whitespace-normal break-words">
                     배송 완료 후 7일 이내에 반품/교환이 가능합니다. 단, 사용
-                    흔적이 있는 경우 제한될 수 있습니다.
+                    흔적이 있는 경우 <br> 제한될 수 있습니다.
                   </p>
                 </div>
                 <div class="border-b border-gray-200 pb-4">
                   <h4 class="font-medium text-gray-800 mb-2">
                     Q. 퍼퓸의 지속력은 어느 정도인가요?
                   </h4>
-                  <p class="text-sm text-gray-600">
+                  <p class="text-sm text-gray-600 whitespace-normal break-words">
                     Rêve 퍼퓸은 평균 4-6시간 지속되며, 개인의 체질과 사용 환경에
-                    따라 차이가 있을 수 있습니다.
+                    따라<br> 차이가 있을 수 있습니다.
                   </p>
                 </div>
               </div>
@@ -252,7 +252,7 @@
                   <h4 class="font-medium text-gray-800 mb-2">
                     Q. 결제 방법은 어떤 것들이 있나요?
                   </h4>
-                  <p class="text-sm text-gray-600">
+                  <p class="text-sm text-gray-600 whitespace-normal break-words">
                     신용카드, 체크카드, 무통장입금, 카카오페이, 네이버페이 등
                     다양한 결제 방법을 지원합니다.
                   </p>
@@ -261,7 +261,7 @@
                   <h4 class="font-medium text-gray-800 mb-2">
                     Q. 회원 등급 혜택은 어떻게 되나요?
                   </h4>
-                  <p class="text-sm text-gray-600">
+                  <p class="text-sm text-gray-600 whitespace-normal break-words">
                     구매 금액에 따라 등급이 결정되며, 등급별로 할인율과 포인트
                     적립률이 차등 적용됩니다.
                   </p>
@@ -270,7 +270,7 @@
                   <h4 class="font-medium text-gray-800 mb-2">
                     Q. 개인정보는 안전하게 보호되나요?
                   </h4>
-                  <p class="text-sm text-gray-600">
+                  <p class="text-sm text-gray-600 whitespace-normal break-words">
                     네, 고객님의 개인정보는 암호화되어 안전하게 보호되며,
                     제3자에게 제공되지 않습니다.
                   </p>

@@ -6,6 +6,7 @@ import java.security.Principal;
 import jakarta.validation.Valid;
 
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.web.PageableDefault;
@@ -73,9 +74,27 @@ public class BoardController {
   public String qnaList(
       Model model,
       @PageableDefault(size = 10, sort = "createdAt", direction = Sort.Direction.DESC)
-          Pageable pageable) {
+          Pageable pageable,
+      @RequestParam(required = false) String keyword,
+      @RequestParam(required = false) String category,
+      @RequestParam(required = false, defaultValue = "") String filterAndSort) {
+
+    String status = null; // QnaService에 전달할 status 값
+    Sort sort = Sort.by(Sort.Direction.DESC, "createdAt"); // 기본 정렬: 최신순
+
+    if ("oldest".equals(filterAndSort)) {
+      sort = Sort.by(Sort.Direction.ASC, "createdAt");
+    } else if ("pending".equals(filterAndSort)) {
+      status = "pending";
+    } else if ("completed".equals(filterAndSort)) {
+      status = "completed";
+    }
+
+    Pageable pageableWithSort =
+        PageRequest.of(pageable.getPageNumber(), pageable.getPageSize(), sort);
+
     // 1. QnaService를 통해 Q&A 목록을 페이징하여 가져오기
-    Page<QnaResDTO> qnaPage = qnaService.selectAll(pageable);
+    Page<QnaResDTO> qnaPage = qnaService.selectAll(keyword, category, status, pageableWithSort);
     // 2. 가져온 Q&A Page 객체를 "qnas"라는 이름으로 모델에 추가 (Thymeleaf에서 qnas로 사용)
     model.addAttribute("qnas", qnaPage);
     // 3. "board/qna/list.html" 뷰 반환
