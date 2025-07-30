@@ -3,7 +3,6 @@ package com.example.reve.controller.user;
 import jakarta.servlet.http.HttpSession;
 
 import org.springframework.stereotype.Controller;
-import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -46,14 +45,6 @@ public class MemberController {
   public String signup(CreateUserDTO create) {
     log.info("가입 정보 {}", create);
     userService.signup(create);
-    return "index";
-  }
-
-  @GetMapping("/")
-  public String index(HttpSession session, Model model) {
-    Object loginUser = session.getAttribute("loginUser");
-    log.info("세션에서 가져온 유저 : {}", loginUser);
-    model.addAttribute("loginUser", loginUser);
     return "index";
   }
 }
