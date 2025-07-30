@@ -114,7 +114,7 @@
 
           <!-- Product Grid -->
           <div class="grid md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
-            <div th:each="perfume : ${perfumeList}" class="bg-white rounded-lg shadow-sm overflow-hidden group relative">
+            <div th:each="perfume : ${perfumePage.content}" class="bg-white rounded-lg shadow-sm overflow-hidden group relative">
               <!-- 체크박스 : 오른쪽 위에 위치, 기본 숨김 -->
               <input type="checkbox" name="perfumeIdList" th:value="${perfume.perfumeId}"
                      class="delete-checkbox absolute top-2 right-2 w-5 h-5 hidden z-10" />
@@ -210,34 +210,43 @@
 
           <!-- Pagination -->
           <div class="mt-12 flex items-center justify-center">
-            <nav class="flex items-center space-x-2">
-              <button
-                class="px-3 py-2 text-sm font-medium text-gray-500 bg-white border border-gray-300 rounded-md hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed"
-              >
+            <nav class="flex items-center space-x-2" aria-label="Pagination">
+
+              <!-- 이전 페이지 버튼 -->
+              <a th:if="${perfumePage.hasPrevious()}"
+                 th:href="@{/shop/list(page=${perfumePage.number - 1}, size=${perfumePage.size}, sort=${sort}, scent=${scent}, search=${search})}"
+                 class="px-3 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-md hover:bg-gray-50">
                 <i class="fas fa-chevron-left"></i>
-              </button>
+              </a>
+              <span th:unless="${perfumePage.hasPrevious()}"
+                    class="px-3 py-2 text-sm font-medium text-gray-400 bg-gray-100 border border-gray-300 rounded-md cursor-not-allowed">
+      <i class="fas fa-chevron-left"></i>
+    </span>
 
-              <button
-                class="px-3 py-2 text-sm font-medium text-white bg-gray-800 border border-gray-800 rounded-md"
-              >
-                1
-              </button>
-              <button
-                class="px-3 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-md hover:bg-gray-50"
-              >
-                2
-              </button>
-              <button
-                class="px-3 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-md hover:bg-gray-50"
-              >
-                3
-              </button>
+              <!-- 페이지 번호 버튼들 -->
+              <span th:each="pageNum : ${#numbers.sequence(0, perfumePage.totalPages - 1)}">
+      <a th:if="${pageNum != perfumePage.number}"
+         th:href="@{/shop/list(page=${pageNum}, size=${perfumePage.size}, sort=${sort}, scent=${scent}, search=${search})}"
+         th:text="${pageNum + 1}"
+         class="px-3 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-md hover:bg-gray-50">
+      </a>
+      <span th:if="${pageNum == perfumePage.number}"
+            th:text="${pageNum + 1}"
+            class="px-3 py-2 text-sm font-medium text-white bg-gray-800 border border-gray-800 rounded-md cursor-default">
+      </span>
+    </span>
 
-              <button
-                class="px-3 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-md hover:bg-gray-50"
-              >
+              <!-- 다음 페이지 버튼 -->
+              <a th:if="${perfumePage.hasNext()}"
+                 th:href="@{/shop/list(page=${perfumePage.number + 1}, size=${perfumePage.size}, sort=${sort}, scent=${scent}, search=${search})}"
+                 class="px-3 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-md hover:bg-gray-50">
                 <i class="fas fa-chevron-right"></i>
-              </button>
+              </a>
+              <span th:unless="${perfumePage.hasNext()}"
+                    class="px-3 py-2 text-sm font-medium text-gray-400 bg-gray-100 border border-gray-300 rounded-md cursor-not-allowed">
+      <i class="fas fa-chevron-right"></i>
+    </span>
+
             </nav>
           </div>
 

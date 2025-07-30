@@ -7,8 +7,10 @@ import java.util.UUID;
 import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
@@ -125,6 +127,45 @@ public class PerfumeService {
     perfumeRepository.deleteAllByIdInBatch(perfumeIdList);
   }
 
+  // ============================= 향수 수정하는 로직임(CRUD 중 U) ==========================================
+  @Transactional
+  public void updatePerfume(
+      Long perfumeId,
+      PerfumeSaveRequestDto requestDto,
+      MultipartFile imageFile,
+      MultipartFile hoverImageFile) {
+
+    Perfume perfume =
+        perfumeRepository
+            .findById(perfumeId)
+            .orElseThrow(() -> new IllegalArgumentException("해당 향수가 존재하지 않습니다."));
+
+    // 이미지 파일 변경이 있다면 저장 및 기존 이미지 삭제 처리
+    if (imageFile != null && !imageFile.isEmpty()) {
+      deleteImage(perfume.getImageUrl());
+      String newImageUrl = storeImage(imageFile);
+      perfume.setImageUrl(newImageUrl);
+    }
+
+    if (hoverImageFile != null && !hoverImageFile.isEmpty()) {
+      deleteImage(perfume.getHoverImageUrl());
+      String newHoverImageUrl = storeImage(hoverImageFile);
+      perfume.setHoverImageUrl(newHoverImageUrl);
+    }
+
+    // 향수 정보 수정
+    perfume.setPerfumeName(requestDto.getPerfumeName());
+    perfume.setScent(requestDto.getScent());
+    perfume.setDescriptionTitle(requestDto.getDescriptionTitle());
+    perfume.setDescription(requestDto.getDescription());
+    perfume.setVolume(requestDto.getVolume());
+    perfume.setPrice(requestDto.getPrice());
+    perfume.setDiscount(requestDto.getDiscount());
+    perfume.setStock(requestDto.getStock());
+
+    // 따로 save() 호출하지 않아도 트랜잭션 커밋 시 변경 반영됨
+  }
+
   // ============================= 향수 조회하는 로직임(CRUD 중 R) ==========================================
   // 모든 향수
   public List<PerfumeListResponseDto> getAllPerfumes() {
@@ -194,5 +235,50 @@ public class PerfumeService {
     return relatedPerfumes.stream()
         .map(PerfumeListResponseDto::fromEntity)
         .collect(Collectors.toList());
+  }
+
+  // 페이지 + 정렬 + 검색까지 적용된 필터링
+  public Page<Perfume> getPerfumes(
+      String search, String scent, String sortParam, int page, int size) {
+    Sort sort;
+
+    if (sortParam == null) { // 기본 정렬 기준 = 최신순
+      sortParam = "new";
+    }
+
+    // 필터링
+    switch (sortParam) {
+      // 가격 내림차순
+      case "price_asc":
+        sort = Sort.by("price").ascending();
+        break;
+      // 가격 오름차순
+      case "price_desc":
+        sort = Sort.by("price").descending();
+        break;
+      // 리뷰 많은 순 정렬
+      case "review":
+        sort = Sort.by("reviewCount").descending();
+        break;
+      default:
+        sort = Sort.by("createdAt").descending();
+    }
+
+    if (search != null && search.isBlank()) {
+      search = null;
+    }
+
+    if (scent != null && scent.isBlank()) {
+      scent = null;
+    }
+
+    // 페이지 0보다 작을 일 없게 함.
+    if (page < 0) {
+      page = 0;
+    }
+
+    Pageable pageable = PageRequest.of(page, size, sort);
+
+    return perfumeRepository.findBySearchAndScent(search, scent, pageable);
   }
 }

@@ -57,6 +57,14 @@ public interface PerfumeRepository extends JpaRepository<Perfume, Long> {
   // 같은 향의 향수를 페이징 처리하여 조회
   Page<Perfume> findByScent(String scent, Pageable pageable);
 
+  // 검색 + 페이징 + 정렬
+  @Query(
+      "SELECT p FROM Perfume p WHERE "
+          + "(:search IS NULL OR LOWER(p.perfumeName) LIKE LOWER(CONCAT('%', :search, '%'))) "
+          + "AND (:scent IS NULL OR p.scent = :scent)")
+  Page<Perfume> findBySearchAndScent(
+      @Param("search") String search, @Param("scent") String scent, Pageable pageable);
+
   // 특정 향수에 대해 평점별 개수
   @Query(
       "SELECT r.rating, COUNT(r) FROM Review r WHERE r.perfume.perfumeId = :perfumeId GROUP BY r.rating")
