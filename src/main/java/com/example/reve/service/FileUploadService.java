@@ -16,8 +16,8 @@ import org.springframework.web.multipart.MultipartFile;
 @Service
 public class FileUploadService {
 
-  @Value("${qna.upload.path}") // application.properties에서 설정한 기본 업로드 경로 주입
-  private String uploadPath;
+  @Value("${file.upload-dir}") // application.properties에서 설정한 기본 업로드 경로 주입
+  private String uploadDir;
 
   /**
    * 단일 파일을 지정된 서브 디렉토리 내에 저장하고 저장된 파일의 상대 경로를 반환 파일명은 현재 시간(밀리초)과 원본 파일명을 조합하여 고유하게 생성
@@ -33,7 +33,7 @@ public class FileUploadService {
     }
 
     // 최종 업로드 디렉토리 경로 생성 (기본 경로 + 서브 디렉토리)
-    Path targetDirectoryPath = Paths.get(uploadPath, subDirectory);
+    Path targetDirectoryPath = Paths.get(uploadDir, "qna", subDirectory);
     if (!Files.exists(targetDirectoryPath)) {
       Files.createDirectories(targetDirectoryPath); // 디렉토리가 없으면 생성
     }
@@ -55,7 +55,7 @@ public class FileUploadService {
 
     // 저장된 파일의 상대 경로 반환 (웹에서 접근 가능한 경로)
     // 예: /uploads/qna/게시물ID/타임스탬프_파일명.jpg
-    return uploadPath + subDirectory + "/" + savedFileName;
+    return "/uploads/qna/" + subDirectory + "/" + savedFileName;
   }
 
   /**
@@ -96,8 +96,8 @@ public class FileUploadService {
    * @throws IOException 디렉토리 이름 변경 중 오류 발생 시
    */
   public void renameDirectory(String oldDirectoryName, String newDirectoryName) throws IOException {
-    Path oldPath = Paths.get(uploadPath, oldDirectoryName);
-    Path newPath = Paths.get(uploadPath, newDirectoryName);
+    Path oldPath = Paths.get(uploadDir, "qna", oldDirectoryName);
+    Path newPath = Paths.get(uploadDir, "qna", newDirectoryName);
 
     if (Files.exists(oldPath)) {
       Files.move(oldPath, newPath);
@@ -105,13 +105,13 @@ public class FileUploadService {
   }
 
   /**
-   * 지정된 디렉토리와 그 안의 모든 내용을 삭제합니다.
+   * 지정된 디렉토리와 그 안의 모든 내용을 삭제
    *
-   * @param directoryName 삭제할 디렉토리 이름 (예: 임시 UUID 또는 Q&A PK)
+   * @param directoryName 삭제할 디렉토리 이름
    * @throws IOException 디렉토리 삭제 중 오류 발생 시
    */
   public void deleteDirectory(String directoryName) throws IOException {
-    Path targetDirectoryPath = Paths.get(uploadPath, directoryName);
+    Path targetDirectoryPath = Paths.get(uploadDir, "qna", directoryName);
     if (Files.exists(targetDirectoryPath)) {
       Files.walk(targetDirectoryPath)
           .sorted(Comparator.reverseOrder())
