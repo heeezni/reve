@@ -7,6 +7,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
 
 import com.example.reve.domain.Perfume;
 
@@ -55,4 +56,9 @@ public interface PerfumeRepository extends JpaRepository<Perfume, Long> {
 
   // 같은 향의 향수를 페이징 처리하여 조회
   Page<Perfume> findByScent(String scent, Pageable pageable);
+
+  // 특정 향수에 대해 평점별 개수
+  @Query(
+      "SELECT r.rating, COUNT(r) FROM Review r WHERE r.perfume.perfumeId = :perfumeId GROUP BY r.rating")
+  List<Object[]> countReviewsByRating(@Param("perfumeId") Long perfumeId);
 }
