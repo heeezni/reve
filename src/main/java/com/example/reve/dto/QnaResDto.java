@@ -16,7 +16,7 @@ public class QnaResDto {
   private String answer;
   private Boolean isSecret;
   private String category;
-  private String image;
+  private String attachment;
   private String userName;
   private String perfumeName;
   private LocalDateTime createdAt;
@@ -29,7 +29,7 @@ public class QnaResDto {
     this.answer = qna.getAnswer();
     this.isSecret = qna.getIsSecret();
     this.category = qna.getCategory();
-    this.image = qna.getImage();
+    this.attachment = qna.getAttachment();
     this.userName = qna.getUser().getName();
     this.perfumeName = qna.getPerfume().getPerfumeName();
     this.createdAt = qna.getCreatedAt();

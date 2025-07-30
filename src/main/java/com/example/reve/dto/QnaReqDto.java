@@ -18,5 +18,5 @@ public class QnaReqDto {
   private String category; // QnA 문의 분류
   private Long userId; // 작성자 ID
   private Long perfumeId; // 관련 상품 ID
-  private List<MultipartFile> imageFiles; // 이미지 파일 리스트
+  private List<MultipartFile> attachmentFiles; // 첨부 파일 리스트
 }

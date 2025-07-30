@@ -75,11 +75,12 @@ public class QnaService {
       qna.setUser(user); // 위에서 찾은 유저 정보
       qna.setPerfume(perfume); // 위에서 찾은 상품 정보
 
-      // 6. 이미지 파일 임시 디렉토리에 저장 및 경로 설정
-      String savedImageUrls = null;
-      if (reqDto.getImageFiles() != null && !reqDto.getImageFiles().isEmpty()) {
-        savedImageUrls = fileUploadService.saveFiles(reqDto.getImageFiles(), tempDirectoryName);
-        qna.setImage(savedImageUrls); // Qna 엔티티의 image 필드에 임시 경로 저장
+      // 6. 첨부 파일 임시 디렉토리에 저장 및 경로 설정
+      String savedAttachmentUrls = null;
+      if (reqDto.getAttachmentFiles() != null && !reqDto.getAttachmentFiles().isEmpty()) {
+        savedAttachmentUrls =
+            fileUploadService.saveFiles(reqDto.getAttachmentFiles(), tempDirectoryName);
+        qna.setAttachment(savedAttachmentUrls); // Qna 엔티티의 attachment 필드에 임시 경로 저장
       }
 
       // 7. 만들어진 Qna 게시글을 DB에 저장 (PK를 얻기 위함)
@@ -87,11 +88,12 @@ public class QnaService {
 
       // 8. DB 저장 성공 후, 임시 디렉토리 이름을 실제 Q&A ID로 변경
       String newDirectoryName = "qna_" + savedQna.getQnaId();
-      if (savedImageUrls != null) { // 이미지가 업로드된 경우에만 디렉토리 이름 변경
+      if (savedAttachmentUrls != null) { // 첨부파일이 업로드된 경우에만 디렉토리 이름 변경
         fileUploadService.renameDirectory(tempDirectoryName, newDirectoryName);
-        // Qna 엔티티의 image 필드에 저장된 경로를 실제 경로로 업데이트
-        String updatedImageUrls = savedImageUrls.replace(tempDirectoryName, newDirectoryName);
-        savedQna.setImage(updatedImageUrls);
+        // Qna 엔티티의 attachment 필드에 저장된 경로를 실제 경로로 업데이트
+        String updatedAttachmentUrls =
+            savedAttachmentUrls.replace(tempDirectoryName, newDirectoryName);
+        savedQna.setAttachment(updatedAttachmentUrls);
         qnaRepository.save(savedQna); // 업데이트된 Qna 엔티티 다시 저장
       }
 
