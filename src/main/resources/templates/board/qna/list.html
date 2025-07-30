@@ -106,7 +106,7 @@
                 class="px-6 py-4 hover:bg-gray-50 transition-colors"
               >
                 <div class="grid grid-cols-12 gap-4 items-center">
-                  <div class="col-span-1 text-center text-sm text-gray-600" th:text="${qnas.size - i.index}">
+                  <div class="col-span-1 text-center text-sm text-gray-600" th:text="${qnas.totalElements - (qnas.number * qnas.size + i.index)}">
                     <!-- 번호 (역순으로 표시) -->
                   </div>
                   <div class="col-span-1 text-center">
