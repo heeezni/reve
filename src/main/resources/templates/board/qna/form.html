@@ -36,10 +36,8 @@
           <div class="bg-white rounded-lg shadow-sm p-8">
             <form id="qna-form" class="space-y-8">
               <!-- Hidden fields for IDs -->
-              <input type="hidden" id="user-id" name="userId" value="1" />
-              <!-- 임시로 사용자 ID 1 설정 -->
-              <input type="hidden" id="perfume-id" name="perfumeId" value="1" />
-              <!-- 임시로 상품 ID 1 설정 -->
+              <input type="hidden" id="user-id" name="userId" th:value="${#authentication.principal != 'anonymousUser' ? #authentication.principal.name : null}" />
+              <input type="hidden" id="perfume-id" name="perfumeId" value="1" /> <!-- 상품 상세 페이지에서 넘어올 경우 동적으로 설정 -->
 
               <!-- Category Selection -->
               <div>
@@ -409,7 +407,7 @@
               const img = $('<img>');
               img.attr('src', e.target.result);
               img.addClass('w-16 h-16 object-cover rounded-md');
-              fileInfoContainer.prepend(img); // 이미지 미리보기를 앞에 추가
+              fileInfoContainer.prepend(img);
             };
             reader.readAsDataURL(file);
           } else {
@@ -438,26 +436,37 @@
         files.splice(index, 1);
         files.forEach((file) => dt.items.add(file));
         fileInput[0].files = dt.files;
-        fileInput.trigger('change'); // .trigger() 메소드 사용
+        fileInput.trigger('change');
       }
 
       // --- 신규/수정된 기능 (jQuery로 변경) ---
 
       // 비밀글 선택 시 비밀번호 필드 표시/숨김
-      const passwordSection = $('#password-section'); // jQuery 선택자 사용
-      $('input[name="isSecret"]').on('change', function () { // .on() 메소드 사용
-        if ($(this).val() === 'true') { // .val() 메소드 사용
-          passwordSection.show(); // .show() 메소드 사용
+      const passwordSection = $('#password-section');
+      const isLoggedIn = $('#is-logged-in').val() === 'true';
+
+      function updatePasswordSection() {
+        const isSecretSelected = $('input[name="isSecret"]:checked').val() === 'true';
+        if (isSecretSelected) {
+          passwordSection.show();
         } else {
-          passwordSection.hide(); // .hide() 메소드 사용
+          passwordSection.hide();
+          $('#qna-password').val(''); // 비밀번호 필드 숨길 때 값 초기화
         }
+      }
+
+      $('input[name="isSecret"]').on('change', updatePasswordSection);
+
+      // 초기 로드 시 비밀번호 섹션 상태 업데이트
+      $(document).ready(function() {
+        updatePasswordSection();
       });
 
       // '문의 등록' 버튼 클릭 이벤트
-      $('#submit-qna').on('click', function (e) { // .on() 메소드 사용
+      $('#submit-qna').on('click', function (e) {
         // 1. 폼 데이터 가져오기
-        const userId = $('#user-id').val(); // userId를 함수 내부에서 가져옵니다.
-        const perfumeId = $('#perfume-id').val(); // perfumeId를 함수 내부에서 가져옵니다.
+        const userId = $('#user-id').val();
+        const perfumeId = $('#perfume-id').val();
         const title = $('#qna-title').val();
         const content = $('#qna-content').val();
         const isSecret = $('input[name="isSecret"]:checked').val();
@@ -477,18 +486,22 @@
           alert('문의 내용을 입력해주세요.');
           return;
         }
-        if (isSecret === 'true' && password.length < 4) {
+        // 비회원이고 비밀글일 경우에만 비밀번호 유효성 검사
+        if (isSecret === 'true' && !isLoggedIn && password.length < 4) {
           alert('비밀번호를 4자리 이상 입력해주세요.');
           return;
         }
 
         // 3. FormData 객체 생성
         const formData = new FormData();
-        formData.append('userId', parseInt(userId, 10));
+        if (userId) { // userId가 있을 경우에만 추가 (회원일 경우)
+            formData.append('userId', userId);
+        }
         formData.append('perfumeId', parseInt(perfumeId, 10));
         formData.append('title', title);
         formData.append('content', content);
-        formData.append('password', isSecret === 'true' ? password : "");
+        // 비회원 비밀글일 경우에만 비밀번호 전송
+        formData.append('password', (isSecret === 'true' && !isLoggedIn) ? password : "");
         formData.append('isSecret', isSecret);
         formData.append('category', category);
 

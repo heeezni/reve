@@ -1,19 +1,21 @@
 package com.example.reve.service;
 
 import java.io.IOException;
+import java.security.Principal;
 import java.util.List;
-import java.util.Optional;
 import java.util.UUID;
 import java.util.stream.Collectors;
 
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.example.reve.domain.Perfume;
 import com.example.reve.domain.Qna;
+import com.example.reve.domain.Role;
 import com.example.reve.domain.User;
 import com.example.reve.dto.QnaReqDto;
 import com.example.reve.dto.QnaResDto;
@@ -22,9 +24,9 @@ import com.example.reve.repository.QnaRepository;
 import com.example.reve.repository.UserRepository;
 
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 
-// MultipartFile import 추가
-
+@Slf4j
 @Service
 @RequiredArgsConstructor
 @Transactional(readOnly = true)
@@ -33,57 +35,67 @@ public class QnaService {
   private final QnaRepository qnaRepository;
   private final UserRepository userRepository;
   private final PerfumeRepository perfumeRepository;
-  private final FileUploadService fileUploadService; // FileUploadService 주입
+  private final FileUploadService fileUploadService;
+  private final PasswordEncoder passwordEncoder;
 
   @Transactional
   public QnaResDto createQna(QnaReqDto reqDto) {
+
+    log.debug("QnaService - createQna: Received userId = {}", reqDto.getUserId());
+
     // 파일 업로드 실패 시 롤백을 위해 임시 디렉토리 이름 생성
     String tempDirectoryName = UUID.randomUUID().toString();
 
     try {
       // 1. DTO에서 받은 userId로 진짜 유저가 DB에 있는지 찾기
-      Optional<User> userOptional = userRepository.findById(reqDto.getUserId());
-      User user; // 나중에 사용될 User 객체를 미리 선언
-
-      // 2. Optional 안에 User가 있는지 확인
-      if (userOptional.isPresent()) {
-        // User 있으면, 꺼내서 user 변수에 담기
-        user = userOptional.get();
-      } else {
-        // 없으면 에러를 발생시키기
-        throw new IllegalArgumentException("해당 유저를 찾을 수 없습니다. ID: " + reqDto.getUserId());
+      User user = null;
+      if (reqDto.getUserId() != null) {
+        user =
+            userRepository
+                .findById(reqDto.getUserId())
+                .orElseThrow(
+                    () ->
+                        new IllegalArgumentException(
+                            "해당 유저를 찾을 수 없습니다. ID: " + reqDto.getUserId()));
       }
 
       // 3. perfumeId로 진짜 상품이 DB에 있는지 확인
-      Optional<Perfume> perfumeOptional = perfumeRepository.findById(reqDto.getPerfumeId());
-      Perfume perfume;
-
-      // 4. Optional 안에 Perfume 있는지 확인
-      if (perfumeOptional.isPresent()) {
-        // Perfume 있으면, 꺼내서 perfume 변수에 담기
-        perfume = perfumeOptional.get();
-      } else {
-        // 없으면 에러를 발생시키기
-        throw new IllegalArgumentException("해당 상품을 찾을 수 없습니다. ID: " + reqDto.getPerfumeId());
-      }
+      Perfume perfume =
+          perfumeRepository
+              .findById(reqDto.getPerfumeId())
+              .orElseThrow(
+                  () ->
+                      new IllegalArgumentException(
+                          "해당 상품을 찾을 수 없습니다. ID: " + reqDto.getPerfumeId()));
 
       // 5. 유저와 상품 정보가 있으면, Qna 게시글 생성
       Qna qna = new Qna();
-
       qna.setTitle(reqDto.getTitle());
       qna.setContent(reqDto.getContent());
-      qna.setPassword(reqDto.getPassword());
-      qna.setIsSecret(reqDto.getIsSecret());
       qna.setCategory(reqDto.getCategory());
-      qna.setUser(user); // 위에서 찾은 유저 정보
-      qna.setPerfume(perfume); // 위에서 찾은 상품 정보
+      qna.setUser(user);
+      qna.setPerfume(perfume);
 
-      // 6. 첨부 파일 임시 디렉토리에 저장 및 경로 설정
+      // isSecret 값은 reqDto에서 받은 대로 사용
+      qna.setIsSecret(reqDto.getIsSecret());
+
+      // 6. 비밀글일 경우 비밀번호 암호화하여 저장
+      if (qna.getIsSecret()) {
+        if (reqDto.getPassword() == null || reqDto.getPassword().isEmpty()) {
+          throw new IllegalArgumentException("비밀글은 비밀번호가 필수입니다.");
+        }
+        qna.setPassword(passwordEncoder.encode(reqDto.getPassword()));
+      } else {
+        qna.setPassword(null); // 공개글일 경우 비밀번호는 null
+      }
+
       String savedAttachmentUrls = null;
-      if (reqDto.getAttachmentFiles() != null && !reqDto.getAttachmentFiles().isEmpty()) {
+      boolean hasAttachment =
+          reqDto.getAttachmentFiles() != null && !reqDto.getAttachmentFiles().isEmpty();
+      if (hasAttachment) {
         savedAttachmentUrls =
             fileUploadService.saveFiles(reqDto.getAttachmentFiles(), tempDirectoryName);
-        qna.setAttachment(savedAttachmentUrls); // Qna 엔티티의 attachment 필드에 임시 경로 저장
+        qna.setAttachment(savedAttachmentUrls);
       }
 
       // 7. 만들어진 Qna 게시글을 DB에 저장 (PK를 얻기 위함)
@@ -141,12 +153,50 @@ public class QnaService {
     return new PageImpl<>(qnaResDtoList, pageable, qnaPage.getTotalElements());
   }
 
-  /** 특정 Q&A 게시글을 ID로 조회하여 QnaResDto로 반환 */
-  public QnaResDto getQnaById(Long qnaId) {
+  /**
+   * Q&A 게시글의 접근 권한을 확인하고, 권한이 있는 경우 QnaResDto를 반환한다.
+   *
+   * @param qnaId Q&A ID
+   * @param principal 현재 로그인한 사용자 정보
+   * @param password 입력된 비밀번호 (없을 경우 null)
+   * @return QnaResDto 객체
+   * @throws IllegalAccessException 접근 권한이 없는 경우
+   */
+  public QnaResDto getQnaById(Long qnaId, Principal principal, String password)
+      throws IllegalAccessException {
     Qna qna =
         qnaRepository
             .findById(qnaId)
             .orElseThrow(() -> new IllegalArgumentException("해당 Q&A를 찾을 수 없습니다. ID: " + qnaId));
+
+    // 공개글이면 바로 반환
+    if (!qna.getIsSecret()) {
+      return new QnaResDto(qna);
+    }
+
+    // 비밀글인 경우, 접근 권한 확인
+    // 1. 관리자인지 확인
+    if (principal != null) {
+      String loggedInUsername = principal.getName();
+      boolean isAdmin =
+          userRepository
+              .findByLoginId(loggedInUsername)
+              .map(user -> user.getRole().equals(Role.ADMIN))
+              .orElse(false);
+      if (isAdmin) {
+        return new QnaResDto(qna); // 관리자면 접근 허용
+      }
+    }
+
+    // 2. 비밀번호 확인 (관리자가 아닌 경우)
+    if (password == null) {
+      throw new IllegalAccessException("비밀글입니다. 비밀번호를 입력해주세요.");
+    }
+    if (!passwordEncoder.matches(password, qna.getPassword())) {
+      throw new IllegalAccessException("비밀번호가 일치하지 않습니다.");
+    }
+
+    // 비밀번호가 일치하면 접근 허용
     return new QnaResDto(qna);
   }
 }

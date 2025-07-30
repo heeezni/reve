@@ -32,6 +32,8 @@ dependencies {
     implementation 'org.springframework.boot:spring-boot-starter-thymeleaf'
     // 웹 MVC 기능
     implementation 'org.springframework.boot:spring-boot-starter-web'
+    // 유효성 검사 (Validation)
+    implementation 'org.springframework.boot:spring-boot-starter-validation'
     // Spring Data JPA (데이터베이스 ORM 및 리포지토리 지원)
     implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
     // MySQL 드라이버 (MySQL에 접속하기 위한 JDBC 드라이버)
