@@ -140,4 +140,13 @@ public class QnaService {
     // 6. 모든 Qna 객체를 QnaResDto로 변환하여 담은 리스트 반환
     return qnaResDtoList;
   }
+
+  /** 특정 Q&A 게시글을 ID로 조회하여 QnaResDto로 반환 */
+  public QnaResDto getQnaById(Long qnaId) {
+    Qna qna =
+        qnaRepository
+            .findById(qnaId)
+            .orElseThrow(() -> new IllegalArgumentException("해당 Q&A를 찾을 수 없습니다. ID: " + qnaId));
+    return new QnaResDto(qna);
+  }
 }

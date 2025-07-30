@@ -48,8 +48,10 @@ public class BoardController {
     return "board/qna/list";
   }
 
-  @GetMapping("/qna/detail")
-  public String qnaDetail() {
+  @GetMapping("/qna/detail/{qnaId}")
+  public String qnaDetail(@PathVariable Long qnaId, Model model) {
+    QnaResDto qna = qnaService.getQnaById(qnaId);
+    model.addAttribute("qna", qna);
     return "board/qna/detail";
   }
 
