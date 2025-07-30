@@ -58,18 +58,18 @@
                   class="text-gray-800 font-medium hover:text-gray-600 transition-colors"
                   >Join</a
                 >
+            </div>
               </div>
-            <div th:if="${session.loginUser !=null}">
+              <div th:if="${session.loginUser != null}">
               <div class="flex space-x-4">
-                <span th:text="${session.loginUser.name}"></span>님
+                <span th:unless="${session.loginUser.nickname != null}" th:text="${session.loginUser.name}+'님'"></span>
+                <span th:if="${session.loginUser.nickname != null}" th:text="${session.loginUser.nickname}+'님'"></span>
                 <a
-                  href="/user/mypage/index"
+                  href="/mypage"
                   class="text-gray-800 font-medium hover:text-gray-600 transition-colors"
                   >My</a
                 >
               </div>
-            </div>
-
             </div>
 
             <!-- Icons -->
