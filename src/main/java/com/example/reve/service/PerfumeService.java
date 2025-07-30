@@ -1,12 +1,17 @@
 package com.example.reve.service;
 
+import java.io.File;
+import java.io.IOException;
 import java.util.List;
+import java.util.UUID;
 import java.util.stream.Collectors;
 
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.multipart.MultipartFile;
 
 import com.example.reve.domain.Perfume;
 import com.example.reve.dto.PerfumeDetailResponseDto;
@@ -22,24 +27,105 @@ public class PerfumeService {
 
   private final PerfumeRepository perfumeRepository;
 
+  @Value("${file.upload-dir}")
+  private String uploadDir;
+
+  @Value("${file.image-url-prefix}")
+  private String imageUrlPrefix;
+
+  // ============================= 향수 등록 및 삭제하는 로직임(CRUD 중 C, D) ==================================
   // 관리자 향수 등록
   @Transactional
-  public Long savePerfume(PerfumeSaveRequestDto requestDto) {
+  public void savePerfume(PerfumeSaveRequestDto requestDto) {
     Perfume perfume =
         Perfume.builder()
             .perfumeName(requestDto.getPerfumeName())
             .scent(requestDto.getScent())
+            .descriptionTitle(requestDto.getDescriptionTitle())
             .description(requestDto.getDescription())
             .stock(requestDto.getStock())
             .price(requestDto.getPrice())
             .discount(requestDto.getDiscount())
             .imageUrl(requestDto.getImageUrl())
+            .volume(requestDto.getVolume())
             .hoverImageUrl(requestDto.getHoverImageUrl())
             .build();
     perfumeRepository.save(perfume);
-    return perfume.getPerfumeId();
   }
 
+  // 향수 등록 시 이미지 등록하는 로직
+  public String storeImage(MultipartFile file) {
+    if (file.isEmpty()) {
+      throw new IllegalArgumentException("빈 파일은 저장할 수 없습니다.");
+    }
+
+    try {
+      String originalFilename = file.getOriginalFilename();
+      String extension = originalFilename.substring(originalFilename.lastIndexOf("."));
+      String uniqueFilename = UUID.randomUUID().toString() + extension;
+
+      File directory = new File(uploadDir);
+      if (!directory.exists()) {
+        directory.mkdirs();
+      }
+
+      File saveFile = new File(uploadDir, uniqueFilename);
+      file.transferTo(saveFile);
+
+      return imageUrlPrefix + uniqueFilename;
+    } catch (IOException e) {
+      throw new RuntimeException("이미지 저장 실패", e);
+    }
+  }
+
+  // 관리자의 향수 삭제 로직 (예외 발생하면 롤백)
+  @Transactional
+  public void deletePerfume(Long perfumeId) {
+    Perfume perfume =
+        perfumeRepository
+            .findById(perfumeId)
+            .orElseThrow(() -> new IllegalArgumentException("해당 향수가 존재하지 않습니다."));
+
+    // 1. 이미지 파일 삭제
+    deleteImage(perfume.getImageUrl());
+    deleteImage(perfume.getHoverImageUrl());
+
+    // 2. 향수 DB에서 삭제
+    perfumeRepository.delete(perfume);
+  }
+
+  private void deleteImage(String imageUrl) {
+    if (imageUrl == null || imageUrl.isBlank()) return;
+
+    String filename = imageUrl.replace(imageUrlPrefix, "");
+    String fullPath = uploadDir + filename;
+
+    File file = new File(fullPath);
+    if (file.exists()) {
+      boolean deleted = file.delete();
+      if (!deleted) {
+        throw new RuntimeException("이미지 삭제 실패: " + fullPath);
+      }
+    }
+  }
+
+  // 이미지 삭제하는 로직
+  @Transactional
+  public void deletePerfumes(List<Long> perfumeIdList) {
+    List<Perfume> perfumes = perfumeRepository.findAllById(perfumeIdList);
+
+    // 이미지 파일 삭제
+    perfumes.forEach(
+        perfume -> {
+          deleteImage(perfume.getImageUrl());
+          deleteImage(perfume.getHoverImageUrl());
+        });
+
+    // DB에서 향수 삭제
+    perfumeRepository.deleteAllByIdInBatch(perfumeIdList);
+  }
+
+  // ============================= 향수 조회하는 로직임(CRUD 중 R) ==========================================
   // 모든 향수
   public List<PerfumeListResponseDto> getAllPerfumes() {
     List<Perfume> perfumes = perfumeRepository.findAllByOrderByCreatedAtDesc();
