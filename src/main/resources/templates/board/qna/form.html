@@ -392,27 +392,43 @@
       const fileList = $('#fileList');
 
       fileInput.on('change', function () {
-        fileList.empty(); // .empty() 메소드 사용
+        fileList.empty(); // 기존 목록 초기화
         const files = Array.from(this.files);
 
         files.forEach((file, index) => {
-          const fileItem = $('<div></div>'); // jQuery로 요소 생성
-          fileItem.addClass('flex items-center justify-between p-3 bg-gray-50 rounded-md'); // .addClass()
-          fileItem.html(`
-            <div class="flex items-center space-x-3">
-              <i class="fas fa-file text-gray-500"></i>
-              <span class="text-sm text-gray-700">${file.name}</span>
-              <span class="text-xs text-gray-500">(${(
-                file.size /
-                1024 /
-                1024
-              ).toFixed(2)}MB)</span>
-            </div>
-            <button type="button" onclick="removeFile(${index})" class="text-red-500 hover:text-red-700">
-              <i class="fas fa-times"></i>
-            </button>
-          `);
-          fileList.append(fileItem); // .append() 메소드 사용
+          const fileItem = $('<div></div>');
+          fileItem.addClass('flex items-center justify-between p-3 bg-gray-50 rounded-md');
+
+          // 파일 정보를 담을 컨테이너
+          const fileInfoContainer = $('<div></div>').addClass('flex items-center space-x-3');
+
+          // 이미지 파일인 경우 미리보기 생성
+          if (file.type.startsWith('image/')) {
+            const reader = new FileReader();
+            reader.onload = function (e) {
+              const img = $('<img>');
+              img.attr('src', e.target.result);
+              img.addClass('w-16 h-16 object-cover rounded-md');
+              fileInfoContainer.prepend(img); // 이미지 미리보기를 앞에 추가
+            };
+            reader.readAsDataURL(file);
+          } else {
+            // 이미지가 아닌 경우 아이콘 표시
+            fileInfoContainer.append('<i class="fas fa-file text-gray-500 text-2xl w-16 text-center"></i>');
+          }
+
+          // 파일명 및 크기 정보 추가
+          const textInfo = $('<div></div>');
+          textInfo.append(`<span class="text-sm text-gray-700">${file.name}</span>`);
+          textInfo.append(`<br><span class="text-xs text-gray-500">(${(file.size / 1024 / 1024).toFixed(2)}MB)</span>`);
+          fileInfoContainer.append(textInfo);
+
+          // 삭제 버튼
+          const removeBtn = $(`<button type="button" onclick="removeFile(${index})" class="text-red-500 hover:text-red-700"><i class="fas fa-times"></i></button>`);
+
+          fileItem.append(fileInfoContainer);
+          fileItem.append(removeBtn);
+          fileList.append(fileItem);
         });
       });
 
@@ -479,7 +495,7 @@
         // 파일 추가
         const files = fileInput[0].files;
         for (let i = 0; i < files.length; i++) {
-            formData.append('imageFiles', files[i]);
+            formData.append('attachmentFiles', files[i]);
         }
 
         // 4. jQuery의 $.ajax()로 서버에 POST 요청 보내기
