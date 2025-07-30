@@ -1,5 +1,6 @@
 package com.example.reve.controller.user;
 
+import java.io.IOException;
 import java.security.Principal;
 
 import jakarta.validation.Valid;
@@ -16,8 +17,8 @@ import org.springframework.validation.FieldError;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
-import com.example.reve.dto.QnaReqDto;
-import com.example.reve.dto.QnaResDto;
+import com.example.reve.dto.QnaReqDTO;
+import com.example.reve.dto.QnaResDTO;
 import com.example.reve.service.QnaService;
 
 import lombok.RequiredArgsConstructor;
@@ -33,8 +34,8 @@ public class BoardController {
   @PostMapping("/qna")
   @ResponseBody // View가 아닌 데이터(JSON)를 반환
   public ResponseEntity<?> createQna(
-      @Valid @ModelAttribute QnaReqDto reqDto, BindingResult bindingResult) {
-    // QnaReqDto의 유효성 검사 수행
+      @Valid @ModelAttribute QnaReqDTO reqDto, BindingResult bindingResult) {
+    // QnaReqDTO의 유효성 검사 수행
     if (bindingResult.hasErrors()) {
       StringBuilder errorMessage = new StringBuilder();
       // 모든 유효성 검사 오류 메시지를 취합하여 반환
@@ -43,8 +44,19 @@ public class BoardController {
       }
       return ResponseEntity.badRequest().body(errorMessage.toString());
     }
-    QnaResDto qna = qnaService.createQna(reqDto);
-    return ResponseEntity.ok(qna); // 성공(200 OK) 응답과 함께 생성된 Q&A 정보 반환
+    try {
+      QnaResDTO qna = qnaService.createQna(reqDto);
+      return ResponseEntity.ok(qna); // 성공(200 OK) 응답과 함께 생성된 Q&A 정보 반환
+    } catch (IOException e) {
+      // 파일 업로드 관련 예외 처리
+      return ResponseEntity.badRequest().body("파일 업로드 실패: " + e.getMessage());
+    } catch (IllegalArgumentException e) {
+      // 서비스 로직에서 발생하는 유효성 검사 예외 처리 (예: 비밀글 비밀번호 누락)
+      return ResponseEntity.badRequest().body("문의 등록 실패: " + e.getMessage());
+    } catch (Exception e) {
+      // 그 외 예상치 못한 예외 처리
+      return ResponseEntity.internalServerError().body("문의 등록 중 알 수 없는 오류가 발생했습니다.");
+    }
   }
 
   @GetMapping("/notice/list")
@@ -63,7 +75,7 @@ public class BoardController {
       @PageableDefault(size = 10, sort = "createdAt", direction = Sort.Direction.DESC)
           Pageable pageable) {
     // 1. QnaService를 통해 Q&A 목록을 페이징하여 가져오기
-    Page<QnaResDto> qnaPage = qnaService.selectAll(pageable);
+    Page<QnaResDTO> qnaPage = qnaService.selectAll(pageable);
     // 2. 가져온 Q&A Page 객체를 "qnas"라는 이름으로 모델에 추가 (Thymeleaf에서 qnas로 사용)
     model.addAttribute("qnas", qnaPage);
     // 3. "board/qna/list.html" 뷰 반환
@@ -74,7 +86,7 @@ public class BoardController {
   public String qnaDetail(@PathVariable Long qnaId, Model model, Principal principal) {
     try {
       // 비밀번호 없이 조회를 시도. 공개글이거나 관리자면 성공.
-      QnaResDto qna = qnaService.getQnaById(qnaId, principal, null);
+      QnaResDTO qna = qnaService.getQnaById(qnaId, principal, null);
       model.addAttribute("qna", qna);
       return "board/qna/detail";
     } catch (IllegalAccessException e) {
@@ -108,7 +120,7 @@ public class BoardController {
       RedirectAttributes redirectAttributes) {
     try {
       // 비밀번호와 함께 조회를 시도
-      QnaResDto qna = qnaService.getQnaById(qnaId, principal, password);
+      QnaResDTO qna = qnaService.getQnaById(qnaId, principal, password);
       model.addAttribute("qna", qna);
       return "board/qna/detail"; // 성공 시 상세 페이지 보여주기
     } catch (IllegalAccessException e) {

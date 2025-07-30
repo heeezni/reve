@@ -9,7 +9,7 @@ import lombok.NoArgsConstructor;
 
 @Getter
 @NoArgsConstructor
-public class QnaResDto {
+public class QnaResDTO {
   private Long qnaId;
   private String title;
   private String content;
@@ -22,7 +22,7 @@ public class QnaResDto {
   private LocalDateTime createdAt;
   private LocalDateTime updatedAt;
 
-  public QnaResDto(Qna qna) {
+  public QnaResDTO(Qna qna) {
     this.qnaId = qna.getQnaId();
     this.title = qna.getTitle();
     this.content = qna.getContent();

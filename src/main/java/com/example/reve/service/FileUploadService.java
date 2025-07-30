@@ -6,6 +6,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Comparator;
 import java.util.List;
 
@@ -18,6 +19,10 @@ public class FileUploadService {
 
   @Value("${file.upload-dir}") // application.properties에서 설정한 기본 업로드 경로 주입
   private String uploadDir;
+
+  private static final long MAX_FILE_SIZE = 10 * 1024 * 1024; // 10MB
+  private static final List<String> ALLOWED_EXTENSIONS =
+      Arrays.asList("jpg", "jpeg", "png", "pdf", "doc", "docx"); // 허용되는 확장자
 
   /**
    * 단일 파일을 지정된 서브 디렉토리 내에 저장하고 저장된 파일의 상대 경로를 반환 파일명은 현재 시간(밀리초)과 원본 파일명을 조합하여 고유하게 생성
@@ -32,22 +37,29 @@ public class FileUploadService {
       return null; // 파일이 없으면 null 반환
     }
 
+    // 파일 크기 검증
+    if (file.getSize() > MAX_FILE_SIZE) {
+      throw new IOException("파일 크기가 10MB를 초과합니다.");
+    }
+
+    // 파일 확장자 검증
+    String originalFilename = file.getOriginalFilename();
+    String extension = "";
+    if (originalFilename != null && originalFilename.contains(".")) {
+      extension = originalFilename.substring(originalFilename.lastIndexOf(".") + 1).toLowerCase();
+    }
+    if (!ALLOWED_EXTENSIONS.contains(extension)) {
+      throw new IOException("허용되지 않는 파일 형식입니다. (허용: JPG, PNG, PDF, DOC, DOCX)");
+    }
+
     // 최종 업로드 디렉토리 경로 생성 (기본 경로 + 서브 디렉토리)
     Path targetDirectoryPath = Paths.get(uploadDir, "qna", subDirectory);
     if (!Files.exists(targetDirectoryPath)) {
       Files.createDirectories(targetDirectoryPath); // 디렉토리가 없으면 생성
     }
 
-    // 파일명 생성: 현재 시간(밀리초) + 원본 파일명 (중복 방지를 위해 UUID도 조합 가능)
-    String originalFilename = file.getOriginalFilename();
-    String extension = "";
-    if (originalFilename != null && originalFilename.contains(".")) {
-      extension = originalFilename.substring(originalFilename.lastIndexOf("."));
-    }
     // 파일명에 현재 시간(밀리초)을 포함하여 고유성 확보
     String savedFileName = System.currentTimeMillis() + "_" + originalFilename;
-    // 또는 UUID와 조합: String savedFileName = UUID.randomUUID().toString() + "_" +
-    // System.currentTimeMillis() + extension;
 
     // 파일을 지정된 경로에 저장
     Path filePath = targetDirectoryPath.resolve(savedFileName);
@@ -82,6 +94,7 @@ public class FileUploadService {
       } catch (Exception e) {
         // 파일 저장 중 오류가 발생해도 다른 파일은 계속 처리
         System.err.println("파일 저장 중 오류 발생: " + e.getMessage());
+        throw new IOException("파일 업로드 중 오류 발생: " + e.getMessage()); // 예외를 다시 던져서 클라이언트에게 전달
       }
     }
     // 콤마로 구분된 문자열로 반환

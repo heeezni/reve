@@ -17,8 +17,8 @@ import com.example.reve.domain.Perfume;
 import com.example.reve.domain.Qna;
 import com.example.reve.domain.Role;
 import com.example.reve.domain.User;
-import com.example.reve.dto.QnaReqDto;
-import com.example.reve.dto.QnaResDto;
+import com.example.reve.dto.QnaReqDTO;
+import com.example.reve.dto.QnaResDTO;
 import com.example.reve.repository.PerfumeRepository;
 import com.example.reve.repository.QnaRepository;
 import com.example.reve.repository.UserRepository;
@@ -39,7 +39,7 @@ public class QnaService {
   private final PasswordEncoder passwordEncoder;
 
   @Transactional
-  public QnaResDto createQna(QnaReqDto reqDto) {
+  public QnaResDTO createQna(QnaReqDTO reqDto) throws IOException {
 
     log.debug("QnaService - createQna: Received userId = {}", reqDto.getUserId());
 
@@ -113,8 +113,8 @@ public class QnaService {
       }
 
       // 9. 저장된 최종 결과를 바탕으로 클라이언트에게 보여줄 응답(DTO)을 만들어 반환
-      return new QnaResDto(savedQna);
-    } catch (IOException e) {
+      return new QnaResDTO(savedQna);
+    } catch (IOException e) { // RuntimeException 대신 IOException을 직접 처리
       // 파일 저장/이름 변경 중 오류 발생 시 임시 디렉토리 삭제
       try {
         fileUploadService.deleteDirectory(tempDirectoryName);
@@ -122,7 +122,7 @@ public class QnaService {
         System.err.println("임시 디렉토리 삭제 중 오류 발생: " + deleteEx.getMessage());
       }
       System.err.println("이미지 파일 처리 중 오류 발생: " + e.getMessage());
-      throw new RuntimeException("이미지 파일 처리 중 오류가 발생했습니다.", e);
+      throw e; // IOException을 그대로 던짐
     } catch (Exception e) {
       // 다른 일반적인 오류 발생 시 임시 디렉토리 삭제
       try {
@@ -136,33 +136,33 @@ public class QnaService {
   }
 
   /**
-   * 모든 Q&A 게시글을 최신순으로 페이징하여 조회하고 QnaResDto Page로 반환
+   * 모든 Q&A 게시글을 최신순으로 페이징하여 조회하고 QnaResDTO Page로 반환
    *
    * @param pageable 페이징 정보 (페이지 번호, 페이지 크기, 정렬 등)
-   * @return QnaResDto의 Page 객체
+   * @return QnaResDTO의 Page 객체
    */
-  public Page<QnaResDto> selectAll(Pageable pageable) {
+  public Page<QnaResDTO> selectAll(Pageable pageable) {
     // QnaRepository를 사용하여 데이터베이스에서 Qna 엔티티를 페이징하여 가져오기
     // findAll(Pageable) 메소드는 Page<Qna>를 반환하며, 정렬 정보는 pageable에 포함되어 있음
     Page<Qna> qnaPage = qnaRepository.findAll(pageable);
 
-    // Page<Qna>를 Page<QnaResDto>로 변환
-    List<QnaResDto> qnaResDtoList =
-        qnaPage.getContent().stream().map(QnaResDto::new).collect(Collectors.toList());
+    // Page<Qna>를 Page<QnaResDTO>로 변환
+    List<QnaResDTO> qnaResDtoList =
+        qnaPage.getContent().stream().map(QnaResDTO::new).collect(Collectors.toList());
 
     return new PageImpl<>(qnaResDtoList, pageable, qnaPage.getTotalElements());
   }
 
   /**
-   * Q&A 게시글의 접근 권한을 확인하고, 권한이 있는 경우 QnaResDto를 반환한다.
+   * Q&A 게시글의 접근 권한을 확인하고, 권한이 있는 경우 QnaResDTO를 반환한다.
    *
    * @param qnaId Q&A ID
    * @param principal 현재 로그인한 사용자 정보
    * @param password 입력된 비밀번호 (없을 경우 null)
-   * @return QnaResDto 객체
+   * @return QnaResDTO 객체
    * @throws IllegalAccessException 접근 권한이 없는 경우
    */
-  public QnaResDto getQnaById(Long qnaId, Principal principal, String password)
+  public QnaResDTO getQnaById(Long qnaId, Principal principal, String password)
       throws IllegalAccessException {
     Qna qna =
         qnaRepository
@@ -171,7 +171,7 @@ public class QnaService {
 
     // 공개글이면 바로 반환
     if (!qna.getIsSecret()) {
-      return new QnaResDto(qna);
+      return new QnaResDTO(qna);
     }
 
     // 비밀글인 경우, 접근 권한 확인
@@ -184,7 +184,7 @@ public class QnaService {
               .map(user -> user.getRole().equals(Role.ADMIN))
               .orElse(false);
       if (isAdmin) {
-        return new QnaResDto(qna); // 관리자면 접근 허용
+        return new QnaResDTO(qna); // 관리자면 접근 허용
       }
     }
 
@@ -197,6 +197,6 @@ public class QnaService {
     }
 
     // 비밀번호가 일치하면 접근 허용
-    return new QnaResDto(qna);
+    return new QnaResDTO(qna);
   }
 }
