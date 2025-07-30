@@ -42,6 +42,10 @@ public class Qna extends BaseEntity {
   @Column(nullable = false)
   private String category;
 
+  // Q&A 첨부 이미지 파일 경로 (여러 개일 경우 콤마로 구분)
+  @Column(nullable = true, columnDefinition = "TEXT")
+  private String image;
+
   // 관계 설정
   // Q&A와 유저와의 관계 (N : 1)
   @ManyToOne(fetch = FetchType.LAZY)
