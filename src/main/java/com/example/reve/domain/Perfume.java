@@ -5,6 +5,8 @@ import java.util.List;
 
 import jakarta.persistence.*;
 
+import org.hibernate.annotations.Formula;
+
 import lombok.*;
 
 /*
@@ -64,6 +66,9 @@ public class Perfume extends BaseEntity {
   // 향수 호버 이미지
   @Column(nullable = false)
   private String hoverImageUrl;
+
+  @Formula("(SELECT COUNT(*) FROM review r WHERE r.perfume_id = perfume_id)")
+  private int reviewCount;
 
   // 관계 설정
   // 향수와 리뷰와의 관계 (1 : N)
