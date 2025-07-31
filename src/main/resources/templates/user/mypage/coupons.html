@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<html lang="ko" xmlns:th="http://www.thymeleaf.org">
+  <head th:replace="~{fragments/header :: head}">
+    <title>공지사항 - Rêve</title>
+  </head>
+  <body class="font-sans text-gray-800">
+    <!-- Header Fragment -->
+    <div th:replace="~{fragments/header :: header}"></div>
+
+    <!-- Main Content -->
+    <main class="pt-20">
+      <div class="min-h-screen bg-gray-50 py-12">
+        <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
+          <!-- Page Title -->
+          <div class="mb-8">
+            <h1 class="text-3xl font-bold text-gray-800 mb-2">쿠폰</h1>
+          </div>
+
+          <!-- Filter Section -->
+          <div class="bg-white rounded-lg shadow-sm p-6 mb-6">
+            <div class="flex flex-col md:flex-row md:items-center md:justify-between space-y-4 md:space-y-0">
+              <div class="flex items-center space-x-4">
+                <label>
+                  <select class="border border-gray-300 rounded-md px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-gray-800 focus:border-transparent">
+                    <option>최신순</option>
+                    <option>생일</option>
+                    <option>신규</option>
+                  </select>
+                </label>
+              </div>
+            </div>
+          </div>
+
+          <!-- Coupon List -->
+          <div class="bg-white rounded-lg shadow-sm overflow-hidden">
+            <div class="bg-gray-50 px-6 py-4 border-b border-gray-200">
+              <div class="grid grid-cols-12 gap-4 text-sm font-medium text-gray-700">
+                <div class="col-span-1 text-center">번호</div>
+                <div class="col-span-1 text-center">분류</div>
+                <div class="col-span-6">제목</div>
+                <div class="col-span-4 text-center">만료일</div>
+              </div>
+            </div>
+
+            <div class="px-6 py-4 hover:bg-gray-50 transition-colors">
+              <div class="grid grid-cols-12 gap-4 items-center">
+                <div class="col-span-1 text-center text-sm text-gray-600">1</div>
+                <div class="col-span-1 text-center">
+                  <span class="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-green-100 text-green-800">신규</span>
+                </div>
+                <div class="col-span-6">
+                  <span class="text-gray-800 hover:text-gray-600">회원가입 축하 쿠폰</span>
+                </div>
+                <div class="col-span-4 text-center text-sm text-gray-600">2025-12-31</div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Quick Links -->
+          <div class="mt-8 bg-white rounded-lg shadow-sm p-6">
+            <h3 class="text-lg font-semibold text-gray-800 mb-4">빠른 링크</h3>
+            <div class="grid md:grid-cols-3 gap-4">
+              <a href="/board/qna/list" class="flex items-center p-3 border border-gray-200 rounded-md hover:bg-gray-50 transition-colors">
+                <i class="fas fa-question-circle text-blue-500 mr-3"></i>
+                <div>
+                  <p class="font-medium text-gray-800">자주 묻는 질문</p>
+                  <p class="text-sm text-gray-600">FAQ에서 답변을 찾아보세요</p>
+                </div>
+              </a>
+              <a href="/info/policy" class="flex items-center p-3 border border-gray-200 rounded-md hover:bg-gray-50 transition-colors">
+                <i class="fas fa-shield-alt text-green-500 mr-3"></i>
+                <div>
+                  <p class="font-medium text-gray-800">개인정보처리방침</p>
+                  <p class="text-sm text-gray-600">개인정보 보호 정책을 확인하세요</p>
+                </div>
+              </a>
+              <a href="/info/terms" class="flex items-center p-3 border border-gray-200 rounded-md hover:bg-gray-50 transition-colors">
+                <i class="fas fa-file-contract text-purple-500 mr-3"></i>
+                <div>
+                  <p class="font-medium text-gray-800">이용약관</p>
+                  <p class="text-sm text-gray-600">서비스 이용 약관을 확인하세요</p>
+                </div>
+              </a>
+            </div>
+          </div>
+        </div>
+      </div>
+    </main>
+
+
+    <!-- Footer Fragment -->
+    <div th:replace="~{fragments/footer :: footer}"></div>
+
+    <!-- Login Modal Fragment -->
+    <div th:replace="~{fragments/modal :: loginModal}"></div>
+
+    <script src="/js/script.js"></script>
+    <script>
+      document.addEventListener("DOMContentLoaded", function () {
+        const filterSelect = document.querySelector("select");
+        const couponItems = document.querySelectorAll(".coupon-item");
+
+        filterSelect.addEventListener("change", function () {
+          const selected = this.value;
+
+          couponItems.forEach((item) => {
+            const categoryText = item.querySelector(".coupon-category").textContent.trim();
+
+            if (selected === "최신순" || selected === categoryText) {
+              item.style.display = "";
+            } else {
+              item.style.display = "none";
+            }
+          });
+        });
+      });
+    </script>
+  </body>
+</html>

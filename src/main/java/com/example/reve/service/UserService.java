@@ -1,6 +1,5 @@
 package com.example.reve.service;
 
-
 import org.springframework.dao.DuplicateKeyException;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.core.userdetails.UserDetails;

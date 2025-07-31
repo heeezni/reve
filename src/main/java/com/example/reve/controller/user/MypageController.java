@@ -37,6 +37,12 @@ public class MypageController {
     }
   }
 
+  @GetMapping("/coupons")
+  public String cupons() {
+    return "user/mypage/coupons";
+  }
+
+  // 쿠폰 목록
   @GetMapping("/wishlist")
   public String wishlist() {
     return "user/mypage/wishlist";
