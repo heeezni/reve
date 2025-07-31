@@ -33,6 +33,10 @@ public class Coupon extends BaseEntity {
   @Column(nullable = false)
   private LocalDate validFrom;
 
+  //발급 날짜
+  @Column(nullable = false)
+  private LocalDate issuedAt;
+
   // 할인율
   @Column(nullable = false)
   private int discountRate;
@@ -46,8 +50,7 @@ public class Coupon extends BaseEntity {
   private Boolean isUsed;
 
   // 사용일
-  @Column
-  private LocalDateTime isUsedAt;
+  @Column private LocalDateTime isUsedAt;
 
   // 관계 설정
   // 쿠폰과 유저와의 관계 (N : 1)
