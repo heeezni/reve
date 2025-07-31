@@ -1,7 +1,12 @@
 package com.example.reve.service;
 
+import java.util.Collections;
+
 import org.springframework.dao.DuplicateKeyException;
 import org.springframework.security.authentication.BadCredentialsException;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
+import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -21,15 +26,15 @@ import lombok.extern.slf4j.Slf4j;
 @Slf4j
 @Transactional
 @RequiredArgsConstructor
-/***
- * User 테이블에 대한 서비스
- */
-public class UserService {
+/** User 테이블에 대한 서비스 */
+public class UserService implements UserDetailsService { // UserDetailsService 구현
+
   private final UserRepository userRepository;
   private final PasswordEncoder passwordEncoder;
 
-  /***
-   *  회원 가입 서비스
+  /**
+   * 회원 가입 서비스
+   *
    * @param create (아이디,비밀번호, 이메일, 휴대폰 번호)
    */
   public void signup(CreateUserDTO create) {
@@ -56,8 +61,9 @@ public class UserService {
     userRepository.save(user);
   }
 
-  /***
-   *로그인 서비스
+  /**
+   * 로그인 서비스
+   *
    * @param loginUser (로그인 아이디, 비밀번호)
    * @return user
    */
@@ -78,8 +84,33 @@ public class UserService {
     return user;
   }
 
-  /***
+  /**
+   * Spring Security의 UserDetailsService 인터페이스 구현 사용자 이름(loginId)으로 사용자 정보를 로드
+   *
+   * @param username 사용자의 로그인 ID
+   * @return UserDetails 객체
+   * @throws UsernameNotFoundException 사용자를 찾을 수 없을 때
+   */
+  @Override
+  public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
+    User user =
+        userRepository
+            .findByLoginId(username)
+            .orElseThrow(
+                () -> new UsernameNotFoundException("User not found with loginId: " + username));
+
+    // Spring Security의 User 객체로 변환하여 반환
+    return new org.springframework.security.core.userdetails.User(
+        user.getLoginId(),
+        user.getPassword(),
+        Collections.singletonList(
+            new SimpleGrantedAuthority("ROLE_" + user.getRole().name())) // 권한 설정
+        );
+  }
+
+  /**
    * 회원 정보 수정 서비스
+   *
    * @param updateProfileDTO (프로필 사진, 이름, 닉네임, 이메일, 생일,휴대폰 번호)
    * @return
    */
@@ -103,9 +134,9 @@ public class UserService {
     return user;
   }
 
-  /***
-   * 비밀번호 변경 서비스
-   * -기존 비밀번호 확인 후 새 비밀번호 암호화 후 저장
+  /**
+   * 비밀번호 변경 서비스 -기존 비밀번호 확인 후 새 비밀번호 암호화 후 저장
+   *
    * @param newPasswordDTO (로그인 아이디, 기존 비밀번호, 변경 비밀번호)
    */
   public boolean updatePassword(NewPasswordDTO newPasswordDTO) {
