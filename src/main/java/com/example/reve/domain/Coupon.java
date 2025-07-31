@@ -46,12 +46,12 @@ public class Coupon extends BaseEntity {
   private Boolean isUsed;
 
   // 사용일
-  @Column(nullable = true)
+  @Column
   private LocalDateTime isUsedAt;
 
   // 관계 설정
   // 쿠폰과 유저와의 관계 (N : 1)
   @ManyToOne(fetch = FetchType.LAZY)
-  @JoinColumn(name = "user_id", nullable = true)
+  @JoinColumn(name = "user_id")
   private User user;
 }
