@@ -448,102 +448,48 @@
                   <!-- Review Summary -->
                   <div class="bg-gray-50 p-6 rounded-lg">
                     <div class="flex items-center justify-between mb-4">
-                      <h3 class="text-lg font-semibold text-gray-800">
-                        리뷰 요약
-                      </h3>
-                      <button class="text-sm text-blue-600 hover:underline">
-                        리뷰 작성하기
-                      </button>
+                      <h3 class="text-lg font-semibold text-gray-800">리뷰 요약</h3>
+                      <button class="text-sm text-blue-600 hover:underline">리뷰 작성하기</button>
                     </div>
                     <div class="grid md:grid-cols-3 gap-6">
                       <div class="text-center">
-                        <div class="text-3xl font-bold text-gray-800 mb-1" th:text="${perfume.averageRating}">
+                        <div class="text-3xl font-bold text-gray-800 mb-1" th:text="${perfume.averageRating}">4.8</div>
+                        <div class="flex items-center justify-center space-x-1 mb-2">
+                          <i th:each="i : ${#numbers.sequence(1,5)}" class="text-yellow-400"
+                             th:classappend="${i <= T(java.lang.Math).round(perfume.averageRating)} ? 'fas fa-star' : 'far fa-star'"></i>
                         </div>
-                        <div
-                          class="flex items-center justify-center space-x-1 mb-2"
-                        >
-                          <i class="fas fa-star text-yellow-400"></i>
-                          <i class="fas fa-star text-yellow-400"></i>
-                          <i class="fas fa-star text-yellow-400"></i>
-                          <i class="fas fa-star text-yellow-400"></i>
-                          <i class="fas fa-star text-yellow-400"></i>
-                        </div>
-                        <div class="text-sm text-gray-600" th:text="'총 ' + ${perfume.reviewCount} + '개의 리뷰'"></div>
+                        <div class="text-sm text-gray-600" th:text="'총 ' + ${totalReviews} + '개 리뷰'">총 127개 리뷰</div>
                       </div>
                       <div class="space-y-2">
-                        <div class="flex items-center space-x-2">
-                          <span class="text-sm text-gray-600">5점</span>
+                        <div th:each="star : ${#numbers.sequence(5,1,-1)}" class="flex items-center space-x-2">
+                          <span class="text-sm text-gray-600" th:text="${star} + '점'">5점</span>
                           <div class="flex-1 bg-gray-200 rounded-full h-2">
-                            <div
-                              class="bg-yellow-400 h-2 rounded-full"
-                              style="width: 85%"
-                            ></div>
+                            <div class="bg-yellow-400 h-2 rounded-full"
+                                 th:style="|width: ${totalReviews > 0 && reviewCountsByRating.get(star) != null ? (reviewCountsByRating.get(star) * 100.0 / totalReviews) : 0}%;|"></div>
                           </div>
-                          <span class="text-sm text-gray-600">85%</span>
-                        </div>
-                        <div class="flex items-center space-x-2">
-                          <span class="text-sm text-gray-600">4점</span>
-                          <div class="flex-1 bg-gray-200 rounded-full h-2">
-                            <div
-                              class="bg-yellow-400 h-2 rounded-full"
-                              style="width: 10%"
-                            ></div>
-                          </div>
-                          <span class="text-sm text-gray-600">10%</span>
-                        </div>
-                        <div class="flex items-center space-x-2">
-                          <span class="text-sm text-gray-600">3점</span>
-                          <div class="flex-1 bg-gray-200 rounded-full h-2">
-                            <div
-                              class="bg-yellow-400 h-2 rounded-full"
-                              style="width: 3%"
-                            ></div>
-                          </div>
-                          <span class="text-sm text-gray-600">3%</span>
+                          <span class="text-sm text-gray-600" th:text="${ratingPercentMap.get(star)}">85%</span>
                         </div>
                       </div>
                     </div>
                   </div>
 
-                  <!-- Review List -->
-                  <div class="space-y-6">
+                  <div class="space-y-6" th:each="review : ${reviews}">
                     <div class="border-b border-gray-200 pb-6">
                       <div class="flex items-start justify-between mb-3">
                         <div class="flex items-center space-x-3">
                           <div class="w-10 h-10 bg-gray-300 rounded-full"></div>
                           <div>
-                            <div class="font-medium text-gray-800">김**</div>
+                            <div class="font-medium text-gray-800" th:text="${review.user.name}">김**</div>
                             <div class="flex items-center space-x-1">
-                              <i
-                                class="fas fa-star text-yellow-400 text-sm"
-                              ></i>
-                              <i
-                                class="fas fa-star text-yellow-400 text-sm"
-                              ></i>
-                              <i
-                                class="fas fa-star text-yellow-400 text-sm"
-                              ></i>
-                              <i
-                                class="fas fa-star text-yellow-400 text-sm"
-                              ></i>
-                              <i
-                                class="fas fa-star text-yellow-400 text-sm"
-                              ></i>
+                              <i class="fas fa-star text-yellow-400 text-sm" th:each="i : ${#numbers.sequence(1, review.rating)}"></i>
                             </div>
                           </div>
                         </div>
-                        <span class="text-sm text-gray-500">2024.01.15</span>
+                        <span class="text-sm text-gray-500" th:text="${#temporals.format(review.createdAt, 'yyyy.MM.dd')}">2024.01.15</span>
                       </div>
-                      <p class="text-gray-700 mb-3">
-                        정말 예쁜 향이에요! 봄날의 꽃향 같아서 기분이
-                        좋아집니다. 지속력도 괜찮고 포장도 예뻐요.
+                      <p class="text-gray-700 mb-3" th:text="${review.content}">
+                        정말 예쁜 향이에요! 봄날의 꽃향 같아서 기분이 좋아집니다. 지속력도 괜찮고 포장도 예뻐요.
                       </p>
-                      <div
-                        class="flex items-center space-x-4 text-sm text-gray-500"
-                      >
-                        <span>도움됨 12</span>
-                        <button class="hover:text-gray-700">답글</button>
-                      </div>
                     </div>
                   </div>
                 </div>
@@ -618,18 +564,21 @@
                         상품 이름
                       </h4>
                       <div class="flex items-center justify-between">
-                        <span
-                                class="font-bold text-gray-800"
-                                th:text="|${#numbers.formatInteger(perfume.price - perfume.discount, 3, 'COMMA')}원|"
-                        >
+                        <span class="font-bold text-gray-800"
+                              th:text="|${#numbers.formatInteger(perfume.price - perfume.discount, 3, 'COMMA')}원|">
                           가격
                         </span>
-                        <span
-                                class="text-sm text-gray-400 line-through"
-                                th:if="${perfume.discount > 0}"
-                                th:text="|${#numbers.formatInteger(perfume.price, 3, 'COMMA')}원|"
-                        >
+
+                        <span class="text-sm text-gray-400 line-through ml-auto"
+                              th:if="${perfume.discount > 0}"
+                              th:text="|${#numbers.formatInteger(perfume.price, 3, 'COMMA')}원|">
                           원래가격
+                        </span>
+
+                        <span class="text-xs text-red-500"
+                              th:if="${perfume.discount > 0}"
+                              th:text="${#numbers.formatDecimal((perfume.discount * 100.0) / perfume.price, 0, 0)} + '% 할인'">
+                          할인율
                         </span>
                       </div>
                     </div>
@@ -799,10 +748,24 @@
         }
       });
 
+      // 공유하기 버튼
       function copyToClipboard() {
         const url = window.location.href;
         navigator.clipboard.writeText(url)
-                .then(() => alert("링크가 복사되었습니다!"));
+                .then(() => showToast("링크가 복사되었습니다!"))
+                .catch(() => showToast("복사에 실패했습니다."));
+      }
+
+      function showToast(message) {
+        const toast = document.getElementById('toast');
+        toast.textContent = message;
+        toast.style.visibility = 'visible';
+        toast.style.opacity = '1';
+
+        setTimeout(() => {
+          toast.style.opacity = '0';
+          toast.style.visibility = 'hidden';
+        }, 2000); // 2초 후 사라짐
       }
 
       // Wishlist functionality
@@ -822,21 +785,40 @@
     </script>
     <!-- 모달 배경 및 창 -->
     <div id="loginAlertModal" style="
-  position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-  background: rgba(0, 0, 0, 0.4); display: none;
-  align-items: center; justify-content: center; z-index: 1000;">
+      position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+      background: rgba(0, 0, 0, 0.4); display: none;
+      align-items: center; justify-content: center; z-index: 1000;">
       <div style="
-    background: white; padding: 30px; border-radius: 10px;
-    font-size: 16px; text-align: center; box-shadow: 0 5px 20px rgba(0,0,0,0.2);">
+        background: white; padding: 30px; border-radius: 10px;
+        font-size: 16px; text-align: center; box-shadow: 0 5px 20px rgba(0,0,0,0.2);">
         로그인이 필요한 기능입니다.
         <br/><br/>
         <button onclick="closeLoginModal()" style="
-      background: #ef4444; color: white; border: none;
-      padding: 10px 20px; border-radius: 6px; cursor: pointer;">
-          닫기
+          background: #ef4444; color: white; border: none;
+          padding: 10px 20px; border-radius: 6px; cursor: pointer;">
+              닫기
         </button>
       </div>
     </div>
+
+    <div id="toast" style="
+      visibility: hidden;
+      min-width: 200px;
+      background-color: #4ade80; /* 연한 초록 */
+      color: white;
+      text-align: center;
+      border-radius: 8px;
+      padding: 12px;
+      position: fixed;
+      z-index: 10000;
+      left: 50%;
+      bottom: 30px;
+      font-size: 14px;
+      transform: translateX(-50%);
+      box-shadow: 0 2px 8px rgba(0,0,0,0.2);
+      transition: visibility 0s, opacity 0.5s linear;
+      opacity: 0;
+    "></div>
 
   </body>
 </html>
