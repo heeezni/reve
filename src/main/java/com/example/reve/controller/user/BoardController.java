@@ -23,6 +23,7 @@ import com.example.reve.domain.User;
 import com.example.reve.dto.QnaReqDTO;
 import com.example.reve.dto.QnaResDTO;
 import com.example.reve.repository.UserRepository;
+import com.example.reve.service.PerfumeService;
 import com.example.reve.service.QnaService;
 
 import lombok.RequiredArgsConstructor;
@@ -36,6 +37,7 @@ public class BoardController {
 
   private final QnaService qnaService; // 서비스 주입 (QnaService)
   private final UserRepository userRepository; // UserRepository 주입
+  private final PerfumeService perfumeService; // PerfumeService 주입
 
   // Q&A 생성 API
   @PostMapping("/qna")
@@ -117,7 +119,7 @@ public class BoardController {
     log.info("qnaDetail: Accessing Q&A with ID: {}", qnaId); // Q&A ID 로깅
     try {
       // 비밀번호 없이 조회를 시도. 공개글이거나 관리자면 성공.
-      QnaResDTO qna = qnaService.getQnaById(qnaId, principal, null);
+      QnaResDTO qna = qnaService.getQnaById(qnaId, principal);
       model.addAttribute("qna", qna);
 
       // 현재 로그인한 사용자 정보 확인
@@ -203,14 +205,15 @@ public class BoardController {
   }
 
   @GetMapping("/qna/form")
-  public String qnaForm() {
+  public String qnaForm(Model model) {
+    model.addAttribute("perfumes", perfumeService.getAllPerfumes());
     return "board/qna/form";
   }
 
   @GetMapping("/qna/edit/{qnaId}")
   public String editQnaForm(@PathVariable Long qnaId, Model model, Principal principal) {
     try {
-      QnaResDTO qna = qnaService.getQnaById(qnaId, principal, null);
+      QnaResDTO qna = qnaService.getQnaById(qnaId, principal);
       model.addAttribute("qna", qna);
       return "board/qna/edit";
     } catch (IllegalAccessException e) {

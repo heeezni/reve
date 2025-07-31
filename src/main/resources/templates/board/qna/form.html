@@ -41,7 +41,24 @@
           <div sec:authorize="isAuthenticated()" class="bg-white rounded-lg shadow-sm p-8">
             <form id="qna-form" class="space-y-8">
               <!-- Hidden fields for IDs -->
-              <input type="hidden" id="perfume-id" name="perfumeId" value="1" /> <!-- 상품 상세 페이지에서 넘어올 경우 동적으로 설정 -->
+              <!-- Product Selection -->
+              <div>
+                <label
+                  for="perfume-select"
+                  class="block text-sm font-medium text-gray-700 mb-3"
+                >
+                  관련 상품 <span class="text-red-500">*</span>
+                </label>
+                <select
+                  id="perfume-select"
+                  name="perfumeId"
+                  class="w-full border border-gray-300 rounded-md px-4 py-3 focus:outline-none focus:ring-2 focus:ring-gray-800 focus:border-transparent"
+                  required
+                >
+                  <option value="">상품을 선택해주세요</option>
+                  <option th:each="perfume : ${perfumes}" th:value="${perfume.perfumeId}" th:text="${perfume.perfumeName}"></option>
+                </select>
+              </div>
 
               <!-- Category Selection -->
               <div>
@@ -436,14 +453,17 @@
           console.log('Submit button 클릭이벤트 실행'); // 클릭 이벤트 핸들러 실행 확인
 
           // 1. 폼 데이터 가져오기
-          const perfumeId = $('#perfume-id').val();
+          const perfumeId = $('#perfume-select').val();
           const title = $('#qna-title').val();
           const content = $('#qna-content').val();
           const isSecret = $('input[name="isSecret"]:checked').val();
-          const password = $('#qna-password').val();
           const category = $('#qna-category').val();
 
           // 2. 유효성 검사
+          if (!perfumeId) {
+            alert('관련 상품을 선택해주세요.');
+            return;
+          }
           if (!category) {
             alert('문의 분류를 선택해주세요.');
             return;
@@ -459,10 +479,9 @@
 
           // 3. FormData 객체 생성
           const formData = new FormData();
-          formData.append('perfumeId', parseInt(perfumeId, 10));
+          formData.append('perfumeId', perfumeId);
           formData.append('title', title);
           formData.append('content', content);
-          formData.append('password', password);
           formData.append('isSecret', isSecret);
           formData.append('category', category);
 

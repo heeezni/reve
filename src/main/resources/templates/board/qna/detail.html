@@ -57,6 +57,7 @@
                 >
                   <!-- Status -->
                 </span>
+                
                 <span
                   th:if="${qna.isSecret}"
                   class="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-gray-100 text-gray-600"
@@ -66,11 +67,14 @@
                 </span>
               </div>
 
-              <h1 class="text-2xl font-bold text-gray-800 mb-4 leading-tight"
+              <h1 class="text-2xl font-bold text-gray-800 mb-2 leading-tight"
                 th:text="${qna.title}"
               >
                 <!-- Title -->
               </h1>
+              <span th:if="${qna.perfumeName}" class="text-sm text-gray-600 mb-4">
+                관련 상품: <span class="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium bg-orange-100 text-orange-800" th:text="${qna.perfumeName}"></span>
+              </span>
 
               <!-- Question Meta -->
               <div

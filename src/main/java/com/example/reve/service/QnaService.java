@@ -11,7 +11,6 @@ import java.util.stream.Collectors;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
-import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -38,7 +37,6 @@ public class QnaService {
   private final UserRepository userRepository;
   private final PerfumeRepository perfumeRepository;
   private final FileUploadService fileUploadService;
-  private final PasswordEncoder passwordEncoder;
 
   @Transactional
   public QnaResDTO createQna(QnaReqDTO reqDto, Principal principal) throws IOException {
@@ -198,12 +196,10 @@ public class QnaService {
    *
    * @param qnaId Q&A ID
    * @param principal 현재 로그인한 사용자 정보
-   * @param password 입력된 비밀번호 (없을 경우 null)
    * @return QnaResDTO 객체
    * @throws IllegalAccessException 접근 권한이 없는 경우
    */
-  public QnaResDTO getQnaById(Long qnaId, Principal principal, String password)
-      throws IllegalAccessException {
+  public QnaResDTO getQnaById(Long qnaId, Principal principal) throws IllegalAccessException {
     Qna qna =
         qnaRepository
             .findById(qnaId)
@@ -221,7 +217,6 @@ public class QnaService {
     // 비밀글인 경우, 접근 권한 확인
     validateUserPermission(principal, qna);
 
-    // 비밀번호가 일치하면 접근 허용
     return new QnaResDTO(qna, prevQnaId, nextQnaId); // prev/next QnaId 포함하여 반환
   }
 
