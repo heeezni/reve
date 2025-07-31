@@ -1,10 +1,7 @@
 package com.example.reve.service;
 
-import java.util.Collections;
-
 import org.springframework.dao.DuplicateKeyException;
 import org.springframework.security.authentication.BadCredentialsException;
-import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
@@ -12,6 +9,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import com.example.reve.domain.CustomUserDetails;
 import com.example.reve.domain.User;
 import com.example.reve.dto.CreateUserDTO;
 import com.example.reve.dto.LoginUserDTO;
@@ -99,13 +97,8 @@ public class UserService implements UserDetailsService { // UserDetailsService �
             .orElseThrow(
                 () -> new UsernameNotFoundException("User not found with loginId: " + username));
 
-    // Spring Security의 User 객체로 변환하여 반환
-    return new org.springframework.security.core.userdetails.User(
-        user.getLoginId(),
-        user.getPassword(),
-        Collections.singletonList(
-            new SimpleGrantedAuthority("ROLE_" + user.getRole().name())) // 권한 설정
-        );
+    // CustomUserDetails 객체로 변환하여 반환
+    return new CustomUserDetails(user);
   }
 
   /**
