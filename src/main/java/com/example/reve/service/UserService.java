@@ -1,5 +1,7 @@
 package com.example.reve.service;
 
+import javax.swing.*;
+
 import org.springframework.dao.DuplicateKeyException;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -131,24 +133,30 @@ public class UserService implements UserDetailsService { // UserDetailsService �
    *
    * @param newPasswordDTO (로그인 아이디, 기존 비밀번호, 변경 비밀번호)
    */
-  public boolean updatePassword(NewPasswordDTO newPasswordDTO) {
+  public boolean checkPassword(NewPasswordDTO newPasswordDTO, String loginId) {
     // 로그인 아이디가 같은 회원 정보 가져오기
-    User user = userRepository.findByLoginId(newPasswordDTO.getLoginId()).orElseThrow();
+    User user = userRepository.findByLoginId(loginId).orElseThrow();
     // 기존 비밀번호가 일치한지 확인하기
     if (passwordEncoder.matches(newPasswordDTO.getPassword(), user.getPassword())) {
-      // 새 비밀번호와 기존 비밀번호가 일치한지 비교
-      if (!newPasswordDTO.getPassword().equals(newPasswordDTO.getNewPassword())) {
-        // 새 비밀번호 암호화
-        String encodedNewPassword = passwordEncoder.encode(newPasswordDTO.getNewPassword());
-        user.setPassword(encodedNewPassword);
-        // 저장
-        userRepository.save(user);
-        return true;
-      } else {
-        throw new BadCredentialsException("비밀번호의 변경사함이 없음");
-      }
+      return true;
     } else {
-      throw new BadCredentialsException("비밀번호가 일치하지 않음");
+      log.error("비밀번호가 일치하지 않음");
+      return false;
+    }
+  }
+
+  public boolean updatePassword(NewPasswordDTO newPasswordDTO, String loginId) {
+    User user = userRepository.findByLoginId(loginId).orElseThrow();
+    // 새 비밀번호와 기존 비밀번호가 일치한지 비교
+    if (!newPasswordDTO.getPassword().equals(newPasswordDTO.getNewPassword())) {
+      // 새 비밀번호 암호화
+      String encodedNewPassword = passwordEncoder.encode(newPasswordDTO.getNewPassword());
+      user.setPassword(encodedNewPassword);
+      // 저장
+      userRepository.save(user);
+      return true;
+    } else {
+      throw new BadCredentialsException("비밀번호의 변경사함이 없음");
     }
   }
 

@@ -88,17 +88,25 @@ public class MypageController {
    * @return "redirect:/" 성공 시 메인페이지로 이동
    */
   @PostMapping("/account/password")
-  public String updatePassword(NewPasswordDTO newPasswordDTO, HttpSession session, Model model) {
+  public String updatePassword(
+      NewPasswordDTO newPasswordDTO,
+      HttpSession session,
+      @AuthenticationPrincipal CustomUserDetails customUserDetails) {
     log.info("비밀번호 변경 컨트롤러 호출");
-    boolean result = userService.updatePassword(newPasswordDTO);
+    String loginId = customUserDetails.getUsername();
+    boolean result = userService.checkPassword(newPasswordDTO, loginId);
     if (result) {
-      // 세션 초기화(로그인 아웃)
-      session.invalidate();
-      return "redirect:/";
+      boolean result2 = userService.updatePassword(newPasswordDTO, loginId);
+      if (result2) {
+        session.setAttribute("result2", true);
+        // 세션 초기화(로그인 아웃)
+        session.invalidate();
+        return "redirect:/";
+      }
     } else {
       log.error("비밀번호 변경 실패");
-      model.addAttribute("result", result);
-      return "redirect:/mypage/account";
+      session.setAttribute("result", false);
     }
+    return "redirect:/mypage/account";
   }
 }

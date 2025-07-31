@@ -391,6 +391,8 @@
       </div>
     </main>
 
+    <!-- Login Modal Fragment -->
+    <script src="/js/script.js"></script>
     <!-- Footer Fragment -->
     <div th:replace="~{fragments/footer :: footer}"></div>
     <script>
@@ -399,23 +401,34 @@
         const newPassword = document.querySelector('input[name="newPassword"]').value;
         const confirmPassword = document.querySelectorAll('input[type="password"]')[2].value;
 
-        // 비어있는지 확인
         if (!password || !newPassword || !confirmPassword) {
           e.preventDefault();
           alert('모든 항목을 입력해주세요.');
           return;
         }
 
-        // 새 비밀번호 일치 확인
+        if (newPassword === password) {
+          e.preventDefault();
+          alert('기존 비밀번호와 동일합니다.');
+          return;
+        }
+
         if (newPassword !== confirmPassword) {
           e.preventDefault();
-          alert('새 비밀번호가 일치하지 않습니다.');
+          alert('새 비밀번호와 일치하지 않습니다.');
           return;
         }
       });
+
     </script>
-    <!-- Login Modal Fragment -->
-    <script src="/js/script.js"></script>
+    <p>디버그 result = [[${result}]]</p>
+    <script th:if="${result}" >
+        alert("비밀번호가 일치하지 않습니다");
+    </script>
+
+    <script th:if="${result2 != null and result2}" >
+      alert("비밀번호가 변경되었습니다 다시 로그인 해 주세요");
+    </script>
     <script>
       // Tab functionality
       const tabBtns = document.querySelectorAll('.tab-btn');
