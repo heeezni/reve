@@ -11,10 +11,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import com.example.reve.domain.CustomUserDetails;
 import com.example.reve.domain.User;
-import com.example.reve.dto.CreateUserDTO;
-import com.example.reve.dto.LoginUserDTO;
-import com.example.reve.dto.NewPasswordDTO;
-import com.example.reve.dto.UpdateProfileDTO;
+import com.example.reve.dto.*;
 import com.example.reve.repository.UserRepository;
 
 import lombok.RequiredArgsConstructor;
@@ -24,7 +21,7 @@ import lombok.extern.slf4j.Slf4j;
 @Slf4j
 @Transactional
 @RequiredArgsConstructor
-/** User 테이블에 대한 서비스 */
+/* User 테이블에 대한 서비스 */
 public class UserService implements UserDetailsService { // UserDetailsService 구현
 
   private final UserRepository userRepository;
@@ -105,7 +102,7 @@ public class UserService implements UserDetailsService { // UserDetailsService �
    * 회원 정보 수정 서비스
    *
    * @param updateProfileDTO (프로필 사진, 이름, 닉네임, 이메일, 생일,휴대폰 번호)
-   * @return
+   * @return user
    */
   public User update(UpdateProfileDTO updateProfileDTO) {
     // 로그인 아이디가 같은 회원
@@ -151,5 +148,9 @@ public class UserService implements UserDetailsService { // UserDetailsService �
     } else {
       throw new BadCredentialsException("비밀번호가 일치하지 않음");
     }
+  }
+
+  public MypageDTO selectMypage(String loginId) {
+    return userRepository.findUserInfoByLoginId(loginId);
   }
 }

@@ -2,16 +2,18 @@ package com.example.reve.controller.user;
 
 import jakarta.servlet.http.HttpSession;
 
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 
+import com.example.reve.domain.CustomUserDetails;
 import com.example.reve.domain.User;
+import com.example.reve.dto.MypageDTO;
 import com.example.reve.dto.NewPasswordDTO;
 import com.example.reve.dto.UpdateProfileDTO;
-import com.example.reve.repository.UserRepository;
 import com.example.reve.service.UserService;
 
 import lombok.RequiredArgsConstructor;
@@ -23,13 +25,20 @@ import lombok.extern.slf4j.Slf4j;
 @Slf4j
 public class MypageController {
 
-  private final UserRepository userRepository;
   private final UserService userService;
 
   @GetMapping
-  public String mypage() {
-
-    return "user/mypage/index";
+  public String mypage(
+      Model model,
+      @AuthenticationPrincipal CustomUserDetails customUserDetails) {
+    String loginId = customUserDetails.getUsername();
+    if (loginId != null) {
+      model.addAttribute("mypage", userService.selectMypage(loginId));
+      return "user/mypage/index";
+    } else {
+      log.error("loginId is {}", loginId);
+      return "redirect:/";
+    }
   }
 
   @GetMapping("/wishlist")
