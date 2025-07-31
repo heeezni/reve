@@ -1,5 +1,6 @@
 package com.example.reve.domain;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 
 import jakarta.persistence.*;
@@ -23,6 +24,14 @@ public class Coupon extends BaseEntity {
   // 쿠폰 코드
   @Column(nullable = false)
   private String code;
+
+  // 쿠폰명
+  @Enumerated(EnumType.STRING)
+  private CouponName couponName;
+
+  // 쿠폰 유효 시작일
+  @Column(nullable = false)
+  private LocalDate validFrom;
 
   // 할인율
   @Column(nullable = false)
