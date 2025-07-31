@@ -250,6 +250,74 @@ public class QnaService {
     qnaRepository.delete(qna);
   }
 
+  /**
+   * Q&A 게시글에 답변 추가 (관리자)
+   *
+   * @param qnaId 답변할 Q&A ID
+   * @param answerContent 답변 내용
+   * @param principal 현재 로그인한 사용자 정보 (관리자 권한 확인용)
+   * @return 업데이트된 QnaResDTO
+   * @throws IllegalAccessException 관리자 권한이 없는 경우
+   */
+  @Transactional
+  public QnaResDTO addAnswer(Long qnaId, String answerContent, Principal principal)
+      throws IllegalAccessException {
+    Qna qna =
+        qnaRepository
+            .findById(qnaId)
+            .orElseThrow(() -> new IllegalArgumentException("해당 Q&A를 찾을 수 없습니다. ID: " + qnaId));
+
+    validateAdminPermission(principal);
+
+    qna.setAnswer(answerContent);
+    Qna updatedQna = qnaRepository.save(qna);
+    return new QnaResDTO(updatedQna);
+  }
+
+  /**
+   * Q&A 게시글 답변 수정
+   *
+   * @param qnaId 수정할 Q&A ID
+   * @param updatedAnswerContent 수정된 답변 내용
+   * @param principal 현재 로그인한 사용자 정보 (관리자 권한 확인용)
+   * @return 업데이트된 QnaResDTO
+   * @throws IllegalAccessException 관리자 권한이 없는 경우
+   */
+  @Transactional
+  public QnaResDTO updateAnswer(Long qnaId, String updatedAnswerContent, Principal principal)
+      throws IllegalAccessException {
+    Qna qna =
+        qnaRepository
+            .findById(qnaId)
+            .orElseThrow(() -> new IllegalArgumentException("해당 Q&A를 찾을 수 없습니다. ID: " + qnaId));
+
+    validateAdminPermission(principal);
+
+    qna.setAnswer(updatedAnswerContent);
+    Qna updatedQna = qnaRepository.save(qna);
+    return new QnaResDTO(updatedQna);
+  }
+
+  /**
+   * Q&A 게시글 답변 삭제
+   *
+   * @param qnaId 삭제할 Q&A ID
+   * @param principal 현재 로그인한 사용자 정보 (관리자 권한 확인용)
+   * @throws IllegalAccessException 관리자 권한이 없는 경우
+   */
+  @Transactional
+  public void deleteAnswer(Long qnaId, Principal principal) throws IllegalAccessException {
+    Qna qna =
+        qnaRepository
+            .findById(qnaId)
+            .orElseThrow(() -> new IllegalArgumentException("해당 Q&A를 찾을 수 없습니다. ID: " + qnaId));
+
+    validateAdminPermission(principal);
+
+    qna.setAnswer(null);
+    qnaRepository.save(qna);
+  }
+
   private void validateUserPermission(Principal principal, Qna qna) throws IllegalAccessException {
     if (principal == null) {
       throw new IllegalAccessException("로그인이 필요합니다.");
@@ -261,6 +329,20 @@ public class QnaService {
 
     if (user.getRole() != Role.ADMIN && !user.getUserId().equals(qna.getUser().getUserId())) {
       throw new IllegalAccessException("해당 게시글에 대한 권한이 없습니다.");
+    }
+  }
+
+  private void validateAdminPermission(Principal principal) throws IllegalAccessException {
+    if (principal == null) {
+      throw new IllegalAccessException("로그인이 필요합니다.");
+    }
+    User user =
+        userRepository
+            .findByLoginId(principal.getName())
+            .orElseThrow(() -> new IllegalAccessException("사용자 정보를 찾을 수 없습니다."));
+
+    if (user.getRole() != Role.ADMIN) {
+      throw new IllegalAccessException("관리자 권한이 필요합니다.");
     }
   }
 }

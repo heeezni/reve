@@ -146,7 +146,7 @@
                     fileInfoContainer.prepend(img);
                 };
                 reader.readAsDataURL(fileOrUrl);
-            } else if (!isNewUrl && (fileOrUrl.endsWith('.jpg') || fileOrUrl.endsWith('.png'))) {
+            } else if (!isNewUrl && (fileOrUrl.endsWith('.jpg') || fileOrUrl.endsWith('.jpeg') || fileOrUrl.endsWith('.png'))) {
                  const img = document.createElement('img');
                  img.src = fileOrUrl;
                  img.className = 'w-16 h-16 object-cover rounded-md';
@@ -192,13 +192,6 @@
                 fileInput.files = dataTransfer.files;
             }
         };
-
-        // 비밀글 라디오 버튼 이벤트 리스너
-        // document.querySelectorAll('input[name="isSecret"]').forEach(radio => {
-        //     radio.addEventListener('change', function() {
-        //         document.getElementById('password-section').style.display = this.value === 'true' ? 'block' : 'none';
-        //     });
-        // });
     });
 </script>
 </body>

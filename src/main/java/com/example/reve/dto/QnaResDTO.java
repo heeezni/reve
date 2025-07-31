@@ -17,6 +17,7 @@ public class QnaResDTO {
   private String content;
   private String answer;
   private Boolean isSecret;
+  private Boolean isAnswered;
   private String category;
   private String attachment;
   private String userName;
@@ -33,6 +34,7 @@ public class QnaResDTO {
     this.content = qna.getContent();
     this.answer = qna.getAnswer();
     this.isSecret = qna.getIsSecret();
+    this.isAnswered = qna.getAnswer() != null && !qna.getAnswer().trim().isEmpty();
     this.category = qna.getCategory();
     this.attachment = qna.getAttachment();
     this.userName = (qna.getUser() != null) ? qna.getUser().getName() : "비회원";
