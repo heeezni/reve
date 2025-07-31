@@ -41,7 +41,7 @@ public class BoardController {
   @PostMapping("/qna")
   @ResponseBody // View가 아닌 데이터(JSON)를 반환
   public ResponseEntity<?> createQna(
-      @Valid @ModelAttribute QnaReqDTO reqDto, BindingResult bindingResult) {
+      @Valid @ModelAttribute QnaReqDTO reqDto, BindingResult bindingResult, Principal principal) {
     // QnaReqDTO의 유효성 검사 수행
     if (bindingResult.hasErrors()) {
       StringBuilder errorMessage = new StringBuilder();
@@ -52,8 +52,7 @@ public class BoardController {
       return ResponseEntity.badRequest().body(errorMessage.toString());
     }
     try {
-      log.info("createQna: Received loginId from reqDto: {}", reqDto.getLoginId()); // 로그 추가
-      QnaResDTO qna = qnaService.createQna(reqDto);
+      QnaResDTO qna = qnaService.createQna(reqDto, principal);
       return ResponseEntity.ok(qna); // 성공(200 OK) 응답과 함께 생성된 Q&A 정보 반환
     } catch (IOException e) {
       // 파일 업로드 관련 예외 처리

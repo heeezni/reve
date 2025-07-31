@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="ko" xmlns:th="http://www.thymeleaf.org">
+<html lang="ko" xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
   <head th:replace="~{fragments/header :: head}">
     <title>Q&A 작성 - Rêve</title>
   </head>
@@ -33,13 +33,15 @@
           </div>
 
           <!-- Q&A Form -->
-          <div class="bg-white rounded-lg shadow-sm p-8">
+          <div sec:authorize="!isAuthenticated()" class="bg-white rounded-lg shadow-sm p-8 text-center">
+            <p class="text-lg text-gray-700">Q&A 작성은 회원만 가능합니다.</p>
+            <a href="/member/login" class="mt-4 inline-block px-6 py-3 bg-gray-800 text-white rounded-md hover:bg-gray-700">로그인</a>
+          </div>
+
+          <div sec:authorize="isAuthenticated()" class="bg-white rounded-lg shadow-sm p-8">
             <form id="qna-form" class="space-y-8">
               <!-- Hidden fields for IDs -->
-              <input type="hidden" id="user-id" name="loginId" th:value="${#authentication.isAuthenticated() ? #authentication.name : ''}" />
               <input type="hidden" id="perfume-id" name="perfumeId" value="1" /> <!-- 상품 상세 페이지에서 넘어올 경우 동적으로 설정 -->
-              <!-- 로그인 상태를 나타내는 hidden input 추가 -->
-              <input type="hidden" id="is-logged-in" th:value="${#authentication.isAuthenticated() ? 'true' : 'false'}" />
 
               <!-- Category Selection -->
               <div>
@@ -433,7 +435,6 @@
 
       // 비밀글 선택 시 비밀번호 필드 표시/숨김
       const passwordSection = $('#password-section');
-      const isLoggedIn = $('#is-logged-in').val() === 'true'; // hidden input에서 값 가져오기
 
       function updatePasswordSection() {
         const isSecretSelected = $('input[name="isSecret"]:checked').val() === 'true';
@@ -461,8 +462,6 @@
           console.log('Submit button 클릭이벤트 실행'); // 클릭 이벤트 핸들러 실행 확인
 
           // 1. 폼 데이터 가져오기
-          const loginId = $('#user-id').val(); // userId 대신 loginId 가져오기
-          console.log('전송 전 loginId :', loginId);
           const perfumeId = $('#perfume-id').val();
           const title = $('#qna-title').val();
           const content = $('#qna-content').val();
@@ -491,9 +490,6 @@
 
           // 3. FormData 객체 생성
           const formData = new FormData();
-          if (loginId) { // loginId가 있을 경우에만 추가 (회원일 경우)
-              formData.append('loginId', loginId); // userId 대신 loginId 사용
-          }
           formData.append('perfumeId', parseInt(perfumeId, 10));
           formData.append('title', title);
           formData.append('content', content);

@@ -39,28 +39,17 @@ public class QnaService {
   private final PasswordEncoder passwordEncoder;
 
   @Transactional
-  public QnaResDTO createQna(QnaReqDTO reqDto) throws IOException {
-
-    log.debug("QnaService - createQna: Received loginId = {}", reqDto.getLoginId());
+  public QnaResDTO createQna(QnaReqDTO reqDto, Principal principal) throws IOException {
 
     // 파일 업로드 실패 시 롤백을 위해 임시 디렉토리 이름 생성
     String tempDirectoryName = UUID.randomUUID().toString();
 
     try {
       // 1. DTO에서 받은 userId로 진짜 유저가 DB에 있는지 찾기
-      User user = null;
-      // loginId가 null이 아니고 비어있지 않으며 "anonymousUser"가 아닌 경우에만 사용자 조회
-      if (reqDto.getLoginId() != null
-          && !reqDto.getLoginId().isEmpty()
-          && !reqDto.getLoginId().equals("anonymousUser")) {
-        user =
-            userRepository
-                .findByLoginId(reqDto.getLoginId()) // findById 대신 findByLoginId 사용
-                .orElseThrow(
-                    () ->
-                        new IllegalArgumentException(
-                            "해당 유저를 찾을 수 없습니다. 로그인 ID: " + reqDto.getLoginId()));
-      }
+      User user =
+          userRepository
+              .findByLoginId(principal.getName())
+              .orElseThrow(() -> new IllegalArgumentException("해당 유저를 찾을 수 없습니다."));
 
       // 3. perfumeId로 진짜 상품이 DB에 있는지 확인
       Perfume perfume =
