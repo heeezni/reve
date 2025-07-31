@@ -107,7 +107,7 @@
                           <input
                             type="text"
                             name="name"
-                            th:value="${session.loginUser.name}"
+                            th:value="${#authentication.principal.name}"
                             class="w-full border border-gray-300 rounded-md px-4 py-3 focus:outline-none focus:ring-2 focus:ring-gray-800 focus:border-transparent"
                           />
                         </label>
@@ -123,7 +123,7 @@
                           <input
                             type="text"
                             name="nickname"
-                            th:value="${session.loginUser.nickname != null} ? ${session.loginUser.nickname} : ''"
+                            th:value="${#authentication.principal.nickname != null} ? ${#authentication.principal.nickname} : ''"
                             class="w-full border border-gray-300 rounded-md px-4 py-3 focus:outline-none focus:ring-2 focus:ring-gray-800 focus:border-transparent"
                           />
                         </label>
@@ -138,7 +138,7 @@
                         <label>
                           <input
                             type="email"
-                            th:value="${session.loginUser.email}"
+                            th:value="${#authentication.principal.email}"
                             class="w-full border border-gray-300 rounded-md px-4 py-3 focus:outline-none focus:ring-2 focus:ring-gray-800 focus:border-transparent"
                             readonly
                           />
@@ -158,7 +158,7 @@
                           <input
                             type="date"
                             name="birthday"
-                            th:value="${session.loginUser.birthday != null} ? ${session.loginUser.birthday} : ''"
+                            th:value="${#authentication.principal.birthday != null} ? $${#authentication.principal.birthday} : ''"
                             class="w-full border border-gray-300 rounded-md px-4 py-3 focus:outline-none focus:ring-2 focus:ring-gray-800 focus:border-transparent"
                           />
                         </label>
@@ -184,7 +184,7 @@
                             <input
                               type="tel"
                               name="phone"
-                              th:value="${session.loginUser.phone}"
+                              th:value="${#authentication.principal.phone}"
                               class="flex-1 border border-gray-300 rounded-md px-4 py-3 focus:outline-none focus:ring-2 focus:ring-gray-800 focus:border-transparent"
                             />
                           </label>
@@ -469,7 +469,6 @@
       });
       const passwordForm = document.getElementById('passwordForm');
       if(passwordForm){
-        const result = [[${result}]];
       }
 
       // Address search functionality

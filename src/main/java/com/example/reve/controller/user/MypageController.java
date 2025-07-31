@@ -11,7 +11,6 @@ import org.springframework.web.bind.annotation.RequestMapping;
 
 import com.example.reve.domain.CustomUserDetails;
 import com.example.reve.domain.User;
-import com.example.reve.dto.MypageDTO;
 import com.example.reve.dto.NewPasswordDTO;
 import com.example.reve.dto.UpdateProfileDTO;
 import com.example.reve.service.UserService;
@@ -28,9 +27,7 @@ public class MypageController {
   private final UserService userService;
 
   @GetMapping
-  public String mypage(
-      Model model,
-      @AuthenticationPrincipal CustomUserDetails customUserDetails) {
+  public String mypage(Model model, @AuthenticationPrincipal CustomUserDetails customUserDetails) {
     String loginId = customUserDetails.getUsername();
     if (loginId != null) {
       model.addAttribute("mypage", userService.selectMypage(loginId));
