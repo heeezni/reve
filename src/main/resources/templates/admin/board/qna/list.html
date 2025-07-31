@@ -1,0 +1,219 @@
+<!DOCTYPE html>
+<html lang="ko" xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+  <head th:replace="~{fragments/header :: head}">
+    <title>관리자 Q&A - Rêve</title>
+  </head>
+  <body class="font-sans text-gray-800">
+    <!-- Header Fragment -->
+    <div th:replace="~{fragments/header :: header}"></div>
+
+    <!-- Main Content -->
+    <main class="pt-20">
+      <div class="min-h-screen bg-gray-50 py-12">
+        <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
+          <!-- Page Title -->
+          <div class="mb-8">
+            <h1 class="text-3xl font-bold text-gray-800 mb-2">관리자 Q&A</h1>
+            <p class="text-gray-600">
+              Q&A 문의를 관리합니다.
+            </p>
+          </div>
+
+          <!-- Search and Filter Section -->
+          <div class="bg-white rounded-lg shadow-sm p-6 mb-6">
+            <form th:action="@{/admin/board/qna/list}" th:method="get" class="flex flex-col md:flex-row md:items-center md:justify-between space-y-4 md:space-y-0">
+              <!-- Search Bar -->
+              <div class="flex-1 max-w-md">
+                <div class="relative">
+                  <label>
+                    <input
+                      type="text"
+                      name="keyword"
+                      placeholder="Q&A 검색..."
+                      class="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-gray-800 focus:border-transparent"
+                      th:value="${param.keyword}"
+                    />
+                  </label>
+                  <div
+                    class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none"
+                  >
+                    <i class="fas fa-search text-gray-400"></i>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Filter Options -->
+              <div class="flex items-center space-x-4">
+                <label>
+                  <select
+                    name="category"
+                    onchange="this.form.submit()"
+                    class="border border-gray-300 rounded-md px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-gray-800 focus:border-transparent"
+                  >
+                    <option value="" th:selected="${#strings.isEmpty(param.category)}">전체</option>
+                    <option value="product" th:selected="${#strings.equals(param.category, 'product')}">상품문의</option>
+                    <option value="delivery" th:selected="${#strings.equals(param.category, 'delivery')}">배송문의</option>
+                    <option value="payment" th:selected="${#strings.equals(param.category, 'payment')}">결제문의</option>
+                    <option value="return" th:selected="${#strings.equals(param.category, 'return')}">반품/교환</option>
+                    <option value="etc" th:selected="${#strings.equals(param.category, 'etc')}">기타</option>
+                  </select>
+                </label>
+                <label>
+                  <select
+                    name="filterAndSort"
+                    onchange="this.form.submit()"
+                    class="border border-gray-300 rounded-md px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-gray-800 focus:border-transparent"
+                  >
+                    <option value="" th:selected="${#strings.isEmpty(param.filterAndSort)}">최신순</option>
+                    <option value="oldest" th:selected="${#strings.equals(param.filterAndSort, 'oldest')}">오래된순</option>
+                    <option value="pending" th:selected="${#strings.equals(param.filterAndSort, 'pending')}">답변대기</option>
+                    <option value="completed" th:selected="${#strings.equals(param.filterAndSort, 'completed')}">답변완료</option>
+                  </select>
+                </label>
+                <button type="submit" class="hidden"></button> <!-- Hidden submit button for search input -->
+              </div>
+            </form>
+          </div>
+
+          <!-- Q&A List -->
+          <div class="bg-white rounded-lg shadow-sm overflow-hidden">
+            <!-- Table Header -->
+            <div class="bg-gray-50 px-6 py-4 border-b border-gray-200">
+              <div
+                class="grid grid-cols-12 gap-4 text-sm font-medium text-gray-700"
+              >
+                <div class="col-span-1 text-center">번호</div>
+                <div class="col-span-1 text-center">분류</div>
+                <div class="col-span-1 text-center">상태</div>
+                <div class="col-span-5">제목</div>
+                <div class="col-span-2 text-center">작성자</div>
+                <div class="col-span-2 text-center">작성일</div>
+              </div>
+            </div>
+
+            <!-- Table Body -->
+            <div class="divide-y divide-gray-200">
+              <!-- Q&A Item Loop -->
+              <div
+                th:each="qna, i : ${qnas}"
+                class="px-6 py-4 hover:bg-gray-50 transition-colors"
+              >
+                <div class="grid grid-cols-12 gap-4 items-center">
+                  <div class="col-span-1 text-center text-sm text-gray-600" th:text="${qnas.totalElements - (qnas.number * qnas.size + i.index)}">
+                    <!-- 번호 (역순으로 표시) -->
+                  </div>
+                  <div class="col-span-1 text-center">
+                    <span
+                      class="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium"
+                      th:classappend="${qna.category == 'product' ? 'bg-blue-100 text-blue-800' :
+                                       (qna.category == 'delivery' ? 'bg-green-100 text-green-800' :
+                                       (qna.category == 'payment' ? 'bg-purple-100 text-purple-800' :
+                                       (qna.category == 'return' ? 'bg-red-100 text-red-800' :
+                                       'bg-gray-100 text-gray-800')))}"
+                      th:text="${qna.category == 'product' ? '상품문의' :
+                                 (qna.category == 'delivery' ? '배송문의' :
+                                 (qna.category == 'payment' ? '결제문의' :
+                                 (qna.category == 'return' ? '반품/교환' :
+                                 '기타')))}"
+                    >
+                      <!-- 분류 -->
+                    </span>
+                  </div>
+                  <div class="col-span-1 text-center">
+                    <span
+                      class="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium"
+                      th:classappend="${qna.answer != null and qna.answer.length() > 0 ? 'bg-green-100 text-green-800' : 'bg-yellow-100 text-yellow-800'}"
+                      th:text="${qna.answer != null and qna.answer.length() > 0 ? '답변완료' : '답변대기'}"
+                    >
+                      <!-- 상태 (답변 유무에 따라) -->
+                    </span>
+                  </div>
+                  <div class="col-span-5">
+                    <a
+                      th:href="@{/board/qna/detail/{qnaId}(qnaId=${qna.qnaId})}"
+                      class="text-gray-800 hover:text-gray-600 font-medium flex items-center"
+                    >
+                      <i
+                        th:if="${qna.isSecret}"
+                        class="fas fa-lock text-gray-400 mr-2 text-sm"
+                      ></i>
+                      <span th:text="${qna.title}"></span>
+                    </a>
+                  </div>
+                  <div class="col-span-2 text-center text-sm text-gray-600" th:text="${qna.userName}">
+                    <!-- 작성자 -->
+                  </div>
+                  <div class="col-span-2 text-center text-sm text-gray-600">
+                    <span th:text="${#temporals.format(qna.createdAt, 'yyyy.MM.dd')}"></span>
+                    <!-- 작성일 -->
+                  </div>
+                </div>
+              </div>
+
+              <!-- Q&A 목록이 없을 경우 -->
+              <div th:if="${#lists.isEmpty(qnas)}" class="px-6 py-4 text-center text-gray-500">
+                등록된 Q&A가 없습니다.
+              </div>
+            </div>
+          </div>
+
+          <!-- Pagination -->
+          <div class="mt-8 flex items-center justify-center">
+            <nav class="flex items-center space-x-2">
+              <!-- Previous Page -->
+              <a
+                th:if="${!qnas.first}"
+                th:href="@{/admin/board/qna/list(page=${qnas.number - 1}, keyword=${param.keyword}, category=${param.category}, filterAndSort=${param.filterAndSort})}"
+                class="px-3 py-2 text-sm font-medium text-gray-500 bg-white border border-gray-300 rounded-md hover:bg-gray-50"
+              >
+                <i class="fas fa-chevron-left"></i>
+              </a>
+              <button
+                th:unless="${!qnas.first}"
+                class="px-3 py-2 text-sm font-medium text-gray-500 bg-white border border-gray-300 rounded-md disabled:opacity-50 disabled:cursor-not-allowed"
+                disabled
+              >
+                <i class="fas fa-chevron-left"></i>
+              </button>
+
+              <!-- Page Numbers -->
+              <th:block th:if="${qnas.totalPages > 0}" th:each="i : ${#numbers.sequence(0, qnas.totalPages - 1)}">
+                <a
+                  th:href="@{/admin/board/qna/list(page=${i}, keyword=${param.keyword}, category=${param.category}, filterAndSort=${param.filterAndSort})}"
+                  th:classappend="${i == qnas.number ? 'text-white bg-gray-800 border-gray-800' : 'text-gray-700 bg-white border-gray-300 hover:bg-gray-50'}"
+                  class="px-3 py-2 text-sm font-medium rounded-md"
+                  th:text="${i + 1}"
+                >
+                </a>
+              </th:block>
+
+              <!-- Next Page -->
+              <a
+                th:if="${!qnas.last}"
+                th:href="@{/admin/board/qna/list(page=${qnas.number + 1}, keyword=${param.keyword}, category=${param.category}, filterAndSort=${param.filterAndSort})}"
+                class="px-3 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-md hover:bg-gray-50"
+              >
+                <i class="fas fa-chevron-right"></i>
+              </a>
+              <button
+                th:unless="${!qnas.last}"
+                class="px-3 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-md disabled:opacity-50 disabled:cursor-not-allowed"
+                disabled
+              >
+                <i class="fas fa-chevron-right"></i>
+              </button>
+            </nav>
+          </div>
+        </div>
+      </div>
+    </main>
+
+    <!-- Footer Fragment -->
+    <div th:replace="~{fragments/footer :: footer}"></div>
+
+    <!-- Login Modal Fragment -->
+    <div th:replace="~{fragments/modal :: loginModal}"></div>
+
+    <script src="/js/script.js"></script>
+  </body>
+</html>
