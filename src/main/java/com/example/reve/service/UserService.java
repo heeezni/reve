@@ -2,16 +2,14 @@ package com.example.reve.service;
 
 import org.springframework.dao.DuplicateKeyException;
 import org.springframework.security.authentication.BadCredentialsException;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.example.reve.domain.User;
-import com.example.reve.dto.CreateUserDTO;
-import com.example.reve.dto.LoginUserDTO;
-import com.example.reve.dto.NewPasswordDTO;
-import com.example.reve.dto.UpdateProfileDTO;
+import com.example.reve.dto.*;
 import com.example.reve.repository.UserRepository;
 
 import lombok.RequiredArgsConstructor;
@@ -21,10 +19,9 @@ import lombok.extern.slf4j.Slf4j;
 @Slf4j
 @Transactional
 @RequiredArgsConstructor
-/***
- * User 테이블에 대한 서비스
- */
-public class UserService {
+/** User 테이블에 대한 서비스 */
+public class UserService implements UserDetailsService { // UserDetailsService 구현
+
   private final UserRepository userRepository;
   private final PasswordEncoder passwordEncoder;
 
@@ -78,7 +75,31 @@ public class UserService {
     return user;
   }
 
-  /***
+  /**
+   * Spring Security의 UserDetailsService 인터페이스 구현 사용자 이름(loginId)으로 사용자 정보를 로드
+   *
+   * @param username 사용자의 로그인 ID
+   * @return UserDetails 객체
+   * @throws UsernameNotFoundException 사용자를 찾을 수 없을 때
+   */
+  @Override
+  public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
+    User user =
+        userRepository
+            .findByLoginId(username)
+            .orElseThrow(
+                () -> new UsernameNotFoundException("User not found with loginId: " + username));
+
+    // CustomUserDetails 객체로 변환하여 반환
+    return new CustomUserDetails(user);
+  }
+
+  public MypageDTO selectMypage(MypageDTO mypageDTO, String loginId) {
+    mypageDTO = userRepository.findUserInfoByLoginId(loginId);
+    return mypageDTO;
+  }
+
+  /**
    * 회원 정보 수정 서비스
    * @param updateProfileDTO (프로필 사진, 이름, 닉네임, 이메일, 생일,휴대폰 번호)
    * @return
