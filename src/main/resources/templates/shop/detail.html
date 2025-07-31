@@ -1,5 +1,6 @@
 <!DOCTYPE html>
-<html lang="ko" xmlns:th="http://www.thymeleaf.org">
+<html lang="ko" xmlns:th="http://www.thymeleaf.org"
+      xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
   <head th:replace="~{fragments/header :: head}">
     <title></title>
   </head>
@@ -26,7 +27,7 @@
             </ol>
 
             <!-- 오른쪽: 수정 삭제 버튼 -->
-            <div class="space-x-2 flex items-center">
+            <div class="space-x-2 flex items-center" sec:authorize="hasRole('ADMIN')">
               <a th:href="@{/admin/shop/edit/{perfumeId}(perfumeId=${perfume.perfumeId})}"
                  class="px-6 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition text-base">
                 수정
@@ -138,7 +139,7 @@
                   <!-- 상품명 -->
                   <h1 class="text-3xl font-bold text-gray-800 mb-2" th:text="${perfume.perfumeName + ' ' + perfume.volume}">
                   </h1>
-                  <p class="text-lg text-gray-600" th:text="${perfume.description}"></p>
+                  <p class="text-lg text-gray-600" th:text="${perfume.descriptionTitle}"></p>
                 </div>
 
                 <!-- Rating and Reviews -->
@@ -219,7 +220,9 @@
                   </div>
 
                   <!-- 수량 선택과 총 금액을 감싸는 영역 -->
-                  <div class="product-section" th:data-unit-price="${perfume.price - perfume.discount}">
+                  <div class="product-section"
+                       th:data-unit-price="${perfume.price - perfume.discount}"
+                       th:data-stock="${perfume.stock}">
                     <!-- 수량 선택 -->
                     <div>
                       <label class="block text-sm font-medium text-gray-700 mb-2">수량</label>
@@ -240,6 +243,7 @@
                           <i class="fas fa-plus text-gray-600"></i>
                         </button>
                       </div>
+                      <p class="stock-warning text-red-600 text-sm mt-2 hidden">현재 재고보다 많습니다</p>
                     </div>
 
                     <!-- 총 상품금액 -->
@@ -328,23 +332,12 @@
                 <div class="space-y-8">
                   <!-- Product Description -->
                   <div>
-                    <h3 class="text-xl font-semibold text-gray-800 mb-4" th:text="${perfume.description}">
-                      상품 설명
+                    <h3 class="text-xl font-semibold text-gray-800 mb-4" th:text="${perfume.descriptionTitle}">
+                      향수 한 줄 소개
                     </h3>
                     <div class="prose max-w-none text-gray-600">
-                      <p class="mb-4">
-                        봄의 설렘을 담은 플로럴 향기, 디어 무드 멀티 퍼퓸은
-                        당신의 일상에 특별한 순간을 선물합니다.
-                      </p>
-                      <p class="mb-4">
-                        장미, 자스민, 라벤더가 조화롭게 어우러진 이 향수는
-                        부드럽고 로맨틱한 분위기를 연출합니다. 오랜 지속력과
-                        은은한 잔향으로 하루 종일 당신만의 특별한 향기를 느낄 수
-                        있습니다.
-                      </p>
-                      <p>
-                        자연 친화적인 성분으로 제작되어 민감한 피부도 안심하고
-                        사용할 수 있습니다.
+                      <p class="mb-4" th:text="${perfume.description}" id="description">
+                        향수 설명
                       </p>
                     </div>
                   </div>
@@ -651,6 +644,17 @@
       const mainImage = document.getElementById('mainImage');
       const thumbnailBtns = document.querySelectorAll('.thumbnail-btn');
 
+      const p = document.getElementById("description");
+      const maxCharsPerLine = 80; // 줄마다 80자 기준
+      const originalText = p.innerText;
+      let result = "";
+
+      for (let i = 0; i < originalText.length; i += maxCharsPerLine) {
+        result += originalText.slice(i, i + maxCharsPerLine) + "<br/>";
+      }
+
+      p.innerHTML = result;
+
       const priceElem = document.getElementById('price');
       const price = parseInt(priceElem.textContent, 10);
       priceElem.textContent = price.toLocaleString() + '원';
@@ -713,10 +717,12 @@
           btn.addEventListener('click', () => {
             const section = btn.closest('.product-section');
             const input = section.querySelector('.quantityInput');
+            const warning = section.querySelector('.stock-warning');
             let qty = parseInt(input.value) || 1;
             if (qty > 1) {
               input.value = qty - 1;
               updateTotal(section);
+              warning.classList.add('hidden');
             }
           });
         });
@@ -725,11 +731,16 @@
         document.querySelectorAll('.increaseQty').forEach(btn => {
           btn.addEventListener('click', () => {
             const section = btn.closest('.product-section');
+            const stock = parseInt(section.dataset.stock);
             const input = section.querySelector('.quantityInput');
+            const warning = section.querySelector('.stock-warning');
             let qty = parseInt(input.value) || 1;
-            if (qty < 99) {
+            if (qty < stock) {
               input.value = qty + 1;
               updateTotal(section);
+              warning.classList.add('hidden');
+            } else {
+              warning.classList.remove('hidden');
             }
           });
         });
@@ -738,6 +749,18 @@
         document.querySelectorAll('.quantityInput').forEach(input => {
           input.addEventListener('input', () => {
             const section = input.closest('.product-section');
+            const warning = section.querySelector('.stock-warning');
+            const stock = parseInt(section.dataset.stock);
+            let qty = parseInt(input.value) || 1;
+
+            if (qty > stock) {
+              warning.classList.remove('hidden'); // 경고 메시지 보이기
+              input.value = stock; // 재고 수량으로 자동 보정
+              qty = stock;
+            } else {
+              warning.classList.add('hidden'); // 경고 메시지 숨기기
+            }
+
             updateTotal(section);
           });
         });
