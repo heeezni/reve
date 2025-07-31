@@ -60,7 +60,7 @@ public class BoardController {
       // 파일 업로드 관련 예외 처리
       return ResponseEntity.badRequest().body("파일 업로드 실패: " + e.getMessage());
     } catch (IllegalArgumentException e) {
-      // 서비스 로직에서 발생하는 유효성 검사 예외 처리 (예: 비밀글 비밀번호 누락)
+      // 서비스 로직에서 발생하는 유효성 검사 예외 처리
       return ResponseEntity.badRequest().body("문의 등록 실패: " + e.getMessage());
     } catch (Exception e) {
       // 그 외 예상치 못한 예외 처리
@@ -189,10 +189,7 @@ public class BoardController {
       qnaService.deleteQna(qnaId, principal);
       redirectAttributes.addFlashAttribute("successMessage", "Q&A가 성공적으로 삭제되었습니다.");
       return "redirect:/board/qna/list";
-    } catch (IllegalAccessException e) {
-      redirectAttributes.addFlashAttribute("errorMessage", e.getMessage());
-      return "redirect:/board/qna/detail/" + qnaId;
-    } catch (IllegalArgumentException e) {
+    } catch (IllegalAccessException | IllegalArgumentException e) {
       redirectAttributes.addFlashAttribute("errorMessage", e.getMessage());
       return "redirect:/board/qna/detail/" + qnaId;
     } catch (IOException e) {
@@ -215,6 +212,7 @@ public class BoardController {
     try {
       QnaResDTO qna = qnaService.getQnaById(qnaId, principal);
       model.addAttribute("qna", qna);
+      model.addAttribute("perfumes", perfumeService.getAllPerfumes());
       return "board/qna/edit";
     } catch (IllegalAccessException e) {
       model.addAttribute("errorMessage", e.getMessage());

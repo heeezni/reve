@@ -20,7 +20,15 @@
             <div class="bg-white rounded-lg shadow-sm p-8">
                 <form id="qna-form" th:action="@{/board/qna/edit/{qnaId}(qnaId=${qna.qnaId})}" method="post" enctype="multipart/form-data" class="space-y-8">
                     <input type="hidden" name="_method" value="post" />
-                    <input type="hidden" name="perfumeId" th:value="${qna.perfumeId}" />
+
+                    <!-- Product Selection -->
+                    <div>
+                        <label for="perfume-select" class="block text-sm font-medium text-gray-700 mb-3">관련 상품 <span class="text-red-500">*</span></label>
+                        <select id="perfume-select" name="perfumeId" class="w-full border border-gray-300 rounded-md px-4 py-3 focus:outline-none focus:ring-2 focus:ring-gray-800 focus:border-transparent" required>
+                            <option value="">상품을 선택해주세요</option>
+                            <option th:each="perfume : ${perfumes}" th:value="${perfume.perfumeId}" th:text="${perfume.perfumeName}" th:selected="${perfume.perfumeId == qna.perfumeId}"></option>
+                        </select>
+                    </div>
 
                     <!-- Category Selection -->
                     <div>

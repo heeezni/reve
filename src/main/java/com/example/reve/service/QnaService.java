@@ -141,6 +141,15 @@ public class QnaService {
     qna.setCategory(reqDto.getCategory());
     qna.setIsSecret(reqDto.getIsSecret());
 
+    // 관련 상품 업데이트
+    Perfume perfume =
+        perfumeRepository
+            .findById(reqDto.getPerfumeId())
+            .orElseThrow(
+                () ->
+                    new IllegalArgumentException("해당 상품을 찾을 수 없습니다. ID: " + reqDto.getPerfumeId()));
+    qna.setPerfume(perfume);
+
     // --- 파일 처리 로직 ---
     List<String> existingAttachments = new ArrayList<>();
     if (qna.getAttachment() != null && !qna.getAttachment().isEmpty()) {
