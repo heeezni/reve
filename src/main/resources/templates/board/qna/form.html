@@ -483,8 +483,8 @@
             alert('문의 내용을 입력해주세요.');
             return;
           }
-          // 비회원이고 비밀글일 경우에만 비밀번호 유효성 검사
-          if (isSecret === 'true' && !isLoggedIn && password.length < 4) {
+          // 비밀글일 경우 비밀번호 유효성 검사
+          if (isSecret === 'true' && password.length < 4) {
             alert('비밀번호를 4자리 이상 입력해주세요.');
             return;
           }
@@ -497,8 +497,7 @@
           formData.append('perfumeId', parseInt(perfumeId, 10));
           formData.append('title', title);
           formData.append('content', content);
-          // 비회원 비밀글일 경우에만 비밀번호 전송
-          formData.append('password', (isSecret === 'true' && !isLoggedIn) ? password : "");
+          formData.append('password', password);
           formData.append('isSecret', isSecret);
           formData.append('category', category);
 
