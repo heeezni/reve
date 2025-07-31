@@ -1,5 +1,6 @@
 package com.example.reve.controller.user;
 
+import java.security.Principal;
 import java.util.List;
 
 import org.springframework.data.domain.Page;
@@ -10,9 +11,12 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 
 import com.example.reve.domain.Perfume;
+import com.example.reve.domain.User;
 import com.example.reve.dto.PerfumeDetailResponseDto;
 import com.example.reve.dto.PerfumeListResponseDto;
+import com.example.reve.repository.UserRepository;
 import com.example.reve.service.PerfumeService;
+import com.example.reve.service.WishListService;
 
 import lombok.RequiredArgsConstructor;
 
@@ -25,6 +29,8 @@ Shop에 관련된 url을 매핑하기 위한 컨트롤러
 public class ShopController {
 
   private final PerfumeService perfumeService;
+  private final UserRepository userRepository;
+  private final WishListService wishListService;
 
   @GetMapping("/list")
   public String productList(
@@ -47,7 +53,8 @@ public class ShopController {
   }
 
   @GetMapping("/detail")
-  public String productDetail(@RequestParam("id") Long perfumeId, Model model) {
+  public String productDetail(
+      @RequestParam("id") Long perfumeId, Model model, Principal principal) {
     PerfumeDetailResponseDto perfumeDetail = perfumeService.getPerfumeDetail(perfumeId);
     model.addAttribute("perfume", perfumeDetail);
 
@@ -60,6 +67,18 @@ public class ShopController {
         relatedPerfumes.stream().filter(p -> !p.getPerfumeId().equals(perfumeId)).toList();
 
     model.addAttribute("relatedPerfumes", relatedPerfumes);
+
+    // 로그인한 유저가 있을 경우 찜 여부 추가
+    boolean isWished = false;
+    if (principal != null) {
+      String loginId = principal.getName();
+      User user = userRepository.findByLoginId(loginId).orElse(null);
+      if (user != null) {
+        isWished = wishListService.isWished(user, perfumeId);
+      }
+    }
+    model.addAttribute("isWished", isWished);
+    model.addAttribute("isLoggedIn", principal != null);
 
     return "shop/detail";
   }
