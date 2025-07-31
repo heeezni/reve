@@ -104,13 +104,11 @@ public class UserService implements UserDetailsService { // UserDetailsService �
    * @param updateProfileDTO (프로필 사진, 이름, 닉네임, 이메일, 생일,휴대폰 번호)
    * @return user
    */
-  public User update(UpdateProfileDTO updateProfileDTO) {
+  public UpdateProfileDTO update(UpdateProfileDTO updateProfileDTO, String loginId) {
     // 로그인 아이디가 같은 회원
-    User user = userRepository.findByLoginId(updateProfileDTO.getLoginId()).orElseThrow();
+    User user = userRepository.findByLoginId(loginId).orElseThrow();
     // 이름
     user.setName(updateProfileDTO.getName());
-    // 닉네임
-    user.setNickname(updateProfileDTO.getNickname());
     // 프로필 사진 경로
     user.setProfileUrl(updateProfileDTO.getProfileUrl());
     // 생일
@@ -121,7 +119,11 @@ public class UserService implements UserDetailsService { // UserDetailsService �
     log.info("회원 정보 변경 : {}", user);
     // 수정하기
     userRepository.save(user);
-    return user;
+    return userRepository.findUserUpdate(loginId);
+  }
+
+  public UpdateProfileDTO profileById(String loginId) {
+    return userRepository.findUserUpdate(loginId);
   }
 
   /**

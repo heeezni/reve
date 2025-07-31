@@ -47,7 +47,7 @@ public class MemberController {
           HttpSessionSecurityContextRepository.SPRING_SECURITY_CONTEXT_KEY,
           SecurityContextHolder.getContext());
       log.info("로그인 성공확인 : {}", loginUser);
-      return "redirect:/";
+      return "redirect:/mypage/account";
     } else {
       return "redirect:/login?error";
     }

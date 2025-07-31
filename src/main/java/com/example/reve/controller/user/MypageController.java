@@ -10,7 +10,6 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 
 import com.example.reve.domain.CustomUserDetails;
-import com.example.reve.domain.User;
 import com.example.reve.dto.NewPasswordDTO;
 import com.example.reve.dto.UpdateProfileDTO;
 import com.example.reve.service.UserService;
@@ -49,7 +48,11 @@ public class MypageController {
   }
 
   @GetMapping("/account")
-  public String mypageAccount() {
+  public String mypageAccount(
+      @AuthenticationPrincipal CustomUserDetails customUserDetails, Model model) {
+    String loginId = customUserDetails.getUsername();
+    // 프로필에 필요한 정보 먼저 조회
+    model.addAttribute("profile", userService.profileById(loginId));
     return "user/mypage/account";
   }
 
@@ -60,14 +63,16 @@ public class MypageController {
    * @return "/user/mypage/account"
    */
   @PostMapping("/account/profile")
-  public String updateProfile(UpdateProfileDTO updateProfileDTO, HttpSession session) {
+  public String updateProfile(
+      UpdateProfileDTO updateProfileDTO,
+      Model model,
+      @AuthenticationPrincipal CustomUserDetails customUserDetails) {
     log.info("회원 정보 수정 컨트롤러 호출");
-    log.info("수정 요청을 한 회원 정보 : {}", updateProfileDTO.toString());
     try {
       // 수정된 회원 정보 가져오기
-      User user = userService.update(updateProfileDTO);
-      log.info("회원 정보 수정 성공 : {}", user);
-      session.setAttribute("loginUser", user);
+      String loginId = customUserDetails.getUsername();
+      model.addAttribute("profile", userService.update(updateProfileDTO, loginId));
+      log.info("회원 정보 수정 성공 : {}", userService.update(updateProfileDTO, loginId).toString());
     } catch (Exception e) {
       log.error("회원 정보 수정 실패");
       throw new RuntimeException(e);
