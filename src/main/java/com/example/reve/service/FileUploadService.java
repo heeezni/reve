@@ -132,4 +132,18 @@ public class FileUploadService {
           .forEach(File::delete);
     }
   }
+
+  public void deleteFile(String fileUrl) throws IOException {
+    if (fileUrl == null || fileUrl.isEmpty()) {
+      return;
+    }
+    // URL에서 실제 파일 경로 추출 (예: /uploads/qna/qna_1/file.jpg ->
+    // /Users/heeezni/reve_uploads/qna/qna_1/file.jpg)
+    String relativePath = fileUrl.substring("/uploads/".length());
+    Path filePath = Paths.get(uploadDir).resolve(relativePath);
+
+    if (Files.exists(filePath)) {
+      Files.delete(filePath);
+    }
+  }
 }

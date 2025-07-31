@@ -191,24 +191,6 @@
                 </div>
               </div>
 
-              <!-- Password for Secret Post -->
-              <div id="password-section" style="display: none">
-                <label
-                  for="qna-password"
-                  class="block text-sm font-medium text-gray-700 mb-3"
-                >
-                  비밀번호 <span class="text-red-500">*</span>
-                </label>
-                <input
-                  type="password"
-                  id="qna-password"
-                  name="password"
-                  placeholder="비밀글의 비밀번호를 4자리 이상 입력해주세요"
-                  class="w-full border border-gray-300 rounded-md px-4 py-3 focus:outline-none focus:ring-2 focus:ring-gray-800 focus:border-transparent"
-                  minlength="4"
-                />
-              </div>
-
               <!-- Notice -->
               <div class="bg-blue-50 border-l-4 border-blue-400 p-4">
                 <div class="flex">
@@ -239,12 +221,6 @@
                   목록으로
                 </a>
                 <div class="flex space-x-3">
-                  <button
-                    type="button"
-                    class="inline-flex items-center px-6 py-3 border border-gray-300 rounded-md text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-gray-800 focus:border-transparent font-medium"
-                  >
-                    임시저장
-                  </button>
                   <button
                     type="button"
                     id="submit-qna"
@@ -434,24 +410,22 @@
       }
 
       // 비밀글 선택 시 비밀번호 필드 표시/숨김
-      const passwordSection = $('#password-section');
-
-      function updatePasswordSection() {
-        const isSecretSelected = $('input[name="isSecret"]:checked').val() === 'true';
-        if (isSecretSelected) {
-          passwordSection.show();
-        } else {
-          passwordSection.hide();
-          $('#qna-password').val(''); // 비밀번호 필드 숨길 때 값 초기화
-        }
-      }
-
-      $('input[name="isSecret"]').on('change', updatePasswordSection);
+      // const passwordSection = $('#password-section'); // 주석 처리 또는 삭제
+      // function updatePasswordSection() { // 주석 처리 또는 삭제
+      //   const isSecretSelected = $('input[name="isSecret"]:checked').val() === 'true'; // 주석 처리 또는 삭제
+      //   if (isSecretSelected) { // 주석 처리 또는 삭제
+      //     passwordSection.show(); // 주석 처리 또는 삭제
+      //   } else { // 주석 처리 또는 삭제
+      //     passwordSection.hide(); // 주석 처리 또는 삭제
+      //     $('#qna-password').val(''); // 비밀번호 필드 숨길 때 값 초기화 // 주석 처리 또는 삭제
+      //   } // 주석 처리 또는 삭제
+      // } // 주석 처리 또는 삭제
+      // $('input[name="isSecret"]').on('change', updatePasswordSection); // 주석 처리 또는 삭제
 
       // 초기 로드 시 비밀번호 섹션 상태 업데이트
       $(document).ready(function() {
         console.log("DOM 로드 완료");
-        updatePasswordSection();
+        // updatePasswordSection(); // 주석 처리 또는 삭제
 
         const submitButton = $('#submit-qna');
         console.log('submitButton :', submitButton); // 버튼 요소가 제대로 찾아졌는지 확인
@@ -480,11 +454,6 @@
           }
           if (!content.trim()) {
             alert('문의 내용을 입력해주세요.');
-            return;
-          }
-          // 비밀글일 경우 비밀번호 유효성 검사
-          if (isSecret === 'true' && password.length < 4) {
-            alert('비밀번호를 4자리 이상 입력해주세요.');
             return;
           }
 

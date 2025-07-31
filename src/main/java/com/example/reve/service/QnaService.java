@@ -2,6 +2,8 @@ package com.example.reve.service;
 
 import java.io.IOException;
 import java.security.Principal;
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.UUID;
 import java.util.stream.Collectors;
@@ -71,16 +73,6 @@ public class QnaService {
       // isSecret 값은 reqDto에서 받은 대로 사용
       qna.setIsSecret(reqDto.getIsSecret());
 
-      // 6. 비밀글일 경우 비밀번호 암호화하여 저장
-      if (qna.getIsSecret()) {
-        if (reqDto.getPassword() == null || reqDto.getPassword().isEmpty()) {
-          throw new IllegalArgumentException("비밀글은 비밀번호가 필수입니다.");
-        }
-        qna.setPassword(passwordEncoder.encode(reqDto.getPassword()));
-      } else {
-        qna.setPassword(null); // 공개글일 경우 비밀번호는 null
-      }
-
       String savedAttachmentUrls = null;
       boolean hasAttachment =
           reqDto.getAttachmentFiles() != null && !reqDto.getAttachmentFiles().isEmpty();
@@ -136,11 +128,14 @@ public class QnaService {
    * @throws IOException 파일 처리 중 오류 발생 시
    */
   @Transactional
-  public QnaResDTO updateQna(Long qnaId, QnaReqDTO reqDto) throws IOException {
+  public QnaResDTO updateQna(Long qnaId, QnaReqDTO reqDto, Principal principal)
+      throws IOException, IllegalAccessException {
     Qna qna =
         qnaRepository
             .findById(qnaId)
             .orElseThrow(() -> new IllegalArgumentException("해당 Q&A를 찾을 수 없습니다. ID: " + qnaId));
+
+    validateUserPermission(principal, qna);
 
     // Q&A 내용 업데이트
     qna.setTitle(reqDto.getTitle());
@@ -148,31 +143,32 @@ public class QnaService {
     qna.setCategory(reqDto.getCategory());
     qna.setIsSecret(reqDto.getIsSecret());
 
-    // 비밀글 비밀번호 처리
-    if (qna.getIsSecret()) {
-      if (reqDto.getPassword() == null || reqDto.getPassword().isEmpty()) {
-        throw new IllegalArgumentException("비밀글은 비밀번호가 필수입니다.");
+    // --- 파일 처리 로직 ---
+    List<String> existingAttachments = new ArrayList<>();
+    if (qna.getAttachment() != null && !qna.getAttachment().isEmpty()) {
+      existingAttachments.addAll(Arrays.asList(qna.getAttachment().split(",")));
+    }
+
+    // 2. 삭제 요청된 파일 처리
+    if (reqDto.getDeletedAttachments() != null) {
+      for (String deletedUrl : reqDto.getDeletedAttachments()) {
+        fileUploadService.deleteFile(deletedUrl);
+        existingAttachments.remove(deletedUrl);
       }
-      qna.setPassword(passwordEncoder.encode(reqDto.getPassword()));
-    } else {
-      qna.setPassword(null); // 공개글로 전환 시 비밀번호 제거
     }
 
-    // 파일 처리 (기존 파일 삭제 후 새 파일 저장)
-    String existingAttachment = qna.getAttachment();
-    String newAttachmentUrls = null;
-    String directoryName = "qna_" + qna.getQnaId();
-
-    // 기존 파일이 있고, 새로운 파일이 없거나 기존 파일이 변경된 경우 기존 파일 삭제
-    if (existingAttachment != null && !existingAttachment.isEmpty()) {
-      fileUploadService.deleteDirectory(directoryName); // 기존 디렉토리 삭제
-    }
-
-    // 새로운 파일이 있는 경우 저장
+    // 3. 새로 추가된 파일 처리
     if (reqDto.getAttachmentFiles() != null && !reqDto.getAttachmentFiles().isEmpty()) {
-      newAttachmentUrls = fileUploadService.saveFiles(reqDto.getAttachmentFiles(), directoryName);
+      String newAttachmentUrls =
+          fileUploadService.saveFiles(reqDto.getAttachmentFiles(), "qna_" + qnaId);
+      if (newAttachmentUrls != null && !newAttachmentUrls.isEmpty()) {
+        existingAttachments.addAll(Arrays.asList(newAttachmentUrls.split(",")));
+      }
     }
-    qna.setAttachment(newAttachmentUrls);
+
+    // 최종 파일 목록을 문자열로 변환. 목록이 비어있으면 null 저장
+    String finalAttachments = String.join(",", existingAttachments);
+    qna.setAttachment(finalAttachments.isEmpty() ? null : finalAttachments);
 
     Qna updatedQna = qnaRepository.save(qna);
     return new QnaResDTO(updatedQna);
@@ -223,26 +219,7 @@ public class QnaService {
     }
 
     // 비밀글인 경우, 접근 권한 확인
-    // 1. 관리자인지 확인
-    if (principal != null) {
-      String loggedInUsername = principal.getName();
-      boolean isAdmin =
-          userRepository
-              .findByLoginId(loggedInUsername)
-              .map(user -> user.getRole().equals(Role.ADMIN))
-              .orElse(false);
-      if (isAdmin) {
-        return new QnaResDTO(qna, prevQnaId, nextQnaId); // 관리자면 접근 허용
-      }
-    }
-
-    // 2. 비밀번호 확인 (관리자가 아닌 경우)
-    if (password == null) {
-      throw new IllegalAccessException("비밀글입니다. 비밀번호를 입력해주세요.");
-    }
-    if (!passwordEncoder.matches(password, qna.getPassword())) {
-      throw new IllegalAccessException("비밀번호가 일치하지 않습니다.");
-    }
+    validateUserPermission(principal, qna);
 
     // 비밀번호가 일치하면 접근 허용
     return new QnaResDTO(qna, prevQnaId, nextQnaId); // prev/next QnaId 포함하여 반환
@@ -255,11 +232,14 @@ public class QnaService {
    * @throws IOException 파일 삭제 중 오류 발생 시
    */
   @Transactional
-  public void deleteQna(Long qnaId) throws IOException {
+  public void deleteQna(Long qnaId, Principal principal)
+      throws IOException, IllegalAccessException {
     Qna qna =
         qnaRepository
             .findById(qnaId)
             .orElseThrow(() -> new IllegalArgumentException("해당 Q&A를 찾을 수 없습니다. ID: " + qnaId));
+
+    validateUserPermission(principal, qna);
 
     // 첨부 파일 디렉토리 삭제
     if (qna.getAttachment() != null && !qna.getAttachment().isEmpty()) {
@@ -268,5 +248,19 @@ public class QnaService {
     }
 
     qnaRepository.delete(qna);
+  }
+
+  private void validateUserPermission(Principal principal, Qna qna) throws IllegalAccessException {
+    if (principal == null) {
+      throw new IllegalAccessException("로그인이 필요합니다.");
+    }
+    User user =
+        userRepository
+            .findByLoginId(principal.getName())
+            .orElseThrow(() -> new IllegalAccessException("사용자 정보를 찾을 수 없습니다."));
+
+    if (user.getRole() != Role.ADMIN && !user.getUserId().equals(qna.getUser().getUserId())) {
+      throw new IllegalAccessException("해당 게시글에 대한 권한이 없습니다.");
+    }
   }
 }

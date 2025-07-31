@@ -24,8 +24,14 @@
             </ol>
           </nav>
 
+          <!-- Access Denied Message for Secret Posts -->
+          <div th:if="${qna.isSecret and !isAuthor and !isAdmin}" class="bg-red-100 border-l-4 border-red-500 text-red-700 p-4 mb-6" role="alert">
+            <p class="font-bold">접근 권한 없음</p>
+            <p>이 게시글은 비밀글입니다. 작성자 또는 관리자만 열람할 수 있습니다.</p>
+          </div>
+
           <!-- Question Section -->
-          <div class="bg-white rounded-lg shadow-sm p-8 mb-6">
+          <div th:unless="${qna.isSecret and !isAuthor and !isAdmin}" class="bg-white rounded-lg shadow-sm p-8 mb-6">
             <div class="border-b border-gray-200 pb-6 mb-6">
               <!-- Category and Status -->
               <div class="flex items-center space-x-3 mb-4">
