@@ -22,7 +22,7 @@ public class QnaReqDTO {
   private String password; // QnA 비밀번호
   private Boolean isSecret; // 비밀글 여부
   private String category; // QnA 문의 분류
-  private Long userId; // 작성자 ID
+  private String loginId; // 작성자 로그인 ID
   private Long perfumeId; // 관련 상품 ID
 
   @Size(max = 5, message = "최대 5개의 파일만 첨부할 수 있습니다.")

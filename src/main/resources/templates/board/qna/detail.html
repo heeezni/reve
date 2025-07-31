@@ -174,6 +174,34 @@
             </a>
 
             <div class="flex items-center space-x-2">
+              <!-- 수정 버튼 -->
+              <a
+                th:if="${(isAuthor != null && isAuthor) || (isAdmin != null && isAdmin)}"
+                th:href="@{/board/qna/edit/{qnaId}(qnaId=${qna.qnaId})}"
+                class="inline-flex items-center px-4 py-2 bg-blue-500 text-white rounded-md hover:bg-blue-600 transition-colors font-medium text-sm"
+              >
+                <i class="fas fa-edit mr-2"></i>
+                수정
+              </a>
+
+              <!-- 삭제 버튼 -->
+              <form
+                th:if="${(isAuthor != null && isAuthor) || (isAdmin != null && isAdmin)}"
+                th:action="@{/board/qna/{qnaId}(qnaId=${qna.qnaId})}"
+                th:method="post"
+                style="display: inline;"
+                onsubmit="return confirm('정말로 이 Q&A를 삭제하시겠습니까?');"
+              >
+                <input type="hidden" name="_method" value="delete" />
+                <button
+                  type="submit"
+                  class="inline-flex items-center px-4 py-2 bg-red-500 text-white rounded-md hover:bg-red-600 transition-colors font-medium text-sm"
+                >
+                  <i class="fas fa-trash-alt mr-2"></i>
+                  삭제
+                </button>
+              </form>
+
               <a
                 th:if="${qna.prevQnaId}"
                 th:href="@{/board/qna/detail/{qnaId}(qnaId=${qna.prevQnaId})}"
@@ -207,78 +235,6 @@
                 <span>다음글</span>
                 <i class="fas fa-chevron-right"></i>
               </button>
-            </div>
-          </div>
-
-          <!-- Related Q&A -->
-          <div class="bg-white rounded-lg shadow-sm p-6">
-            <h3 class="text-lg font-semibold text-gray-800 mb-4">관련 Q&A</h3>
-            <div class="space-y-3">
-              <a
-                href="#"
-                class="flex items-center justify-between p-3 border border-gray-200 rounded-md hover:bg-gray-50 transition-colors"
-              >
-                <div class="flex items-center space-x-3">
-                  <span
-                    class="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-blue-100 text-blue-800"
-                  >
-                    상품문의
-                  </span>
-                  <span
-                    class="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-green-100 text-green-800"
-                  >
-                    답변완료
-                  </span>
-                  <span class="text-gray-800"
-                    >베스크 퍼퓸의 향조가 궁금합니다</span
-                  >
-                </div>
-                <span class="text-sm text-gray-500">2025.02.14</span>
-              </a>
-
-              <a
-                href="#"
-                class="flex items-center justify-between p-3 border border-gray-200 rounded-md hover:bg-gray-50 transition-colors"
-              >
-                <div class="flex items-center space-x-3">
-                  <span
-                    class="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-blue-100 text-blue-800"
-                  >
-                    상품문의
-                  </span>
-                  <span
-                    class="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-green-100 text-green-800"
-                  >
-                    답변완료
-                  </span>
-                  <span class="text-gray-800"
-                    >두벨라 퍼퓸의 사용법을 알려주세요</span
-                  >
-                </div>
-                <span class="text-sm text-gray-500">2025.02.11</span>
-              </a>
-
-              <a
-                href="#"
-                class="flex items-center justify-between p-3 border border-gray-200 rounded-md hover:bg-gray-50 transition-colors"
-              >
-                <div class="flex items-center space-x-3">
-                  <span
-                    class="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-blue-100 text-blue-800"
-                  >
-                    상품문의
-                  </span>
-                  <span
-                    class="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-yellow-100 text-yellow-800"
-                  >
-                    답변대기
-                  </span>
-                  <span class="text-gray-800"
-                    >퍼퓸 보관 방법에 대해 문의드립니다</span
-                  >
-                </div>
-                <span class="text-sm text-gray-500">2025.02.10</span>
-              </a>
             </div>
           </div>
 
