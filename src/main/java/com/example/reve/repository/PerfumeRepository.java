@@ -65,9 +65,4 @@ public interface PerfumeRepository extends JpaRepository<Perfume, Long> {
           + "GROUP BY p.perfumeId")
   Page<Perfume> findBySearchAndScentWithReviewJoin(
       @Param("search") String search, @Param("scent") String scent, Pageable pageable);
-
-  // 특정 향수에 대해 평점별 개수
-  @Query(
-      "SELECT r.rating, COUNT(r) FROM Review r WHERE r.perfume.perfumeId = :perfumeId GROUP BY r.rating")
-  List<Object[]> countReviewsByRating(@Param("perfumeId") Long perfumeId);
 }
