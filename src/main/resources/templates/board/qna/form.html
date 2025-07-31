@@ -36,8 +36,10 @@
           <div class="bg-white rounded-lg shadow-sm p-8">
             <form id="qna-form" class="space-y-8">
               <!-- Hidden fields for IDs -->
-              <input type="hidden" id="user-id" name="userId" th:value="${#authentication.principal != 'anonymousUser' ? #authentication.principal.name : null}" />
+              <input type="hidden" id="user-id" name="loginId" th:value="${#authentication.isAuthenticated() ? #authentication.name : ''}" />
               <input type="hidden" id="perfume-id" name="perfumeId" value="1" /> <!-- 상품 상세 페이지에서 넘어올 경우 동적으로 설정 -->
+              <!-- 로그인 상태를 나타내는 hidden input 추가 -->
+              <input type="hidden" id="is-logged-in" th:value="${#authentication.isAuthenticated() ? 'true' : 'false'}" />
 
               <!-- Category Selection -->
               <div>
@@ -77,9 +79,14 @@
                   class="w-full border border-gray-300 rounded-md px-4 py-3 focus:outline-none focus:ring-2 focus:ring-gray-800 focus:border-transparent"
                   maxlength="100"
                 />
-                <p class="text-sm text-gray-500 mt-1">
-                  최대 100자까지 입력 가능합니다
-                </p>
+                <div class="flex justify-between items-center mt-1">
+                  <p class="text-sm text-gray-500">
+                    최대 100자까지 입력 가능합니다
+                  </p>
+                  <p class="text-sm text-gray-500">
+                    <span id="titleCharCount">0</span>/100
+                  </p>
+                </div>
               </div>
 
               <!-- Content -->
@@ -122,7 +129,7 @@
                     ></i>
                     <div>
                       <p class="text-sm text-gray-600 mb-2">
-                        파일을 드래그하여 업로드하거나 클릭하여 선택하세요
+                        파일을 선택하세요
                       </p>
                       <p class="text-xs text-gray-500">
                         최대 5개 파일, 각 파일 10MB 이하 (JPG, PNG, PDF, DOC,
@@ -198,75 +205,6 @@
                   class="w-full border border-gray-300 rounded-md px-4 py-3 focus:outline-none focus:ring-2 focus:ring-gray-800 focus:border-transparent"
                   minlength="4"
                 />
-              </div>
-
-              <!-- Additional Options -->
-              <div class="space-y-4">
-                <label class="block text-sm font-medium text-gray-700">
-                  추가 옵션
-                </label>
-                <div class="space-y-3">
-                  <label class="flex items-center">
-                    <input
-                      type="checkbox"
-                      class="w-4 h-4 text-gray-800 border-gray-300 rounded focus:ring-gray-800"
-                    />
-                    <span class="ml-3 text-sm text-gray-700"
-                      >답변 완료 시 이메일로 알림 받기</span
-                    >
-                  </label>
-                  <label class="flex items-center">
-                    <input
-                      type="checkbox"
-                      class="w-4 h-4 text-gray-800 border-gray-300 rounded focus:ring-gray-800"
-                    />
-                    <span class="ml-3 text-sm text-gray-700"
-                      >SMS로 답변 완료 알림 받기</span
-                    >
-                  </label>
-                </div>
-              </div>
-
-              <!-- Contact Information -->
-              <div class="bg-gray-50 p-6 rounded-lg">
-                <h3 class="text-lg font-semibold text-gray-800 mb-4">
-                  연락처 정보
-                </h3>
-                <div class="grid md:grid-cols-2 gap-4">
-                  <div>
-                    <label
-                      for="qna-email"
-                      class="block text-sm font-medium text-gray-700 mb-2"
-                    >
-                      이메일
-                    </label>
-                    <input
-                      type="email"
-                      id="qna-email"
-                      name="email"
-                      placeholder="example@email.com"
-                      class="w-full border border-gray-300 rounded-md px-4 py-3 focus:outline-none focus:ring-2 focus:ring-gray-800 focus:border-transparent"
-                    />
-                  </div>
-                  <div>
-                    <label
-                      for="qna-tel"
-                      class="block text-sm font-medium text-gray-700 mb-2"
-                    >
-                      연락처
-                    </label>
-                    <input
-                      type="tel"
-                      id="qna-tel"
-                      name="tel"
-                      placeholder="010-0000-0000"
-                      class="w-full border border-gray-300 rounded-md px-4 py-3 focus:outline-none focus:ring-2 focus:ring-gray-800 focus:border-transparent"
-                    />
-                  </div>
-                </div>
-                <p class="text-sm text-gray-500 mt-3">
-                  * 연락처 정보는 답변 전달 및 추가 문의 시에만 사용됩니다.
-                </p>
               </div>
 
               <!-- Notice -->
@@ -369,7 +307,7 @@
 
     <script src="/js/script.js"></script>
     <script>
-      // --- 기존 기능 유지 ---
+      console.log('form.html script 실행됨');
 
       // Character count for textarea
       const textarea = $('#qna-content'); // jQuery 선택자 사용
@@ -385,49 +323,103 @@
         }
       });
 
+      // Character count for title
+      const titleInput = $('#qna-title');
+      const titleCharCount = $('#titleCharCount');
+
+      titleInput.on('input', function () {
+        const length = $(this).val().length;
+        titleCharCount.text(length.toString());
+        if (length > 90) { // 90자 초과 시 색상 변경
+          titleCharCount.addClass('text-red-500');
+        } else {
+          titleCharCount.removeClass('text-red-500');
+        }
+      });
+
       // File upload functionality (jQuery로 변경)
       const fileInput = $('#fileInput');
       const fileList = $('#fileList');
 
+      // 허용되는 파일 확장자 및 최대 파일 크기 정의 (백엔드와 일치하도록)
+      const MAX_FILES = 5;
+      const MAX_FILE_SIZE_MB = 10; // MB
+      const MAX_FILE_SIZE_BYTES = MAX_FILE_SIZE_MB * 1024 * 1024;
+      const ALLOWED_EXTENSIONS = ['jpg', 'jpeg', 'png', 'pdf', 'doc', 'docx'];
+
       fileInput.on('change', function () {
         fileList.empty(); // 기존 목록 초기화
-        const files = Array.from(this.files);
+        let selectedFiles = Array.from(this.files);
+        const validFiles = [];
 
-        files.forEach((file, index) => {
-          const fileItem = $('<div></div>');
-          fileItem.addClass('flex items-center justify-between p-3 bg-gray-50 rounded-md');
+        // 파일 개수 제한 검사
+        if (selectedFiles.length > MAX_FILES) {
+          alert(`최대 ${MAX_FILES}개의 파일만 첨부할 수 있습니다.`);
+          // 초과된 파일은 제외하고 유효한 파일만 처리
+          selectedFiles = selectedFiles.slice(0, MAX_FILES);
+        }
 
-          // 파일 정보를 담을 컨테이너
-          const fileInfoContainer = $('<div></div>').addClass('flex items-center space-x-3');
+        selectedFiles.forEach((file, index) => {
+          let isValid = true;
+          let errorMessage = '';
 
-          // 이미지 파일인 경우 미리보기 생성
-          if (file.type.startsWith('image/')) {
-            const reader = new FileReader();
-            reader.onload = function (e) {
-              const img = $('<img>');
-              img.attr('src', e.target.result);
-              img.addClass('w-16 h-16 object-cover rounded-md');
-              fileInfoContainer.prepend(img);
-            };
-            reader.readAsDataURL(file);
-          } else {
-            // 이미지가 아닌 경우 아이콘 표시
-            fileInfoContainer.append('<i class="fas fa-file text-gray-500 text-2xl w-16 text-center"></i>');
+          // 파일 크기 검증
+          if (file.size > MAX_FILE_SIZE_BYTES) {
+            errorMessage = `파일 크기가 ${MAX_FILE_SIZE_MB}MB를 초과합니다.`;
+            isValid = false;
           }
 
-          // 파일명 및 크기 정보 추가
-          const textInfo = $('<div></div>');
-          textInfo.append(`<span class="text-sm text-gray-700">${file.name}</span>`);
-          textInfo.append(`<br><span class="text-xs text-gray-500">(${(file.size / 1024 / 1024).toFixed(2)}MB)</span>`);
-          fileInfoContainer.append(textInfo);
+          // 파일 타입 검증
+          const fileExtension = file.name.split('.').pop().toLowerCase();
+          if (!ALLOWED_EXTENSIONS.includes(fileExtension)) {
+            errorMessage = `허용되지 않는 파일 형식입니다. (허용: ${ALLOWED_EXTENSIONS.join(', ').toUpperCase()})`;
+            isValid = false;
+          }
 
-          // 삭제 버튼
-          const removeBtn = $(`<button type="button" onclick="removeFile(${index})" class="text-red-500 hover:text-red-700"><i class="fas fa-times"></i></button>`);
+          if (isValid) {
+            validFiles.push(file);
+            const fileItem = $('<div></div>');
+            fileItem.addClass('flex items-center justify-between p-3 bg-gray-50 rounded-md');
 
-          fileItem.append(fileInfoContainer);
-          fileItem.append(removeBtn);
-          fileList.append(fileItem);
+            // 파일 정보를 담을 컨테이너
+            const fileInfoContainer = $('<div></div>').addClass('flex items-center space-x-3');
+
+            // 이미지 파일인 경우 미리보기 생성
+            if (file.type.startsWith('image/')) {
+              const reader = new FileReader();
+              reader.onload = function (e) {
+                const img = $('<img>');
+                img.attr('src', e.target.result);
+                img.addClass('w-16 h-16 object-cover rounded-md');
+                fileInfoContainer.prepend(img);
+              };
+              reader.readAsDataURL(file);
+            } else {
+              // 이미지가 아닌 경우 아이콘 표시
+              fileInfoContainer.append('<i class="fas fa-file text-gray-500 text-2xl w-16 text-center"></i>');
+            }
+
+            // 파일명 및 크기 정보 추가
+            const textInfo = $('<div></div>');
+            textInfo.append(`<span class="text-sm text-gray-700">${file.name}</span>`);
+            textInfo.append(`<br><span class="text-xs text-gray-500">(${(file.size / 1024 / 1024).toFixed(2)}MB)</span>`);
+            fileInfoContainer.append(textInfo);
+
+            // 삭제 버튼
+            const removeBtn = $(`<button type="button" onclick="removeFile(${validFiles.length - 1})" class="text-red-500 hover:text-red-700"><i class="fas fa-times"></i></button>`);
+
+            fileItem.append(fileInfoContainer);
+            fileItem.append(removeBtn);
+            fileList.append(fileItem);
+          } else {
+            alert(`파일 업로드 실패: ${file.name} - ${errorMessage}`);
+          }
         });
+
+        // 유효한 파일들로 DataTransfer 객체 재구성
+        const dt = new DataTransfer();
+        validFiles.forEach(file => dt.items.add(file));
+        fileInput[0].files = dt.files;
       });
 
       function removeFile(index) {
@@ -436,14 +428,12 @@
         files.splice(index, 1);
         files.forEach((file) => dt.items.add(file));
         fileInput[0].files = dt.files;
-        fileInput.trigger('change');
+        fileInput.trigger('change'); // 파일 목록을 다시 렌더링하기 위해 change 이벤트 트리거
       }
-
-      // --- 신규/수정된 기능 (jQuery로 변경) ---
 
       // 비밀글 선택 시 비밀번호 필드 표시/숨김
       const passwordSection = $('#password-section');
-      const isLoggedIn = $('#is-logged-in').val() === 'true';
+      const isLoggedIn = $('#is-logged-in').val() === 'true'; // hidden input에서 값 가져오기
 
       function updatePasswordSection() {
         const isSecretSelected = $('input[name="isSecret"]:checked').val() === 'true';
@@ -459,74 +449,81 @@
 
       // 초기 로드 시 비밀번호 섹션 상태 업데이트
       $(document).ready(function() {
+        console.log("DOM 로드 완료");
         updatePasswordSection();
-      });
 
-      // '문의 등록' 버튼 클릭 이벤트
-      $('#submit-qna').on('click', function (e) {
-        // 1. 폼 데이터 가져오기
-        const userId = $('#user-id').val();
-        const perfumeId = $('#perfume-id').val();
-        const title = $('#qna-title').val();
-        const content = $('#qna-content').val();
-        const isSecret = $('input[name="isSecret"]:checked').val();
-        const password = $('#qna-password').val();
-        const category = $('#qna-category').val();
+        const submitButton = $('#submit-qna');
+        console.log('submitButton :', submitButton); // 버튼 요소가 제대로 찾아졌는지 확인
 
-        // 2. 유효성 검사
-        if (!category) {
-          alert('문의 분류를 선택해주세요.');
-          return;
-        }
-        if (!title.trim()) {
-          alert('제목을 입력해주세요.');
-          return;
-        }
-        if (!content.trim()) {
-          alert('문의 내용을 입력해주세요.');
-          return;
-        }
-        // 비회원이고 비밀글일 경우에만 비밀번호 유효성 검사
-        if (isSecret === 'true' && !isLoggedIn && password.length < 4) {
-          alert('비밀번호를 4자리 이상 입력해주세요.');
-          return;
-        }
+        // '문의 등록' 버튼 클릭 이벤트 (document.ready 안으로 이동)
+        submitButton.on('click', function (e) {
+          e.preventDefault(); // 기본 제출 동작 방지
+          console.log('Submit button 클릭이벤트 실행'); // 클릭 이벤트 핸들러 실행 확인
 
-        // 3. FormData 객체 생성
-        const formData = new FormData();
-        if (userId) { // userId가 있을 경우에만 추가 (회원일 경우)
-            formData.append('userId', userId);
-        }
-        formData.append('perfumeId', parseInt(perfumeId, 10));
-        formData.append('title', title);
-        formData.append('content', content);
-        // 비회원 비밀글일 경우에만 비밀번호 전송
-        formData.append('password', (isSecret === 'true' && !isLoggedIn) ? password : "");
-        formData.append('isSecret', isSecret);
-        formData.append('category', category);
+          // 1. 폼 데이터 가져오기
+          const loginId = $('#user-id').val(); // userId 대신 loginId 가져오기
+          console.log('전송 전 loginId :', loginId);
+          const perfumeId = $('#perfume-id').val();
+          const title = $('#qna-title').val();
+          const content = $('#qna-content').val();
+          const isSecret = $('input[name="isSecret"]:checked').val();
+          const password = $('#qna-password').val();
+          const category = $('#qna-category').val();
 
-        // 파일 추가
-        const files = fileInput[0].files;
-        for (let i = 0; i < files.length; i++) {
-            formData.append('attachmentFiles', files[i]);
-        }
-
-        // 4. jQuery의 $.ajax()로 서버에 POST 요청 보내기
-        $.ajax({
-          url: '/board/qna',
-          type: 'POST',
-          data: formData,
-          processData: false,
-          contentType: false,
-          success: function (data) {
-            console.log('성공:', data);
-            alert('문의가 성공적으로 등록되었습니다.');
-            location.href = '/board/qna/list';
-          },
-          error: function (xhr, status, error) {
-            console.error('Error:', xhr.responseText || error);
-            alert('문의 등록에 실패했습니다. 다시 시도해주세요.');
+          // 2. 유효성 검사
+          if (!category) {
+            alert('문의 분류를 선택해주세요.');
+            return;
           }
+          if (!title.trim()) {
+            alert('제목을 입력해주세요.');
+            return;
+          }
+          if (!content.trim()) {
+            alert('문의 내용을 입력해주세요.');
+            return;
+          }
+          // 비밀글일 경우 비밀번호 유효성 검사
+          if (isSecret === 'true' && password.length < 4) {
+            alert('비밀번호를 4자리 이상 입력해주세요.');
+            return;
+          }
+
+          // 3. FormData 객체 생성
+          const formData = new FormData();
+          if (loginId) { // loginId가 있을 경우에만 추가 (회원일 경우)
+              formData.append('loginId', loginId); // userId 대신 loginId 사용
+          }
+          formData.append('perfumeId', parseInt(perfumeId, 10));
+          formData.append('title', title);
+          formData.append('content', content);
+          formData.append('password', password);
+          formData.append('isSecret', isSecret);
+          formData.append('category', category);
+
+          // 파일 추가
+          const files = fileInput[0].files;
+          for (let i = 0; i < files.length; i++) {
+              formData.append('attachmentFiles', files[i]);
+          }
+
+          // 4. jQuery의 $.ajax()로 서버에 POST 요청 보내기
+          $.ajax({
+            url: '/board/qna',
+            type: 'POST',
+            data: formData,
+            processData: false,
+            contentType: false,
+            success: function (data) {
+              console.log('성공:', data);
+              alert('문의가 성공적으로 등록되었습니다.');
+              location.href = '/board/qna/list';
+            },
+            error: function (xhr, status, error) {
+              console.error('Error:', xhr.responseText || error);
+              alert('문의 등록에 실패했습니다. 다시 시도해주세요.');
+            }
+          });
         });
       });
     </script>

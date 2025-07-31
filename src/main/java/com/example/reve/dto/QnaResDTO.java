@@ -9,7 +9,7 @@ import lombok.NoArgsConstructor;
 
 @Getter
 @NoArgsConstructor
-public class QnaResDto {
+public class QnaResDTO {
   private Long qnaId;
   private String title;
   private String content;
@@ -21,8 +21,10 @@ public class QnaResDto {
   private String perfumeName;
   private LocalDateTime createdAt;
   private LocalDateTime updatedAt;
+  private Long prevQnaId; // 이전 글 ID
+  private Long nextQnaId; // 다음 글 ID
 
-  public QnaResDto(Qna qna) {
+  public QnaResDTO(Qna qna) {
     this.qnaId = qna.getQnaId();
     this.title = qna.getTitle();
     this.content = qna.getContent();
@@ -34,5 +36,12 @@ public class QnaResDto {
     this.perfumeName = qna.getPerfume().getPerfumeName();
     this.createdAt = qna.getCreatedAt();
     this.updatedAt = qna.getUpdatedAt();
+  }
+
+  // 이전/다음 글 ID를 설정하는 생성자 추가
+  public QnaResDTO(Qna qna, Long prevQnaId, Long nextQnaId) {
+    this(qna); // 기존 생성자 호출
+    this.prevQnaId = prevQnaId;
+    this.nextQnaId = nextQnaId;
   }
 }
