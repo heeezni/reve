@@ -73,6 +73,22 @@ public class MypageController {
     return "redirect:" + thisPage;
   }
 
+  // 찜 목록에서 삭제
+  @PostMapping("/wishlist/remove")
+  public String wishlistRemove(
+      @AuthenticationPrincipal CustomUserDetails customUserDetails,
+      WishlistDTO wishlistDTO,
+      HttpServletRequest request) {
+    log.info("위시리스트에 삭제시작");
+    Long userId = customUserDetails.getUser().getUserId();
+    Long performId = wishlistDTO.getPerfume().getPerfumeId();
+    // 목록 추가하기 요청
+    wishlistService.removeWishlist(userId, performId);
+    // 현재페이지로 돌아가기
+    String thisPage = request.getHeader("Referer");
+    return "redirect:" + thisPage;
+  }
+
   // 쿠폰 목록
   @GetMapping("/coupons")
   public String cupons(Model model, @AuthenticationPrincipal CustomUserDetails customUserDetails) {

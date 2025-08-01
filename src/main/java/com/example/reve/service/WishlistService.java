@@ -1,6 +1,7 @@
 package com.example.reve.service;
 
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import com.example.reve.domain.Perfume;
 import com.example.reve.domain.User;
@@ -32,5 +33,18 @@ public class WishlistService {
     wishList.setPerfume(perfume);
     // 저장
     wishListRepository.save(wishList);
+  }
+
+  @Transactional
+  public void removeWishlist(Long userId, Long perfumeId) {
+    log.info("위시리스트 추가 서비스 호출");
+    // 유저 찾기
+    User user = userRepository.findById(userId).orElseThrow();
+    // 상품 찾기
+    Perfume perfume = perfumeRepository.findById(perfumeId).orElseThrow();
+    WishList wishList = new WishList();
+    wishList.setUser(user);
+    wishList.setPerfume(perfume);
+    wishListRepository.deleteByUser_UserIdAndPerfume_PerfumeId(userId, perfumeId);
   }
 }
