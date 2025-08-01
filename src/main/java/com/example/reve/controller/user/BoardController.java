@@ -258,21 +258,17 @@ public class BoardController {
 
   // Q&A 삭제 API
   @DeleteMapping("/qna/{qnaId}")
-  public String deleteQna(
-      @PathVariable Long qnaId, Principal principal, RedirectAttributes redirectAttributes) {
+  @ResponseBody
+  public ResponseEntity<?> deleteQna(@PathVariable Long qnaId, Principal principal) {
     try {
       qnaService.deleteQna(qnaId, principal);
-      redirectAttributes.addFlashAttribute("successMessage", "Q&A가 성공적으로 삭제되었습니다.");
-      return "redirect:/board/qna/list";
+      return ResponseEntity.ok().body("Q&A가 성공적으로 삭제되었습니다.");
     } catch (IllegalAccessException | IllegalArgumentException e) {
-      redirectAttributes.addFlashAttribute("errorMessage", e.getMessage());
-      return "redirect:/board/qna/detail/" + qnaId;
+      return ResponseEntity.badRequest().body("Q&A 삭제 실패: " + e.getMessage());
     } catch (IOException e) {
-      redirectAttributes.addFlashAttribute("errorMessage", "파일 삭제 중 오류가 발생했습니다: " + e.getMessage());
-      return "redirect:/board/qna/detail/" + qnaId;
+      return ResponseEntity.status(500).body("파일 삭제 중 오류가 발생했습니다: " + e.getMessage());
     } catch (Exception e) {
-      redirectAttributes.addFlashAttribute("errorMessage", "Q&A 삭제 중 알 수 없는 오류가 발생했습니다.");
-      return "redirect:/board/qna/detail/" + qnaId;
+      return ResponseEntity.status(500).body("Q&A 삭제 중 알 수 없는 오류가 발생했습니다.");
     }
   }
 
