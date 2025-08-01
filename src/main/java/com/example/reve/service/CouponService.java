@@ -37,22 +37,22 @@ public class CouponService {
         birthday = LocalDate.parse(user.getBirthday());
         expiresDate = birthday.plusDays(6);
         validFrom = birthday;
+        // 2월 29일 보장
+        if (birthday.getMonthValue() == 2 && birthday.getDayOfMonth() == 29) {
+          boolean isLeap = Year.isLeap(today.getYear());
+          if (!isLeap) {
+            birthday = LocalDate.of(today.getYear(), 2, 28);
+          } else {
+            birthday = birthday.withYear(today.getYear());
+          }
+        } else {
+          birthday = birthday.withYear(today.getYear());
+        }
       } catch (Exception e) {
         throw new RuntimeException(e);
       }
     } else {
       log.error("생일이 등록되어 있지 않음");
-    }
-    // 2월 29일 보장
-    if (birthday.getMonthValue() == 2 && birthday.getDayOfMonth() == 29) {
-      boolean isLeap = Year.isLeap(today.getYear());
-      if (!isLeap) {
-        birthday = LocalDate.of(today.getYear(), 2, 28);
-      } else {
-        birthday = birthday.withYear(today.getYear());
-      }
-    } else {
-      birthday = birthday.withYear(today.getYear());
     }
 
     // 오늘 생일 확인
