@@ -26,7 +26,7 @@
             </div>
             <!--쿠폰 리스트 시작 -->
             <div th:each="coupon : ${couponList}">
-              <div th:if="${coupon.isUsed
+              <div th:if="${!coupon.isUsed
                 && !coupon.validFrom.isAfter(#temporals.createNow.toLocalDate)
                 && coupon.expiresAt.isAfter(#temporals.createNow)}">
                 <div class="px-6 py-4">

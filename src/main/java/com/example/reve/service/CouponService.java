@@ -137,7 +137,7 @@ public class CouponService {
     coupon.setCouponName(CouponName.BirthDay);
     coupon.setDiscountRate(50);
     coupon.setExpiresAt(expiresDate.atTime(23, 59, 59));
-    coupon.setIsUsed(true);
+    coupon.setIsUsed(false);
     coupon.setIssuedAt(issuedAt);
     coupon.setValidFrom(validFrom);
     couponRepository.save(coupon);
