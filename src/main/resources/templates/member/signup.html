@@ -26,12 +26,15 @@
 
 
             <form th:action="@{/member/signup}" method="post" class="space-y-6">
+              <div id="globalError" class="hidden bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded relative mt-4"  role="alert">
+                <span> 다시 입력해 주세요</span>
+              </div>
               <!-- Basic Information Section -->
               <div class="border-t pt-6">
                 <h3 class="text-lg font-semibold text-gray-800 mb-4">
                   기본정보
                 </h3>
-                <p class="text-sm text-red-500 mb-4">필수 필수입력사항</p>
+                <p class="text-sm text-red-500 mb-4">필수입력사항</p>
 
                 <!-- Username -->
                 <div class="mb-4">
@@ -42,6 +45,7 @@
                     <input
                       type="text"
                       name="loginId"
+                      id="loginId"
                       required
                       class="w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-gray-800 focus:border-transparent"
                       placeholder="아이디를 입력하세요"
@@ -50,6 +54,7 @@
                   <p class="text-xs text-gray-500 mt-1">
                     (영문소문자/숫자, 4~16자)
                   </p>
+                  <p id="loginIdError" class="text-red-500 text-sm mt-1 hidden"></p>
                 </div>
 
                 <!-- Password -->
@@ -61,6 +66,7 @@
                     <input
                       type="password"
                       name="password"
+                      id="password"
                       required
                       class="w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-gray-800 focus:border-transparent"
                       placeholder="비밀번호를 입력하세요"
@@ -69,6 +75,7 @@
                   <p class="text-xs text-gray-500 mt-1">
                     (영문 대소문자/숫자/특수문자 중 2가지 이상 조합, 10자~16자)
                   </p>
+                  <p id="passwordError" class="text-red-500 text-sm mt-1 hidden"></p>
                 </div>
 
                 <!-- Password Confirm -->
@@ -80,11 +87,13 @@
                     <input
                       type="password"
                       name="passwordConfirm"
+                      id="passwordConfirm"
                       required
                       class="w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-gray-800 focus:border-transparent"
                       placeholder="비밀번호를 다시 입력하세요"
                     />
                   </label>
+                  <p id="passwordConfirmError" class="text-red-500 text-sm mt-1 hidden"></p>
                 </div>
 
                 <!-- Name -->
@@ -96,11 +105,13 @@
                     <input
                       type="text"
                       name="name"
+                      id="name"
                       required
                       class="w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-gray-800 focus:border-transparent"
                       placeholder="이름을 입력하세요"
                     />
                   </label>
+                  <p id="nameError" class="text-red-500 text-sm mt-1 hidden"></p>
                 </div>
 
                 <!-- Address -->
@@ -128,6 +139,7 @@
                         <input
                           type="text"
                           name="middleNum"
+                          id="middleNum"
                           required
                           class="flex-1 border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-gray-800 focus:border-transparent"
                           placeholder="-"
@@ -137,12 +149,15 @@
                         <input
                           type="text"
                           name="lastNum"
+                          id="lastNum"
                           required
                           class="flex-1 border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-gray-800 focus:border-transparent"
                           placeholder="-"
                         />
                       </label>
                     </div>
+                      <p id="middleNumError" class="text-red-500 hidden text-sm mt-1"></p>
+                      <p id="lastNumError" class="text-red-500 hidden text-sm mt-1"></p>
                   </div>
                 </div>
 
@@ -155,11 +170,13 @@
                     <input
                       type="email"
                       name="email"
+                      id="email"
                       required
                       class="w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-gray-800 focus:border-transparent"
                       placeholder="이메일을 입력하세요"
                     />
                   </label>
+                  <p id="emailError" class="text-red-500 hidden text-sm mt-1"></p>
                 </div>
               </div>
               <!-- Agreement Section -->
@@ -173,7 +190,7 @@
                   <label class="flex items-start">
                     <input
                       type="checkbox"
-                      id="allAgreement"
+                      id="agreeAll"
                       class="mt-1 mr-3"
                     />
                     <div>
@@ -193,7 +210,7 @@
                       type="checkbox"
                       name="termsAgreement"
                       required
-                      class="mt-1 mr-3"
+                      class="agree-item mt-1 mr-3"
                     />
                     <div>
                       <span class="font-medium"
@@ -207,38 +224,12 @@
                       type="checkbox"
                       name="privacyAgreement"
                       required
-                      class="mt-1 mr-3"
+                      class="agree-item mt-1 mr-3"
                     />
                     <div>
                       <span class="font-medium"
                         >개인정보처리방침에 동의합니다.
                         <span class="text-red-500">(필수)</span></span
-                      >
-                    </div>
-                  </label>
-                  <label class="flex items-start">
-                    <input
-                      type="checkbox"
-                      name="smsAgreement"
-                      class="mt-1 mr-3"
-                    />
-                    <div>
-                      <span class="font-medium"
-                        >SMS 수신 동의
-                        <span class="text-gray-500">(선택)</span></span
-                      >
-                    </div>
-                  </label>
-                  <label class="flex items-start">
-                    <input
-                      type="checkbox"
-                      name="emailAgreement"
-                      class="mt-1 mr-3"
-                    />
-                    <div>
-                      <span class="font-medium"
-                        >이메일 수신 동의
-                        <span class="text-gray-500">(선택)</span></span
                       >
                     </div>
                   </label>
@@ -268,39 +259,234 @@
 
     <script src="/js/script.js"></script>
     <script>
-      // 전체 동의 체크박스 기능
-      document
-        .getElementById('allAgreement')
-        .addEventListener('change', function () {
-          const checkboxes = document.querySelectorAll(
-            'input[type="checkbox"]'
-          );
-          checkboxes.forEach((checkbox) => {
-            if (checkbox !== this) {
-              checkbox.checked = this.checked;
+
+      document.addEventListener("DOMContentLoaded", () => {
+        const agreeAll = document.getElementById("agreeAll");
+        const agreeItems = document.querySelectorAll(".agree-item");
+
+        if (agreeAll) {
+          // 전체 동의 클릭 시 -> 하위 항목 모두 선택
+          agreeAll.addEventListener("change", function () {
+            agreeItems.forEach((item) => {
+              item.checked = this.checked;
+            });
+          });
+
+          // 개별 항목 변경 시 -> 전체 동의 체크 상태 갱신
+          agreeItems.forEach((item) => {
+            item.addEventListener("change", () => {
+              const allChecked = Array.from(agreeItems).every((i) => i.checked);
+              agreeAll.checked = allChecked;
+            });
+          });
+        }
+      });
+
+
+      document.addEventListener("DOMContentLoaded", () => {
+        const agreeAll = document.getElementById("agreeAll");
+        const agreeItems = document.querySelectorAll(".agree-item");
+
+        if (agreeAll) {
+          agreeAll.addEventListener("change", function () {
+            agreeItems.forEach((item) => {
+              item.checked = this.checked;
+            });
+          });
+
+          agreeItems.forEach((item) => {
+            item.addEventListener("change", () => {
+              // 전체 항목이 체크되었는지 확인
+              const allChecked = Array.from(agreeItems).every((i) => i.checked);
+              agreeAll.checked = allChecked;
+            });
+          });
+        }
+      });
+
+
+
+      function containsEmoji(str) {
+        const emojiRegex = /[\u{1F300}-\u{1FAFF}]/u;
+        return emojiRegex.test(str);
+      }
+
+      function validateLoginId() {
+        const id = document.getElementById("loginId").value.trim();
+        const error = document.getElementById("loginIdError");
+        const valid = /^[a-z0-9]{4,16}$/.test(id);
+
+        if (!valid) {
+          error.textContent = "아이디는 영문 소문자 또는 숫자 4~16자여야 합니다.";
+          error.classList.remove("hidden");
+          return true;
+        }
+        error.classList.add("hidden");
+        return false;
+      }
+
+      function validatePassword() {
+        const pw = document.getElementById("password").value.trim();
+        const error = document.getElementById("passwordError");
+        const lengthValid = pw.length >= 10 && pw.length <= 16;
+        const complexity = [
+          /[a-z]/.test(pw),
+          /[A-Z]/.test(pw),
+          /\d/.test(pw),
+          /[^A-Za-z0-9]/.test(pw),
+        ].filter(Boolean).length;
+
+        if (!lengthValid || complexity < 2) {
+          error.textContent = "비밀번호는 10~16자이며, 영문/숫자/특수문자 중 2가지 이상 포함해야 합니다.";
+          error.classList.remove("hidden");
+          return true;
+        }
+        error.classList.add("hidden");
+        return false;
+      }
+
+      function validatePasswordConfirm() {
+        const pw = document.getElementById("password").value.trim();
+        const pwc = document.getElementById("passwordConfirm").value.trim();
+        const error = document.getElementById("passwordConfirmError");
+
+        if (pwc && pw !== pwc) {
+          error.textContent = "비밀번호가 일치하지 않습니다.";
+          error.classList.remove("hidden");
+          return true;
+        }
+        error.classList.add("hidden");
+        return false;
+      }
+
+      function validateName() {
+        const name = document.getElementById("name").value.trim();
+        const error = document.getElementById("nameError");
+        const valid = /^[^\s]{1,10}$/.test(name) && !containsEmoji(name);
+
+        if (!valid) {
+          error.textContent = "이름은 공백/이모지 없이 최대 10자까지 가능합니다.";
+          error.classList.remove("hidden");
+          return true;
+        }
+        error.classList.add("hidden");
+        return false;
+      }
+
+      function validateEmail() {
+        const email = document.getElementById("email").value.trim();
+        const error = document.getElementById("emailError");
+        const valid = /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email) && !containsEmoji(email);
+
+        if (!valid) {
+          error.textContent = "이메일 형식이 올바르지 않거나 공백/이모지가 포함되었습니다.";
+          error.classList.remove("hidden");
+          return true;
+        }
+        error.classList.add("hidden");
+        return false;
+      }
+
+      function validatePhone() {
+        const middle = document.getElementById("middleNum").value.trim();
+        const last = document.getElementById("lastNum").value.trim();
+        const middleError = document.getElementById("middleNumError");
+        const lastError = document.getElementById("lastNumError");
+
+        let hasError = false;
+
+        if (!/^\d{3,4}$/.test(middle)) {
+          middleError.textContent = "가운데 번호는 숫자 3~4자리여야 합니다.";
+          middleError.classList.remove("hidden");
+          hasError = true;
+        } else {
+          middleError.classList.add("hidden");
+        }
+
+        if (!/^\d{4}$/.test(last)) {
+          lastError.textContent = "마지막 번호는 숫자 4자리여야 합니다.";
+          lastError.classList.remove("hidden");
+          hasError = true;
+        } else {
+          lastError.classList.add("hidden");
+        }
+
+        return hasError;
+      }
+
+      function clearInvalidFields() {
+        if (validateLoginId()) document.getElementById("loginId").value = "";
+        if (validatePassword()) document.getElementById("password").value = "";
+        if (validatePasswordConfirm()) document.getElementById("passwordConfirm").value = "";
+        if (validateName()) document.getElementById("name").value = "";
+        if (validateEmail()) document.getElementById("email").value = "";
+        if (validatePhone()) {
+          document.getElementById("middleNum").value = "";
+          document.getElementById("lastNum").value = "";
+        }
+      }
+
+      document.addEventListener("DOMContentLoaded", () => {
+        const ids = ["loginId", "password", "passwordConfirm", "name", "email", "middleNum", "lastNum"];
+        ids.forEach((id) => {
+          document.getElementById(id).addEventListener("input", () => {
+            // 각 필드 개별 검사만 실행
+            switch (id) {
+              case "loginId":
+                validateLoginId();
+                break;
+              case "password":
+                validatePassword();
+                break;
+              case "passwordConfirm":
+                validatePasswordConfirm();
+                break;
+              case "name":
+                validateName();
+                break;
+              case "email":
+                validateEmail();
+                break;
+              case "middleNum":
+              case "lastNum":
+                validatePhone();
+                break;
             }
           });
         });
 
-      // 개별 체크박스 변경 시 전체 동의 상태 업데이트
-      document
-        .querySelectorAll('input[type="checkbox"]')
-        .forEach((checkbox) => {
-          if (checkbox.id !== 'allAgreement') {
-            checkbox.addEventListener('change', function () {
-              const allCheckboxes = document.querySelectorAll(
-                'input[type="checkbox"]'
-              );
-              const allAgreement = document.getElementById('allAgreement');
-              const checkedCount = Array.from(allCheckboxes).filter(
-                (cb) => cb.checked && cb.id !== 'allAgreement'
-              ).length;
-              const totalCount = allCheckboxes.length - 1;
+        // 제출 시 전체 검사
+        document.querySelector("form").addEventListener("submit", function (e) {
+          const hasError =
+                  validateLoginId() ||
+                  validatePassword() ||
+                  validatePasswordConfirm() ||
+                  validateName() ||
+                  validateEmail() ||
+                  validatePhone();
 
-              allAgreement.checked = checkedCount === totalCount;
-            });
+          if (hasError) {
+            e.preventDefault();
+            clearInvalidFields();
+
+            let alertDiv = document.getElementById("globalError");
+            if (!alertDiv) {
+              alertDiv = document.createElement("div");
+              alertDiv.id = "globalError";
+              alertDiv.className =
+                      "bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded relative mt-4";
+              alertDiv.innerHTML =
+                      "<strong class='font-bold'>입력값을 다시 확인해주세요.</strong>";
+              document.body.prepend(alertDiv);
+            } else {
+              alertDiv.classList.remove("hidden");
+            }
+
+            window.scrollTo({ top: 0, behavior: "smooth" });
           }
         });
+      });
     </script>
+
   </body>
 </html>
