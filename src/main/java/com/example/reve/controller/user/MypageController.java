@@ -2,7 +2,6 @@ package com.example.reve.controller.user;
 
 import java.util.List;
 
-import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpSession;
 
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
@@ -16,10 +15,8 @@ import com.example.reve.domain.CustomUserDetails;
 import com.example.reve.dto.CouponDTO;
 import com.example.reve.dto.NewPasswordDTO;
 import com.example.reve.dto.UpdateProfileDTO;
-import com.example.reve.dto.WishlistDTO;
 import com.example.reve.service.CouponService;
 import com.example.reve.service.UserService;
-import com.example.reve.service.WishlistService;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -32,7 +29,6 @@ public class MypageController {
 
   private final UserService userService;
   private final CouponService couponService;
-  private final WishlistService wishlistService;
 
   @GetMapping
   public String mypage(Model model, @AuthenticationPrincipal CustomUserDetails customUserDetails) {
@@ -57,38 +53,6 @@ public class MypageController {
   @GetMapping("/wishlist")
   public String wishlist() {
     return "user/mypage/wishlist";
-  }
-
-  // 찜 목록 추가
-  @PostMapping("/wishlist/add")
-  public String wishlistAdd(
-      @AuthenticationPrincipal CustomUserDetails customUserDetails,
-      WishlistDTO wishlistDTO,
-      HttpServletRequest request) {
-    log.info("위시리스트에 추가시작");
-    Long userId = customUserDetails.getUser().getUserId();
-    Long performId = wishlistDTO.getPerfume().getPerfumeId();
-    // 목록 추가하기 요청
-    wishlistService.addWishlist(userId, performId);
-    // 현재페이지로 돌아가기
-    String thisPage = request.getHeader("Referer");
-    return "redirect:" + thisPage;
-  }
-
-  // 찜 목록에서 삭제
-  @PostMapping("/wishlist/remove")
-  public String wishlistRemove(
-      @AuthenticationPrincipal CustomUserDetails customUserDetails,
-      WishlistDTO wishlistDTO,
-      HttpServletRequest request) {
-    log.info("위시리스트에 삭제시작");
-    Long userId = customUserDetails.getUser().getUserId();
-    Long performId = wishlistDTO.getPerfume().getPerfumeId();
-    // 목록 추가하기 요청
-    wishlistService.removeWishlist(userId, performId);
-    // 현재페이지로 돌아가기
-    String thisPage = request.getHeader("Referer");
-    return "redirect:" + thisPage;
   }
 
   // 쿠폰 목록
