@@ -1,0 +1,436 @@
+<!DOCTYPE html>
+<html lang="ko" xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+<head th:replace="~{fragments/header :: head(title='공지사항 등록 | Rêve Admin')}">
+</head>
+<body class="font-sans text-gray-800">
+<!-- Header Fragment -->
+<div th:replace="~{fragments/header :: header}"></div>
+
+<!-- Main Content -->
+<main class="pt-20">
+  <div class="min-h-screen bg-gray-50 py-12">
+    <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
+      <!-- Breadcrumb -->
+      <nav class="mb-6">
+        <ol class="flex items-center space-x-2 text-sm text-gray-600">
+          <li><a href="/" class="hover:text-gray-800">홈</a></li>
+          <li><i class="fas fa-chevron-right text-xs"></i></li>
+          <li><a href="/board/notice/list" class="hover:text-gray-800">공지사항</a></li>
+          <li><i class="fas fa-chevron-right text-xs"></i></li>
+          <li class="text-gray-800">공지사항 등록</li>
+        </ol>
+      </nav>
+
+      <!-- Page Title -->
+      <div class="mb-8">
+        <h1 class="text-3xl font-bold text-gray-800 mb-2">공지사항 등록</h1>
+        <p class="text-gray-600">새로운 공지사항을 등록합니다.</p>
+      </div>
+
+      <!-- Notice Registration Form -->
+      <div sec:authorize="!hasRole('ADMIN')" class="bg-white rounded-lg shadow-sm p-8 text-center">
+        <p class="text-lg text-gray-700">공지사항 작성은 관리자만 가능합니다.</p>
+        <a href="/member/login" class="mt-4 inline-block px-6 py-3 bg-gray-800 text-white rounded-md hover:bg-gray-700">로그인</a>
+      </div>
+
+      <div sec:authorize="hasRole('ADMIN')" class="bg-white rounded-lg shadow-sm p-8">
+        <form id="notice-form" class="space-y-8">
+          <!-- Hidden fields for IDs -->
+          <!-- Category Selection -->
+          <div>
+            <label
+                    for="notice-category"
+                    class="block text-sm font-medium text-gray-700 mb-3"
+            >
+              카테고리 <span class="text-red-500">*</span>
+            </label>
+            <select
+                    id="notice-category"
+                    name="category"
+                    class="w-full border border-gray-300 rounded-md px-4 py-3 focus:outline-none focus:ring-2 focus:ring-800 focus:border-transparent"
+            >
+              <option value="일반">일반</option>
+              <option value="이벤트">이벤트</option>
+              <option value="시스템">시스템</option>
+              <option value="배송">배송</option>
+            </select>
+          </div>
+          
+
+          <!-- Title -->
+          <div>
+            <label
+                    for
+                    class="block text-sm font-medium text-gray-700 mb-3"
+            >
+              제목 <span class="text-red-500">*</span>
+            </label>
+            <input
+                    type="text"
+                    id="notice-title"
+                    name="title"
+                    placeholder="문의 제목을 입력해주세요"
+                    class="w-full border border-gray-300 rounded-md px-4 py-3 focus:outline-none focus:ring-2 focus:ring-gray-800 focus:border-transparent"
+                    maxlength="100"
+            />
+            <div class="flex justify-between items-center mt-1">
+              <p class="text-sm text-gray-500">
+                최대 100자까지 입력 가능합니다
+              </p>
+              <p class="text-sm text-gray-500">
+                <span id="titleCharCount">0</span>/100
+              </p>
+            </div>
+          </div>
+
+          <!-- Content -->
+          <div>
+            <label
+                    for
+                    class="block text-sm font-medium text-gray-700 mb-3"
+            >
+              공지 내용 <span class="text-red-500">*</span>
+            </label>
+            <textarea
+                    id="notice-content"
+                    name="content"
+                    placeholder="공지사항을 작성해주세요"
+                    rows="10"
+                    class="w-full border border-gray-300 rounded-md px-4 py-3 focus:outline-none focus:ring-2 focus:ring-gray-800 focus:border-transparent resize-none"
+                    maxlength="2000"
+            ></textarea>
+            <div class="flex justify-between items-center mt-1">
+              <p class="text-sm text-gray-500">
+                최대 2,000자까지 입력 가능합니다
+              </p>
+              <p class="text-sm text-gray-500">
+                <span id="charCount">0</span>/2,000
+              </p>
+            </div>
+          </div>
+
+          <!-- File Upload -->
+          <div>
+            <label class="block text-sm font-medium text-gray-700 mb-3">
+              첨부파일
+            </label>
+            <div
+                    class="border-2 border-dashed border-gray-300 rounded-lg p-6 text-center hover:border-gray-400 transition-colors"
+            >
+              <div class="space-y-4">
+                <i
+                        class="fas fa-cloud-upload-alt text-3xl text-gray-400"
+                ></i>
+                <div>
+                  <p class="text-sm text-gray-600 mb-2">
+                    파일을 선택하세요
+                  </p>
+                  <p class="text-xs text-gray-500">
+                    최대 5개 파일, 각 파일 10MB 이하 (JPG, PNG, PDF, DOC,
+                    DOCX)
+                  </p>
+                </div>
+                <input
+                        type="file"
+                        multiple
+                        accept=".jpg,.jpeg,.png,.pdf,.doc,.docx"
+                        class="hidden"
+                        id="fileInput"
+                />
+                <button
+                        type="button"
+                        onclick="document.getElementById('fileInput').click()"
+                        class="inline-flex items-center px-4 py-2 border border-gray-300 rounded-md text-sm font-medium text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-gray-800 focus:border-transparent"
+                >
+                  <i class="fas fa-folder-open mr-2"></i>
+                  파일 선택
+                </button>
+              </div>
+            </div>
+            <!-- File List -->
+            <div id="fileList" class="mt-4 space-y-2"></div>
+          </div>
+
+          
+
+          <!-- Notice -->
+          <div class="bg-blue-50 border-l-4 border-blue-400 p-4">
+            <div class="flex">
+              <i class="fas fa-info-circle text-blue-500 mt-1 mr-3"></i>
+              <div class="text-sm text-blue-700">
+                <p class="font-medium mb-1">공지사항 작성 시 주의사항</p>
+                <ul class="list-disc list-inside space-y-1">
+                  <li>
+                    공지사항은 모든 사용자에게 공개됩니다. 신중하게 작성해주세요.
+                  </li>
+                  <li>욕설, 비방, 광고성 내용은 삭제될 수 있습니다.</li>
+                  <li>중요한 내용은 명확하고 간결하게 작성해주세요.</li>
+                </ul>
+              </div>
+            </div>
+          </div>
+
+          <!-- Submit Buttons -->
+          <div
+                  class="flex items-center justify-between pt-6 border-t border-gray-200"
+          >
+            <a
+                    href="/board/notice/list"
+                    class="inline-flex items-center px-6 py-3 border border-gray-300 rounded-md text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-gray-800 focus:border-transparent font-medium"
+            >
+              <i class="fas fa-arrow-left mr-2"></i>
+              목록으로
+            </a>
+            <div class="flex space-x-3">
+              <button
+                      type="button"
+                      id="submit-notice"
+                      class="inline-flex items-center px-6 py-3 bg-purple-600 text-white rounded-md hover:bg-purple-700 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent font-medium"
+              >
+                <i class="fas fa-paper-plane mr-2"></i>
+                공지사항 등록
+              </button>
+            </div>
+          </div>
+        </form>
+      </div>
+
+      <!-- Quick Links -->
+      <div class="mt-8 grid md:grid-cols-2 gap-4">
+        <a
+                href="/admin/board/notice/list"
+                class="flex items-center justify-center p-4 bg-white rounded-lg shadow-sm hover:shadow-md transition-shadow"
+        >
+          <div class="text-center">
+            <i class="fas fa-list text-2xl text-blue-500 mb-2"></i>
+            <p class="font-medium text-gray-800">공지사항 목록</p>
+            <p class="text-sm text-gray-600">
+              등록된 공지사항을 확인하세요
+            </p>
+          </div>
+        </a>
+
+        <a
+                href="/admin/dashboard"
+                class="flex items-center justify-center p-4 bg-white rounded-lg shadow-sm hover:shadow-md transition-shadow"
+        >
+          <div class="text-center">
+            <i class="fas fa-tachometer-alt text-2xl text-green-500 mb-2"></i>
+            <p class="font-medium text-gray-800">관리자 대시보드</p>
+            <p class="text-sm text-gray-600">
+              관리자 페이지로 돌아가기
+            </p>
+          </div>
+        </a>
+      </div>
+    </div>
+  </div>
+</main>
+
+<!-- Footer Fragment -->
+<div th:replace="~{fragments/footer :: footer}"></div>
+
+<!-- Login Modal Fragment -->
+<div th:replace="~{fragments/modal :: loginModal}"></div>
+
+<script src="/js/script.js"></script>
+<script>
+  console.log('register.html script 실행됨');
+
+  // Character count for textarea
+  const textarea = $('#notice-content'); // jQuery 선택자 사용
+  const charCount = $('#charCount'); // jQuery 선택자 사용
+
+  textarea.on('input', function () { // .on() 메소드 사용
+    const length = $(this).val().length; // .val() 메소드 사용
+    charCount.text(length.toString()); // .text() 메소드 사용
+    if (length > 1900) {
+      charCount.addClass('text-red-500'); // .addClass() 메소드 사용
+    } else {
+      charCount.removeClass('text-red-500'); // .removeClass() 메소드 사용
+    }
+  });
+
+  // Character count for title
+  const titleInput = $('#notice-title');
+  const titleCharCount = $('#titleCharCount');
+
+  titleInput.on('input', function () {
+    const length = $(this).val().length;
+    titleCharCount.text(length.toString());
+    if (length > 90) { // 90자 초과 시 색상 변경
+      titleCharCount.addClass('text-red-500');
+    } else {
+      titleCharCount.removeClass('text-red-500');
+    }
+  });
+
+  // File upload functionality (jQuery로 변경)
+  const fileInput = $('#fileInput');
+  const fileList = $('#fileList');
+
+  // 허용되는 파일 확장자 및 최대 파일 크기 정의 (백엔드와 일치하도록)
+  const MAX_FILES = 5;
+  const MAX_FILE_SIZE_MB = 10; // MB
+  const MAX_FILE_SIZE_BYTES = MAX_FILE_SIZE_MB * 1024 * 1024;
+  const ALLOWED_EXTENSIONS = ['jpg', 'jpeg', 'png', 'pdf', 'doc', 'docx'];
+
+  fileInput.on('change', function () {
+    fileList.empty(); // 기존 목록 초기화
+    let selectedFiles = Array.from(this.files);
+    const validFiles = [];
+
+    // 파일 개수 제한 검사
+    if (selectedFiles.length > MAX_FILES) {
+      alert(`최대 ${MAX_FILES}개의 파일만 첨부할 수 있습니다.`);
+      // 초과된 파일은 제외하고 유효한 파일만 처리
+      selectedFiles = selectedFiles.slice(0, MAX_FILES);
+    }
+
+    selectedFiles.forEach((file, index) => {
+      let isValid = true;
+      let errorMessage = '';
+
+      // 파일 크기 검증
+      if (file.size > MAX_FILE_SIZE_BYTES) {
+        errorMessage = `파일 크기가 ${MAX_FILE_SIZE_MB}MB를 초과합니다.`;
+        isValid = false;
+      }
+
+      // 파일 타입 검증
+      const fileExtension = file.name.split('.').pop().toLowerCase();
+      if (!ALLOWED_EXTENSIONS.includes(fileExtension)) {
+        errorMessage = `허용되지 않는 파일 형식입니다. (허용: ${ALLOWED_EXTENSIONS.join(', ').toUpperCase()})`;
+        isValid = false;
+      }
+
+      if (isValid) {
+        validFiles.push(file);
+        const fileItem = $('<div></div>');
+        fileItem.addClass('flex items-center justify-between p-3 bg-gray-50 rounded-md');
+
+        // 파일 정보를 담을 컨테이너
+        const fileInfoContainer = $('<div></div>').addClass('flex items-center space-x-3');
+
+        // 이미지 파일인 경우 미리보기 생성
+        if (file.type.startsWith('image/')) {
+          const reader = new FileReader();
+          reader.onload = function (e) {
+            const img = $('<img>');
+            img.attr('src', e.target.result);
+            img.addClass('w-16 h-16 object-cover rounded-md');
+            fileInfoContainer.prepend(img);
+          };
+          reader.readAsDataURL(file);
+        } else {
+          // 이미지가 아닌 경우 아이콘 표시
+          fileInfoContainer.append('<i class="fas fa-file text-gray-500 text-2xl w-16 text-center"></i>');
+        }
+
+        // 파일명 및 크기 정보 추가
+        const textInfo = $('<div></div>');
+        textInfo.append(`<span class="text-sm text-gray-700">${file.name}</span>`);
+        textInfo.append(`<br><span class="text-xs text-gray-500">(${(file.size / 1024 / 1024).toFixed(2)}MB)</span>`);
+        fileInfoContainer.append(textInfo);
+
+        // 삭제 버튼
+        const removeBtn = $(`<button type="button" onclick="removeFile(${validFiles.length - 1})" class="text-red-500 hover:text-red-700"><i class="fas fa-times"></i></button>`);
+
+        fileItem.append(fileInfoContainer);
+        fileItem.append(removeBtn);
+        fileList.append(fileItem);
+      } else {
+        alert(`파일 업로드 실패: ${file.name} - ${errorMessage}`);
+      }
+    });
+
+    // 유효한 파일들로 DataTransfer 객체 재구성
+    const dt = new DataTransfer();
+    validFiles.forEach(file => dt.items.add(file));
+    fileInput[0].files = dt.files;
+  });
+
+  function removeFile(index) {
+    const dt = new DataTransfer();
+    const files = Array.from(fileInput[0].files);
+    files.splice(index, 1);
+    files.forEach((file) => dt.items.add(file));
+    fileInput[0].files = dt.files;
+    fileInput.trigger('change'); // 파일 목록을 다시 렌더링하기 위해 change 이벤트 트리거
+  }
+
+  // 비밀글 선택 시 비밀번호 필드 표시/숨김
+  // const passwordSection = $('#password-section'); // 주석 처리 또는 삭제
+  // function updatePasswordSection() { // 주석 처리 또는 삭제
+  //   const isSecretSelected = $('input[name="isSecret"]:checked').val() === 'true'; // 주석 처리 또는 삭제
+  //   if (isSecretSelected) { // 주석 처리 또는 삭제
+  //     passwordSection.show(); // 주석 처리 또는 삭제
+  //   } else { // 주석 처리 또는 삭제
+  //     passwordSection.hide(); // 주석 처리 또는 삭제
+  //     $('#qna-password').val(''); // 비밀번호 필드 숨길 때 값 초기화 // 주석 처리 또는 삭제
+  //   } // 주석 처리 또는 삭제
+  // } // 주석 처리 또는 삭제
+  // $('input[name="isSecret"]').on('change', updatePasswordSection); // 주석 처리 또는 삭제
+
+  // 초기 로드 시 비밀번호 섹션 상태 업데이트
+  $(document).ready(function() {
+    console.log("DOM 로드 완료");
+    // updatePasswordSection(); // 주석 처리 또는 삭제
+
+    const submitButton = $('#submit-notice');
+    console.log('submitButton :', submitButton); // 버튼 요소가 제대로 찾아졌는지 확인
+
+    // '문의 등록' 버튼 클릭 이벤트 (document.ready 안으로 이동)
+    submitButton.on('click', function (e) {
+      e.preventDefault(); // 기본 제출 동작 방지
+      console.log('Submit button 클릭이벤트 실행'); // 클릭 이벤트 핸들러 실행 확인
+
+      // 1. 폼 데이터 가져오기
+      const title = $('#notice-title').val();
+      const content = $('#notice-content').val();
+      const category = $('#notice-category').val();
+
+      // 2. 유효성 검사
+      if (!title.trim()) {
+        alert('제목을 입력해주세요.');
+        return;
+      }
+      if (!content.trim()) {
+        alert('내용을 입력해주세요.');
+        return;
+      }
+
+      // 3. FormData 객체 생성
+      const formData = new FormData();
+      formData.append('title', title);
+      formData.append('content', content);
+      formData.append('category', category);
+
+      // 파일 추가
+      const files = fileInput[0].files;
+      for (let i = 0; i < files.length; i++) {
+        formData.append('attachmentFiles', files[i]);
+      }
+
+      // 4. jQuery의 $.ajax()로 서버에 POST 요청 보내기
+      $.ajax({
+        url: '/admin/board/notice/register',
+        type: 'POST',
+        data: formData,
+        processData: false,
+        contentType: false,
+        success: function (data) {
+          console.log('성공:', data);
+          alert('공지사항이 성공적으로 등록되었습니다.');
+          location.href = '/board/notice/list';
+        },
+        error: function (xhr, status, error) {
+          console.error('Error:', xhr.responseText || error);
+          alert('공지사항 등록에 실패했습니다. 다시 시도해주세요.');
+        }
+      });
+    });
+  });
+</script>
+</body>
+</html>

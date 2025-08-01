@@ -2,6 +2,8 @@ package com.example.reve.controller.user;
 
 import java.io.IOException;
 import java.security.Principal;
+import java.util.List;
+import java.util.NoSuchElementException;
 
 import jakarta.validation.Valid;
 
@@ -11,6 +13,8 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.web.PageableDefault;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
@@ -23,6 +27,7 @@ import com.example.reve.domain.User;
 import com.example.reve.dto.QnaReqDTO;
 import com.example.reve.dto.QnaResDTO;
 import com.example.reve.repository.UserRepository;
+import com.example.reve.service.NoticeService;
 import com.example.reve.service.PerfumeService;
 import com.example.reve.service.QnaService;
 
@@ -35,9 +40,10 @@ import lombok.extern.slf4j.Slf4j;
 @RequiredArgsConstructor
 public class BoardController {
 
-  private final QnaService qnaService; // 서비스 주입 (QnaService)
-  private final UserRepository userRepository; // UserRepository 주입
-  private final PerfumeService perfumeService; // PerfumeService 주입
+  private final QnaService qnaService;
+  private final UserRepository userRepository;
+  private final PerfumeService perfumeService;
+  private final NoticeService noticeService;
 
   // Q&A 생성 API
   @PostMapping("/qna")
@@ -69,13 +75,82 @@ public class BoardController {
   }
 
   @GetMapping("/notice/list")
-  public String noticeList() {
+  public String noticeList(
+      Model model,
+      @PageableDefault(size = 10, sort = "createdAt", direction = Sort.Direction.DESC)
+          Pageable pageable,
+      @RequestParam(required = false) String keyword,
+      @RequestParam(required = false) String category,
+      @RequestParam(required = false, defaultValue = "createdAt,desc") String sort, // sort 파라미터 추가
+      Principal principal) {
+    model.addAttribute("isAdmin", isAdmin(principal));
+
+    // sort 파라미터 파싱
+    Sort sortObj;
+    if (sort.equals("createdAt,desc")) {
+      sortObj =
+          Sort.by(Sort.Direction.DESC, "important").and(Sort.by(Sort.Direction.DESC, "createdAt"));
+    } else if (sort.equals("hit,desc")) {
+      sortObj = Sort.by(Sort.Direction.DESC, "important").and(Sort.by(Sort.Direction.DESC, "hit"));
+    } else if (sort.equals("title,asc")) {
+      sortObj = Sort.by(Sort.Direction.DESC, "important").and(Sort.by(Sort.Direction.ASC, "title"));
+    } else {
+      sortObj =
+          Sort.by(Sort.Direction.DESC, "important")
+              .and(Sort.by(Sort.Direction.DESC, "createdAt")); // 기본 정렬
+    }
+
+    Pageable sortedPageable =
+        PageRequest.of(pageable.getPageNumber(), pageable.getPageSize(), sortObj);
+
+    // 공지사항 목록을 가져오는 로직 추가
+    Page<com.example.reve.domain.Notice> noticePage =
+        noticeService.getAllNotices(sortedPageable, keyword, category); // sortedPageable 전달
+    model.addAttribute("notices", noticePage);
+    model.addAttribute("keyword", keyword);
+    model.addAttribute("category", category);
+    model.addAttribute("sort", sort); // sort 값도 모델에 추가
+
     return "board/notice/list";
   }
 
-  @GetMapping("/notice/detail")
-  public String noticeDetail() {
-    return "board/notice/detail";
+  @GetMapping("/notice/detail/{noticeId}")
+  public String noticeDetail(@PathVariable Long noticeId, Model model, Principal principal) {
+    model.addAttribute("isAdmin", isAdmin(principal));
+
+    try {
+      // 공지사항 상세 내용을 가져오는 로직 추가
+      com.example.reve.domain.Notice notice = noticeService.getNoticeById(noticeId);
+      model.addAttribute("notice", notice);
+
+      // 이전/다음 공지사항 가져오기
+      noticeService
+          .getPrevNotice(noticeId)
+          .ifPresent(prevNotice -> model.addAttribute("prevNotice", prevNotice));
+      noticeService
+          .getNextNotice(noticeId)
+          .ifPresent(nextNotice -> model.addAttribute("nextNotice", nextNotice));
+
+      // 관련 공지사항 가져오기 (현재 공지사항 제외, 같은 카테고리 내에서, 최신순 5개)
+      List<com.example.reve.domain.Notice> relatedNotices =
+          noticeService.getRelatedNotices(noticeId, notice.getCategory(), 5);
+      model.addAttribute("relatedNotices", relatedNotices);
+
+      return "board/notice/detail";
+    } catch (NoSuchElementException e) {
+      model.addAttribute("errorMessage", e.getMessage());
+      return "common/error"; // 또는 공지사항 목록 페이지로 리다이렉트
+    }
+  }
+
+  private boolean isAdmin(Principal principal) {
+    if (principal == null) {
+      return false;
+    }
+    Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+    return authentication != null
+        && authentication.getAuthorities().stream()
+            .anyMatch(a -> a.getAuthority().equals("ROLE_ADMIN"));
   }
 
   @GetMapping("/qna/list")
@@ -183,21 +258,17 @@ public class BoardController {
 
   // Q&A 삭제 API
   @DeleteMapping("/qna/{qnaId}")
-  public String deleteQna(
-      @PathVariable Long qnaId, Principal principal, RedirectAttributes redirectAttributes) {
+  @ResponseBody
+  public ResponseEntity<?> deleteQna(@PathVariable Long qnaId, Principal principal) {
     try {
       qnaService.deleteQna(qnaId, principal);
-      redirectAttributes.addFlashAttribute("successMessage", "Q&A가 성공적으로 삭제되었습니다.");
-      return "redirect:/board/qna/list";
+      return ResponseEntity.ok().body("Q&A가 성공적으로 삭제되었습니다.");
     } catch (IllegalAccessException | IllegalArgumentException e) {
-      redirectAttributes.addFlashAttribute("errorMessage", e.getMessage());
-      return "redirect:/board/qna/detail/" + qnaId;
+      return ResponseEntity.badRequest().body("Q&A 삭제 실패: " + e.getMessage());
     } catch (IOException e) {
-      redirectAttributes.addFlashAttribute("errorMessage", "파일 삭제 중 오류가 발생했습니다: " + e.getMessage());
-      return "redirect:/board/qna/detail/" + qnaId;
+      return ResponseEntity.status(500).body("파일 삭제 중 오류가 발생했습니다: " + e.getMessage());
     } catch (Exception e) {
-      redirectAttributes.addFlashAttribute("errorMessage", "Q&A 삭제 중 알 수 없는 오류가 발생했습니다.");
-      return "redirect:/board/qna/detail/" + qnaId;
+      return ResponseEntity.status(500).body("Q&A 삭제 중 알 수 없는 오류가 발생했습니다.");
     }
   }
 

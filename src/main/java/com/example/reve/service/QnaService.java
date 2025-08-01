@@ -2,10 +2,7 @@ package com.example.reve.service;
 
 import java.io.IOException;
 import java.security.Principal;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-import java.util.UUID;
+import java.util.*;
 import java.util.stream.Collectors;
 
 import org.springframework.data.domain.Page;
@@ -214,19 +211,67 @@ public class QnaService {
             .findById(qnaId)
             .orElseThrow(() -> new IllegalArgumentException("해당 Q&A를 찾을 수 없습니다. ID: " + qnaId));
 
-    // 이전/다음 Q&A ID 조회
-    Long prevQnaId = qnaRepository.findPrevQnaId(qnaId).orElse(null);
-    Long nextQnaId = qnaRepository.findNextQnaId(qnaId).orElse(null);
-
     // 공개글이면 바로 반환
     if (!qna.getIsSecret()) {
-      return new QnaResDTO(qna, prevQnaId, nextQnaId); // prev/next QnaId 포함하여 반환
+      Long prevQnaId = findAccessiblePrevQnaId(qnaId, principal);
+      Long nextQnaId = findAccessibleNextQnaId(qnaId, principal);
+      return new QnaResDTO(qna, prevQnaId, nextQnaId);
     }
 
     // 비밀글인 경우, 접근 권한 확인
     validateUserPermission(principal, qna);
 
-    return new QnaResDTO(qna, prevQnaId, nextQnaId); // prev/next QnaId 포함하여 반환
+    Long prevQnaId = findAccessiblePrevQnaId(qnaId, principal);
+    Long nextQnaId = findAccessibleNextQnaId(qnaId, principal);
+    return new QnaResDTO(qna, prevQnaId, nextQnaId);
+  }
+
+  private Long findAccessiblePrevQnaId(Long currentQnaId, Principal principal) {
+    Long prevId = currentQnaId;
+    while (true) {
+      Optional<Long> foundId = qnaRepository.findPrevQnaId(prevId);
+      if (foundId.isEmpty()) {
+        return null; // 더 이상 이전 글이 없음
+      }
+      prevId = foundId.get();
+      try {
+        Qna qna = qnaRepository.findById(prevId).orElse(null);
+        if (qna != null) {
+          if (!qna.getIsSecret()) { // 공개글이면 바로 반환
+            return prevId;
+          } else { // 비밀글이면 권한 확인
+            validateUserPermission(principal, qna);
+            return prevId; // 권한 있으면 반환
+          }
+        }
+      } catch (IllegalAccessException e) {
+        // 접근 권한이 없으면 계속 이전 글 탐색
+      }
+    }
+  }
+
+  private Long findAccessibleNextQnaId(Long currentQnaId, Principal principal) {
+    Long nextId = currentQnaId;
+    while (true) {
+      Optional<Long> foundId = qnaRepository.findNextQnaId(nextId);
+      if (foundId.isEmpty()) {
+        return null; // 더 이상 다음 글이 없음
+      }
+      nextId = foundId.get();
+      try {
+        Qna qna = qnaRepository.findById(nextId).orElse(null);
+        if (qna != null) {
+          if (!qna.getIsSecret()) { // 공개글이면 바로 반환
+            return nextId;
+          } else { // 비밀글이면 권한 확인
+            validateUserPermission(principal, qna);
+            return nextId; // 권한 있으면 반환
+          }
+        }
+      } catch (IllegalAccessException e) {
+        // 접근 권한이 없으면 계속 다음 글 탐색
+      }
+    }
   }
 
   /**
