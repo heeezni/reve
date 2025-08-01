@@ -72,7 +72,6 @@ public class MypageController {
   @PostMapping("/account/profile")
   public String updateProfile(
       UpdateProfileDTO updateProfileDTO,
-      CouponByBirthdayDTO couponByBirthdayDTO,
       Model model,
       @AuthenticationPrincipal CustomUserDetails customUserDetails) {
     log.info("회원 정보 수정 컨트롤러 호출");
