@@ -1,22 +1,33 @@
 package com.example.reve.controller.admin;
 
 import java.security.Principal;
+import java.util.NoSuchElementException;
+
+import jakarta.validation.Valid;
 
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.web.PageableDefault;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
+import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
+import com.example.reve.domain.Notice;
+import com.example.reve.dto.NoticeReqDTO;
 import com.example.reve.dto.QnaResDTO;
 import com.example.reve.repository.UserRepository;
+import com.example.reve.service.NoticeService;
 import com.example.reve.service.QnaService;
 
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 
+@Slf4j
 @Controller
 @RequestMapping("/admin/board")
 @RequiredArgsConstructor
@@ -24,15 +35,44 @@ public class AdminBoardController {
 
   private final QnaService qnaService;
   private final UserRepository userRepository;
+  private final NoticeService noticeService;
 
-  @GetMapping("/notice/list")
-  public String noticeList() {
-    return "admin/board/notice/list";
+  @GetMapping("/notice/register")
+  public String noticeRegisterForm(Model model) {
+    model.addAttribute("noticeReqDTO", new NoticeReqDTO());
+    return "admin/board/notice/register";
   }
 
-  @GetMapping("/notice/form")
-  public String noticeForm() {
-    return "admin/board/notice/form";
+  @GetMapping("/notice/edit/{noticeId}")
+  public String noticeEditForm(@PathVariable Long noticeId, Model model, Principal principal) {
+    try {
+      Notice notice = noticeService.getNoticeById(noticeId);
+      model.addAttribute("notice", notice);
+      return "admin/board/notice/edit";
+    } catch (NoSuchElementException e) {
+      model.addAttribute("errorMessage", e.getMessage());
+      return "common/error";
+    }
+  }
+
+  @PostMapping("/notice/register")
+  public String registerNotice(
+      @Valid @ModelAttribute NoticeReqDTO noticeReqDTO,
+      BindingResult bindingResult,
+      Principal principal,
+      RedirectAttributes redirectAttributes) {
+    if (bindingResult.hasErrors()) {
+      return "admin/board/notice/register";
+    }
+    try {
+      noticeService.createNotice(noticeReqDTO, principal);
+      redirectAttributes.addFlashAttribute("successMessage", "공지사항이 성공적으로 등록되었습니다.");
+      return "redirect:/board/notice/list";
+    } catch (Exception e) {
+      log.error("공지사항 등록 중 오류 발생: {}", e.getMessage());
+      redirectAttributes.addFlashAttribute("errorMessage", "공지사항 등록에 실패했습니다.");
+      return "redirect:/admin/board/notice/register";
+    }
   }
 
   @GetMapping("/qna/list")
@@ -113,6 +153,20 @@ public class AdminBoardController {
       return "redirect:/board/qna/detail/" + qnaId;
     } catch (IllegalAccessException | IllegalArgumentException e) {
       return "redirect:/error";
+    }
+  }
+
+  @DeleteMapping("/notice/{noticeId}")
+  public ResponseEntity<String> deleteNotice(@PathVariable Long noticeId, Principal principal) {
+    try {
+      noticeService.deleteNotice(noticeId, principal);
+      return ResponseEntity.ok("공지사항이 성공적으로 삭제되었습니다.");
+    } catch (IllegalAccessException e) {
+      return ResponseEntity.status(403).body("권한이 없습니다.");
+    } catch (NoSuchElementException e) {
+      return ResponseEntity.status(404).body("공지사항을 찾을 수 없습니다.");
+    } catch (Exception e) {
+      return ResponseEntity.status(500).body("공지사항 삭제 중 오류가 발생했습니다: " + e.getMessage());
     }
   }
 }

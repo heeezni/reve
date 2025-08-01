@@ -11,6 +11,8 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.web.PageableDefault;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
@@ -23,6 +25,7 @@ import com.example.reve.domain.User;
 import com.example.reve.dto.QnaReqDTO;
 import com.example.reve.dto.QnaResDTO;
 import com.example.reve.repository.UserRepository;
+import com.example.reve.service.NoticeService;
 import com.example.reve.service.PerfumeService;
 import com.example.reve.service.QnaService;
 
@@ -35,9 +38,10 @@ import lombok.extern.slf4j.Slf4j;
 @RequiredArgsConstructor
 public class BoardController {
 
-  private final QnaService qnaService; // 서비스 주입 (QnaService)
-  private final UserRepository userRepository; // UserRepository 주입
-  private final PerfumeService perfumeService; // PerfumeService 주입
+  private final QnaService qnaService;
+  private final UserRepository userRepository;
+  private final PerfumeService perfumeService;
+  private final NoticeService noticeService;
 
   // Q&A 생성 API
   @PostMapping("/qna")
@@ -69,13 +73,64 @@ public class BoardController {
   }
 
   @GetMapping("/notice/list")
-  public String noticeList() {
+  public String noticeList(
+      Model model,
+      @PageableDefault(size = 10, sort = "createdAt", direction = Sort.Direction.DESC)
+          Pageable pageable,
+      @RequestParam(required = false) String keyword,
+      @RequestParam(required = false) String category,
+      @RequestParam(required = false, defaultValue = "createdAt,desc") String sort, // sort 파라미터 추가
+      Principal principal) {
+    model.addAttribute("isAdmin", isAdmin(principal));
+
+    // sort 파라미터 파싱
+    Sort sortObj;
+    if (sort.equals("createdAt,desc")) {
+      sortObj =
+          Sort.by(Sort.Direction.DESC, "important").and(Sort.by(Sort.Direction.DESC, "createdAt"));
+    } else if (sort.equals("hit,desc")) {
+      sortObj = Sort.by(Sort.Direction.DESC, "important").and(Sort.by(Sort.Direction.DESC, "hit"));
+    } else if (sort.equals("title,asc")) {
+      sortObj = Sort.by(Sort.Direction.DESC, "important").and(Sort.by(Sort.Direction.ASC, "title"));
+    } else {
+      sortObj =
+          Sort.by(Sort.Direction.DESC, "important")
+              .and(Sort.by(Sort.Direction.DESC, "createdAt")); // 기본 정렬
+    }
+
+    Pageable sortedPageable =
+        PageRequest.of(pageable.getPageNumber(), pageable.getPageSize(), sortObj);
+
+    // 공지사항 목록을 가져오는 로직 추가
+    Page<com.example.reve.domain.Notice> noticePage =
+        noticeService.getAllNotices(sortedPageable, keyword, category); // sortedPageable 전달
+    model.addAttribute("notices", noticePage);
+    model.addAttribute("keyword", keyword);
+    model.addAttribute("category", category);
+    model.addAttribute("sort", sort); // sort 값도 모델에 추가
+
     return "board/notice/list";
   }
 
-  @GetMapping("/notice/detail")
-  public String noticeDetail() {
+  @GetMapping("/notice/detail/{noticeId}")
+  public String noticeDetail(@PathVariable Long noticeId, Model model, Principal principal) {
+    model.addAttribute("isAdmin", isAdmin(principal));
+
+    // 공지사항 상세 내용을 가져오는 로직 추가
+    com.example.reve.domain.Notice notice = noticeService.getNoticeById(noticeId);
+    model.addAttribute("notice", notice);
+
     return "board/notice/detail";
+  }
+
+  private boolean isAdmin(Principal principal) {
+    if (principal == null) {
+      return false;
+    }
+    Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+    return authentication != null
+        && authentication.getAuthorities().stream()
+            .anyMatch(a -> a.getAuthority().equals("ROLE_ADMIN"));
   }
 
   @GetMapping("/qna/list")
