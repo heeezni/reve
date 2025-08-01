@@ -75,4 +75,13 @@ public class Perfume extends BaseEntity {
   @OneToMany(mappedBy = "perfume", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
   @Builder.Default
   private List<Review> reviewList = new ArrayList<>();
+
+  // 향수와 QnA와의 관계 (1 : N)
+  @OneToMany(
+      mappedBy = "perfume",
+      cascade = CascadeType.ALL,
+      orphanRemoval = true,
+      fetch = FetchType.LAZY)
+  @Builder.Default
+  private List<Qna> qnaList = new ArrayList<>();
 }
