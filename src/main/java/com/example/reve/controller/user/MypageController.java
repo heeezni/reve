@@ -10,6 +10,7 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.multipart.MultipartFile;
 
 import com.example.reve.domain.CustomUserDetails;
 import com.example.reve.dto.CouponDTO;
@@ -86,13 +87,14 @@ public class MypageController {
   public String updateProfile(
       UpdateProfileDTO updateProfileDTO,
       Model model,
+      MultipartFile profileImage,
       @AuthenticationPrincipal CustomUserDetails customUserDetails) {
     log.info("회원 정보 수정 컨트롤러 호출");
     try {
       // 수정된 회원 정보 가져오기
       String loginId = customUserDetails.getUsername();
-      model.addAttribute("profile", userService.update(updateProfileDTO, loginId));
-      log.info("회원 정보 수정 성공 : {}", userService.update(updateProfileDTO, loginId).toString());
+      UpdateProfileDTO result = userService.update(updateProfileDTO, loginId, profileImage);
+      model.addAttribute("profile", result);
     } catch (Exception e) {
       log.error("회원 정보 수정 실패");
       throw new RuntimeException(e);

@@ -60,20 +60,26 @@
               <!-- Profile Tab -->
               <div id="profile" class="tab-content">
                 <div class="space-y-8">
-                  <form th:action="@{/mypage/account/profile}" method="post" id="updateForm">
+                  <form th:action="@{/mypage/account/profile}" method="post" id="updateForm" enctype="multipart/form-data">
                   <!-- Profile Image -->
                   <div>
                     <label class="block text-sm font-medium text-gray-700 mb-4"
                       >프로필 이미지</label
                     >
                     <div class="flex items-center space-x-6">
-                      <div
-                        class="w-24 h-24 bg-gray-200 rounded-full flex items-center justify-center"
-                      >
-                        <i class="fas fa-user text-3xl text-gray-400"></i>
+                      <div class="w-24 h-24 rounded-full overflow-hidden">
+                        <img th:if="${profile.profileUrl != null}" th:src="@{${profile.profileUrl}}"
+                            alt="프로필 이미지"
+                            id="profilePreview"
+                            class="w-full h-full object-cover rounded-full border" />
+                        <div th:if="${profile.profileUrl == null}" class="w-24 h-24 bg-gray-200 rounded-full flex items-center justify-center"
+                          id="defaultIcon">
+                          <i class="fas fa-user text-3xl text-gray-400"></i>
+                        </div>
                       </div>
+
                       <div class="space-y-3">
-                        <input type="file" name="profileUrl" class="hidden" accept=".jpg,.png" />
+                        <input type="file" id="profileImageInput" name="profileImage" accept=".jpg,.png" class="hidden" />
                         <button
                                 type="button"
                                 id="bt_profile"
@@ -397,6 +403,33 @@
     <!-- Footer Fragment -->
     <div th:replace="~{fragments/footer :: footer}"></div>
     <script>
+
+      document.getElementById("profileImageInput").addEventListener("change", function () {
+        const file = this.files[0];
+        if (file) {
+          const reader = new FileReader();
+          reader.onload = function (e) {
+            const previewImg = document.getElementById("profilePreview");
+            const defaultIcon = document.getElementById("defaultIcon");
+
+            if (previewImg) {
+              previewImg.src = e.target.result;
+            } else {
+              // 기존 아이콘을 이미지로 교체
+              const newImg = document.createElement("img");
+              newImg.id = "profilePreview";
+              newImg.src = e.target.result;
+              newImg.className = "w-full h-full object-cover rounded-full border";
+
+              defaultIcon.replaceWith(newImg);
+            }
+          };
+          reader.readAsDataURL(file);
+        }
+      });
+
+
+
       // 프로필 이미지 버튼 → 파일 input 클릭
       document.getElementById("bt_profile").addEventListener("click", function () {
         this.previousElementSibling.click();

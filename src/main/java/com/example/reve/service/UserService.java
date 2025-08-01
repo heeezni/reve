@@ -1,5 +1,7 @@
 package com.example.reve.service;
 
+import java.io.IOException;
+
 import org.springframework.dao.DuplicateKeyException;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -8,6 +10,7 @@ import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.multipart.MultipartFile;
 
 import com.example.reve.domain.CustomUserDetails;
 import com.example.reve.domain.User;
@@ -27,6 +30,7 @@ public class UserService implements UserDetailsService { // UserDetailsService �
   private final UserRepository userRepository;
   private final PasswordEncoder passwordEncoder;
   private final CouponService couponService;
+  private final ProfileUrlService profileUrlService;
 
   /**
    * 회원 가입 서비스
@@ -112,13 +116,31 @@ public class UserService implements UserDetailsService { // UserDetailsService �
    * @param updateProfileDTO (프로필 사진, 이름, 닉네임, 이메일, 생일,휴대폰 번호)
    * @return user
    */
-  public UpdateProfileDTO update(UpdateProfileDTO updateProfileDTO, String loginId) {
+  public UpdateProfileDTO update(
+      UpdateProfileDTO updateProfileDTO, String loginId, MultipartFile profileImg) {
     // 로그인 아이디가 같은 회원
     User user = userRepository.findByLoginId(loginId).orElseThrow();
+    log.info("profile image : {}", profileImg);
+
+    if (profileImg != null && !profileImg.isEmpty()) {
+      try {
+        if (user.getProfileUrl() != null) {
+          profileUrlService.deleteProfileImage(user.getProfileUrl());
+        }
+        // 파일 저장
+        String userIdStr = Long.toString(user.getUserId());
+        log.info("userIdStr : {}", userIdStr);
+        String saveUrl = profileUrlService.saveProfileImage(profileImg, "profile", userIdStr);
+        log.info("saveUrl : {}", saveUrl);
+        // 프로필 사진 경로
+        user.setProfileUrl(saveUrl);
+      } catch (IOException e) {
+        throw new RuntimeException(e);
+      }
+    }
+
     // 이름
     user.setName(updateProfileDTO.getName());
-    // 프로필 사진 경로
-    user.setProfileUrl(updateProfileDTO.getProfileUrl());
     // 생일
     user.setBirthday(updateProfileDTO.getBirthday());
     // 휴대폰 번호
