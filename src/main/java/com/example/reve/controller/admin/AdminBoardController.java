@@ -20,7 +20,6 @@ import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 import com.example.reve.domain.Notice;
 import com.example.reve.dto.NoticeReqDTO;
 import com.example.reve.dto.QnaResDTO;
-import com.example.reve.repository.UserRepository;
 import com.example.reve.service.NoticeService;
 import com.example.reve.service.QnaService;
 
@@ -34,7 +33,6 @@ import lombok.extern.slf4j.Slf4j;
 public class AdminBoardController {
 
   private final QnaService qnaService;
-  private final UserRepository userRepository;
   private final NoticeService noticeService;
 
   @GetMapping("/notice/register")
@@ -44,7 +42,7 @@ public class AdminBoardController {
   }
 
   @GetMapping("/notice/edit/{noticeId}")
-  public String noticeEditForm(@PathVariable Long noticeId, Model model, Principal principal) {
+  public String noticeEditForm(@PathVariable Long noticeId, Model model) {
     try {
       Notice notice = noticeService.getNoticeById(noticeId);
       model.addAttribute("notice", notice);
@@ -125,7 +123,7 @@ public class AdminBoardController {
       }
       qnaService.addAnswer(qnaId, answerContent, principal);
       return "redirect:/board/qna/detail/" + qnaId;
-    } catch (IllegalAccessException | IllegalArgumentException e) {
+    } catch (IllegalArgumentException e) {
       return "redirect:/error"; // 권한 없음 페이지 또는 에러 페이지로 리다이렉트
     }
   }
@@ -141,7 +139,7 @@ public class AdminBoardController {
       }
       qnaService.updateAnswer(qnaId, answerContent, principal);
       return "redirect:/board/qna/detail/" + qnaId;
-    } catch (IllegalAccessException | IllegalArgumentException e) {
+    } catch (IllegalArgumentException e) {
       return "redirect:/error";
     }
   }
@@ -151,7 +149,7 @@ public class AdminBoardController {
     try {
       qnaService.deleteAnswer(qnaId, principal);
       return "redirect:/board/qna/detail/" + qnaId;
-    } catch (IllegalAccessException | IllegalArgumentException e) {
+    } catch (IllegalArgumentException e) {
       return "redirect:/error";
     }
   }

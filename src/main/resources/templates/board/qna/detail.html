@@ -1,6 +1,7 @@
 <!DOCTYPE html>
 <html lang="ko" xmlns:th="http://www.thymeleaf.org">
   <head th:replace="~{fragments/header :: head(title=${qna.title} + ' | Rêve')}">
+    <title>Loading...</title>
   </head>
   <body class="font-sans text-gray-800">
     <!-- Header Fragment -->
@@ -24,9 +25,10 @@
           </nav>
 
           <!-- Access Denied Message for Secret Posts -->
-          <div th:if="${qna.isSecret and !isAuthor and !isAdmin}" class="bg-red-100 border-l-4 border-red-500 text-red-700 p-4 mb-6" role="alert">
+          <div th:if="${accessDenied}" class="bg-red-100 border-l-4 border-red-500 text-red-700 p-4 mb-6" role="alert">
             <p class="font-bold">접근 권한 없음</p>
-            <p>이 게시글은 비밀글입니다. 작성자 또는 관리자만 열람할 수 있습니다.</p>
+            <p th:if="${qna.isSecret}">이 게시글은 비밀글입니다. 작성자 또는 관리자만 열람할 수 있습니다.</p>
+            <p th:unless="${qna.isSecret}">이 게시글은 로그인한 사용자만 열람할 수 있습니다. <a th:href="@{/member/login}" class="font-bold underline">로그인</a> 해주세요.</p>
           </div>
 
           <!-- Question Section -->

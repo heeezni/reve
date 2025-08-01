@@ -13,6 +13,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.web.PageableDefault;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Controller;
@@ -87,17 +88,13 @@ public class BoardController {
 
     // sort 파라미터 파싱
     Sort sortObj;
-    if (sort.equals("createdAt,desc")) {
-      sortObj =
-          Sort.by(Sort.Direction.DESC, "important").and(Sort.by(Sort.Direction.DESC, "createdAt"));
-    } else if (sort.equals("hit,desc")) {
+    if (sort.equals("hit,desc")) {
       sortObj = Sort.by(Sort.Direction.DESC, "important").and(Sort.by(Sort.Direction.DESC, "hit"));
     } else if (sort.equals("title,asc")) {
       sortObj = Sort.by(Sort.Direction.DESC, "important").and(Sort.by(Sort.Direction.ASC, "title"));
-    } else {
+    } else { // "createdAt,desc"이거나 다른 값일 경우
       sortObj =
-          Sort.by(Sort.Direction.DESC, "important")
-              .and(Sort.by(Sort.Direction.DESC, "createdAt")); // 기본 정렬
+          Sort.by(Sort.Direction.DESC, "important").and(Sort.by(Sort.Direction.DESC, "createdAt"));
     }
 
     Pageable sortedPageable =
@@ -190,70 +187,53 @@ public class BoardController {
   }
 
   @GetMapping("/qna/detail/{qnaId}")
-  public String qnaDetail(@PathVariable Long qnaId, Model model, Principal principal) {
+  public String qnaDetail(@PathVariable Long qnaId, Model model, Principal principal)
+      throws AccessDeniedException {
     log.info("qnaDetail: Accessing Q&A with ID: {}", qnaId); // Q&A ID 로깅
-    try {
-      // 비밀번호 없이 조회를 시도. 공개글이거나 관리자면 성공.
-      QnaResDTO qna = qnaService.getQnaById(qnaId, principal);
-      model.addAttribute("qna", qna);
+    // try-catch 블록 제거
+    QnaResDTO qna = qnaService.getQnaById(qnaId, principal);
+    model.addAttribute("qna", qna);
 
-      // 현재 로그인한 사용자 정보 확인
-      boolean isAuthor = false;
-      boolean isAdmin = false;
+    // 현재 로그인한 사용자 정보 확인
+    boolean isAuthor = false;
+    boolean isAdmin = false;
 
-      log.info("qnaDetail: Principal is null: {}", (principal == null)); // Principal null 여부
-      if (principal != null) {
-        String loggedInUsername = principal.getName();
-        log.info("qnaDetail: Logged-in username: {}", loggedInUsername); // 로그인한 사용자 이름
-        User loggedInUser = userRepository.findByLoginId(loggedInUsername).orElse(null);
-        log.info(
-            "qnaDetail: Found loggedInUser: {}",
-            (loggedInUser != null ? loggedInUser.getLoginId() : "null")); // 조회된 사용자 ID
+    log.info("qnaDetail: Principal is null: {}", (principal == null)); // Principal null 여부
+    if (principal != null) {
+      String loggedInUsername = principal.getName();
+      log.info("qnaDetail: Logged-in username: {}", loggedInUsername); // 로그인한 사용자 이름
+      User loggedInUser = userRepository.findByLoginId(loggedInUsername).orElse(null);
+      log.info(
+          "qnaDetail: Found loggedInUser: {}",
+          (loggedInUser != null ? loggedInUser.getLoginId() : "null")); // 조회된 사용자 ID
 
-        if (loggedInUser != null) {
-          // 작성자 확인
-          log.info("qnaDetail: Qna userName: {}", qna.getUserName()); // Q&A 작성자 이름
-          if (qna.getUserName() != null && qna.getUserName().equals(loggedInUser.getName())) {
-            isAuthor = true;
-            log.info("qnaDetail: User is author."); // 작성자 일치
-          } else {
-            log.info(
-                "qnaDetail: User is NOT author. Qna userName: {}, LoggedInUser name: {}",
-                qna.getUserName(),
-                loggedInUser.getName()); // 작성자 불일치
-          }
-          // 관리자 확인
-          if (loggedInUser.getRole().equals(Role.ADMIN)) {
-            isAdmin = true;
-            log.info("qnaDetail: User is admin."); // 관리자 일치
-          } else {
-            log.info(
-                "qnaDetail: User is NOT admin. User role: {}", loggedInUser.getRole()); // 관리자 불일치
-          }
+      if (loggedInUser != null) {
+        // 작성자 확인
+        log.info("qnaDetail: Qna userName: {}", qna.getUserName()); // Q&A 작성자 이름
+        if (qna.getUserName() != null && qna.getUserName().equals(loggedInUser.getName())) {
+          isAuthor = true;
+          log.info("qnaDetail: User is author."); // 작성자 일치
+        } else {
+          log.info(
+              "qnaDetail: User is NOT author. Qna userName: {}, LoggedInUser name: {}",
+              qna.getUserName(),
+              loggedInUser.getName()); // 작성자 불일치
+        }
+        // 관리자 확인
+        if (loggedInUser.getRole().equals(Role.ADMIN)) {
+          isAdmin = true;
+          log.info("qnaDetail: User is admin."); // 관리자 일치
+        } else {
+          log.info(
+              "qnaDetail: User is NOT admin. User role: {}", loggedInUser.getRole()); // 관리자 불일치
         }
       }
-      model.addAttribute("isAuthor", isAuthor);
-      model.addAttribute("isAdmin", isAdmin);
-      log.info("qnaDetail: isAuthor: {}, isAdmin: {}", isAuthor, isAdmin); // 최종 isAuthor, isAdmin 값
-
-      return "board/qna/detail";
-    } catch (IllegalAccessException e) {
-      log.error(
-          "qnaDetail: IllegalAccessException for Q&A ID {}: {}", qnaId, e.getMessage()); // 에러 로깅
-      // 비밀글이고 권한이 없으면 접근 거부 메시지를 표시하도록 모델에 플래그 추가
-      model.addAttribute("accessDenied", true);
-      // 최소한의 QnaResDTO 객체를 생성하여 isSecret을 true로 설정 (템플릿 조건 처리를 위함)
-      QnaResDTO dummyQna = new QnaResDTO();
-      dummyQna.setIsSecret(true);
-      model.addAttribute("qna", dummyQna);
-      model.addAttribute("qnaId", qnaId); // qnaId도 함께 전달
-      model.addAttribute("isAuthor", false); // 접근 권한이 없으므로 false
-      model.addAttribute("isAdmin", false); // 접근 권한이 없으므로 false
-      return "board/qna/detail";
-    } catch (IllegalArgumentException e) {
-      model.addAttribute("errorMessage", e.getMessage());
-      return "common/error";
     }
+    model.addAttribute("isAuthor", isAuthor);
+    model.addAttribute("isAdmin", isAdmin);
+    log.info("qnaDetail: isAuthor: {}, isAdmin: {}", isAuthor, isAdmin); // 최종 isAuthor, isAdmin 값
+
+    return "board/qna/detail";
   }
 
   // Q&A 삭제 API
@@ -263,7 +243,7 @@ public class BoardController {
     try {
       qnaService.deleteQna(qnaId, principal);
       return ResponseEntity.ok().body("Q&A가 성공적으로 삭제되었습니다.");
-    } catch (IllegalAccessException | IllegalArgumentException e) {
+    } catch (IllegalArgumentException e) {
       return ResponseEntity.badRequest().body("Q&A 삭제 실패: " + e.getMessage());
     } catch (IOException e) {
       return ResponseEntity.status(500).body("파일 삭제 중 오류가 발생했습니다: " + e.getMessage());
@@ -280,15 +260,10 @@ public class BoardController {
 
   @GetMapping("/qna/edit/{qnaId}")
   public String editQnaForm(@PathVariable Long qnaId, Model model, Principal principal) {
-    try {
-      QnaResDTO qna = qnaService.getQnaById(qnaId, principal);
-      model.addAttribute("qna", qna);
-      model.addAttribute("perfumes", perfumeService.getAllPerfumes());
-      return "board/qna/edit";
-    } catch (IllegalAccessException e) {
-      model.addAttribute("errorMessage", e.getMessage());
-      return "common/error";
-    }
+    QnaResDTO qna = qnaService.getQnaById(qnaId, principal);
+    model.addAttribute("qna", qna);
+    model.addAttribute("perfumes", perfumeService.getAllPerfumes());
+    return "board/qna/edit";
   }
 
   @PostMapping("/qna/edit/{qnaId}")
@@ -307,7 +282,7 @@ public class BoardController {
     try {
       qnaService.updateQna(qnaId, reqDto, principal);
       return "redirect:/board/qna/detail/" + qnaId;
-    } catch (IOException | IllegalAccessException e) {
+    } catch (IOException e) {
       redirectAttributes.addFlashAttribute("errorMessage", e.getMessage());
       return "redirect:/board/qna/edit/" + qnaId;
     }
