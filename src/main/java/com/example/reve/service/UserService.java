@@ -26,6 +26,7 @@ public class UserService implements UserDetailsService { // UserDetailsService �
 
   private final UserRepository userRepository;
   private final PasswordEncoder passwordEncoder;
+  private final CouponService couponService;
 
   /**
    * 회원 가입 서비스
@@ -104,7 +105,8 @@ public class UserService implements UserDetailsService { // UserDetailsService �
    * @param updateProfileDTO (프로필 사진, 이름, 닉네임, 이메일, 생일,휴대폰 번호)
    * @return user
    */
-  public UpdateProfileDTO update(UpdateProfileDTO updateProfileDTO, String loginId) {
+  public UpdateProfileDTO update(
+      UpdateProfileDTO updateProfileDTO, CouponByBirthdayDTO couponByBirthdayDTO, String loginId) {
     // 로그인 아이디가 같은 회원
     User user = userRepository.findByLoginId(loginId).orElseThrow();
     // 이름
@@ -119,6 +121,10 @@ public class UserService implements UserDetailsService { // UserDetailsService �
     log.info("회원 정보 변경 : {}", user);
     // 수정하기
     userRepository.save(user);
+    // 생일 등록 시 생일쿠폰 발급
+    if (updateProfileDTO.getBirthday() != null) {
+            couponService.birthdayCoupon(couponByBirthdayDTO, user);
+    }
     return userRepository.findUserUpdate(loginId);
   }
 

@@ -10,6 +10,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 
 import com.example.reve.domain.CustomUserDetails;
+import com.example.reve.dto.CouponByBirthdayDTO;
 import com.example.reve.dto.NewPasswordDTO;
 import com.example.reve.dto.UpdateProfileDTO;
 import com.example.reve.service.UserService;
@@ -37,12 +38,6 @@ public class MypageController {
     }
   }
 
-  @GetMapping("/coupons")
-  public String cupons() {
-    return "user/mypage/coupons";
-  }
-
-  // 쿠폰 목록
   @GetMapping("/wishlist")
   public String wishlist() {
     return "user/mypage/wishlist";
@@ -51,6 +46,12 @@ public class MypageController {
   @GetMapping("/order")
   public String mypageOrder() {
     return "user/mypage/order";
+  }
+
+  // 쿠폰 목록
+  @GetMapping("/coupons")
+  public String cupons() {
+    return "user/mypage/coupons";
   }
 
   @GetMapping("/account")
@@ -71,14 +72,18 @@ public class MypageController {
   @PostMapping("/account/profile")
   public String updateProfile(
       UpdateProfileDTO updateProfileDTO,
+      CouponByBirthdayDTO couponByBirthdayDTO,
       Model model,
       @AuthenticationPrincipal CustomUserDetails customUserDetails) {
     log.info("회원 정보 수정 컨트롤러 호출");
     try {
       // 수정된 회원 정보 가져오기
       String loginId = customUserDetails.getUsername();
-      model.addAttribute("profile", userService.update(updateProfileDTO, loginId));
-      log.info("회원 정보 수정 성공 : {}", userService.update(updateProfileDTO, loginId).toString());
+      model.addAttribute(
+          "profile", userService.update(updateProfileDTO, couponByBirthdayDTO, loginId));
+      log.info(
+          "회원 정보 수정 성공 : {}",
+          userService.update(updateProfileDTO, couponByBirthdayDTO, loginId).toString());
     } catch (Exception e) {
       log.error("회원 정보 수정 실패");
       throw new RuntimeException(e);

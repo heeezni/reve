@@ -33,7 +33,7 @@ public class Coupon extends BaseEntity {
   @Column(nullable = false)
   private LocalDate validFrom;
 
-  //발급 날짜
+  // 발급 날짜
   @Column(nullable = false)
   private LocalDate issuedAt;
 
