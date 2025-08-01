@@ -27,6 +27,10 @@ public class Review extends BaseEntity {
   @Column(nullable = false)
   private Double rating;
 
+  // 리뷰 이미지 URL
+  @Column(name = "image_url")
+  private String imageUrl;
+
   // 관계 설정
   // 유저와의 관게 (N : 1)
   @ManyToOne(fetch = FetchType.LAZY)

@@ -1,5 +1,6 @@
 <!DOCTYPE html>
-<html lang="ko" xmlns:th="http://www.thymeleaf.org">
+<html lang="ko" xmlns:th="http://www.thymeleaf.org"
+      xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
   <head th:replace="~{fragments/header :: head}">
     <title></title>
   </head>
@@ -26,7 +27,7 @@
             </ol>
 
             <!-- 오른쪽: 수정 삭제 버튼 -->
-            <div class="space-x-2 flex items-center">
+            <div class="space-x-2 flex items-center" sec:authorize="hasRole('ADMIN')">
               <a th:href="@{/admin/shop/edit/{perfumeId}(perfumeId=${perfume.perfumeId})}"
                  class="px-6 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition text-base">
                 수정
@@ -67,10 +68,10 @@
                     </span>
                   </div>
 
-                  <!-- Zoom Button -->
-                  <button
-                    class="absolute top-4 right-4 w-10 h-10 bg-white rounded-full flex items-center justify-center shadow-md hover:bg-gray-50 transition-colors"
-                  >
+                  <!-- 줌 버튼 -->
+                  <button id="zoomButton"
+                          class="absolute top-4 right-4 w-10 h-10 bg-white rounded-full flex items-center justify-center shadow-md hover:bg-gray-50 transition-colors"
+                          th:attr="data-image=@{${perfume.hoverImageUrl}}">
                     <i class="fas fa-search-plus text-gray-600"></i>
                   </button>
                 </div>
@@ -138,7 +139,7 @@
                   <!-- 상품명 -->
                   <h1 class="text-3xl font-bold text-gray-800 mb-2" th:text="${perfume.perfumeName + ' ' + perfume.volume}">
                   </h1>
-                  <p class="text-lg text-gray-600" th:text="${perfume.description}"></p>
+                  <p class="text-lg text-gray-600" th:text="${perfume.descriptionTitle}"></p>
                 </div>
 
                 <!-- Rating and Reviews -->
@@ -219,7 +220,9 @@
                   </div>
 
                   <!-- 수량 선택과 총 금액을 감싸는 영역 -->
-                  <div class="product-section" th:data-unit-price="${perfume.price - perfume.discount}">
+                  <div class="product-section"
+                       th:data-unit-price="${perfume.price - perfume.discount}"
+                       th:data-stock="${perfume.stock}">
                     <!-- 수량 선택 -->
                     <div>
                       <label class="block text-sm font-medium text-gray-700 mb-2">수량</label>
@@ -240,6 +243,7 @@
                           <i class="fas fa-plus text-gray-600"></i>
                         </button>
                       </div>
+                      <p class="stock-warning text-red-600 text-sm mt-2 hidden">현재 재고보다 많습니다</p>
                     </div>
 
                     <!-- 총 상품금액 -->
@@ -254,7 +258,9 @@
                 <!-- Action Buttons -->
                 <div class="flex space-x-3">
                   <button
-                    class="flex-1 bg-gray-800 text-white py-4 px-6 rounded-md hover:bg-gray-700 transition-colors font-medium"
+                          id="addToCartBtn"
+                          th:data-product-id="${perfume.perfumeId}"
+                          class="flex-1 bg-gray-800 text-white py-4 px-6 rounded-md hover:bg-gray-700 transition-colors font-medium"
                   >
                     <i class="fas fa-shopping-cart mr-2"></i>
                     장바구니 담기
@@ -272,14 +278,24 @@
                   class="flex items-center justify-between pt-4 border-t border-gray-200"
                 >
                   <div class="flex space-x-4">
+                    <!-- 찜하기 버튼 -->
+                    <form th:action="@{/wishlist/toggle}" method="post"
+                          onsubmit="checkLoginBeforeSubmit(event)">
+                      <input type="hidden" name="perfumeId" th:value="${perfume.perfumeId}" />
+                      <input type="hidden" id="isLoggedIn" th:value="${isLoggedIn}" />
+                      <button type="submit"
+                              class="flex items-center space-x-2 text-gray-600 hover:text-gray-800 transition-colors"
+                              style="all: unset; cursor: pointer;"
+                      >
+                        <i class="text-lg" th:class="${isWished} ? 'fas fa-heart text-red-500' : 'far fa-heart'"></i>
+                        <span class="text-sm">찜하기</span>
+                      </button>
+                    </form>
+
+                    <!-- 공유하기 버튼 -->
                     <button
-                      class="flex items-center space-x-2 text-gray-600 hover:text-gray-800 transition-colors"
-                    >
-                      <i class="far fa-heart text-lg"></i>
-                      <span class="text-sm">찜하기</span>
-                    </button>
-                    <button
-                      class="flex items-center space-x-2 text-gray-600 hover:text-gray-800 transition-colors"
+                            class="flex items-center space-x-2 text-gray-600 hover:text-gray-800 transition-colors"
+                            onclick="copyToClipboard()"
                     >
                       <i class="fas fa-share-alt text-lg"></i>
                       <span class="text-sm">공유하기</span>
@@ -328,23 +344,12 @@
                 <div class="space-y-8">
                   <!-- Product Description -->
                   <div>
-                    <h3 class="text-xl font-semibold text-gray-800 mb-4" th:text="${perfume.description}">
-                      상품 설명
+                    <h3 class="text-xl font-semibold text-gray-800 mb-4" th:text="${perfume.descriptionTitle}">
+                      향수 한 줄 소개
                     </h3>
                     <div class="prose max-w-none text-gray-600">
-                      <p class="mb-4">
-                        봄의 설렘을 담은 플로럴 향기, 디어 무드 멀티 퍼퓸은
-                        당신의 일상에 특별한 순간을 선물합니다.
-                      </p>
-                      <p class="mb-4">
-                        장미, 자스민, 라벤더가 조화롭게 어우러진 이 향수는
-                        부드럽고 로맨틱한 분위기를 연출합니다. 오랜 지속력과
-                        은은한 잔향으로 하루 종일 당신만의 특별한 향기를 느낄 수
-                        있습니다.
-                      </p>
-                      <p>
-                        자연 친화적인 성분으로 제작되어 민감한 피부도 안심하고
-                        사용할 수 있습니다.
+                      <p class="mb-4" th:text="${perfume.description}" id="description">
+                        향수 설명
                       </p>
                     </div>
                   </div>
@@ -445,101 +450,70 @@
                   <!-- Review Summary -->
                   <div class="bg-gray-50 p-6 rounded-lg">
                     <div class="flex items-center justify-between mb-4">
-                      <h3 class="text-lg font-semibold text-gray-800">
-                        리뷰 요약
-                      </h3>
-                      <button class="text-sm text-blue-600 hover:underline">
+                      <h3 class="text-lg font-semibold text-gray-800">리뷰 요약</h3>
+                      <a th:href="@{/shop/review(perfumeId=${perfume.perfumeId})}"
+                         class="text-sm text-blue-600 hover:underline">
                         리뷰 작성하기
-                      </button>
+                      </a>
                     </div>
                     <div class="grid md:grid-cols-3 gap-6">
                       <div class="text-center">
-                        <div class="text-3xl font-bold text-gray-800 mb-1" th:text="${perfume.averageRating}">
+                        <div class="text-3xl font-bold text-gray-800 mb-1" th:text="${perfume.averageRating}">4.8</div>
+                        <div class="flex items-center justify-center space-x-1 mb-2">
+                          <i th:each="i : ${#numbers.sequence(1,5)}" class="text-yellow-400"
+                             th:classappend="${i <= T(java.lang.Math).round(perfume.averageRating)} ? 'fas fa-star' : 'far fa-star'"></i>
                         </div>
-                        <div
-                          class="flex items-center justify-center space-x-1 mb-2"
-                        >
-                          <i class="fas fa-star text-yellow-400"></i>
-                          <i class="fas fa-star text-yellow-400"></i>
-                          <i class="fas fa-star text-yellow-400"></i>
-                          <i class="fas fa-star text-yellow-400"></i>
-                          <i class="fas fa-star text-yellow-400"></i>
-                        </div>
-                        <div class="text-sm text-gray-600" th:text="'총 ' + ${perfume.reviewCount} + '개의 리뷰'"></div>
+                        <div class="text-sm text-gray-600" th:text="'총 ' + ${totalReviews} + '개 리뷰'">총 127개 리뷰</div>
                       </div>
                       <div class="space-y-2">
-                        <div class="flex items-center space-x-2">
-                          <span class="text-sm text-gray-600">5점</span>
+                        <div th:each="star : ${#numbers.sequence(5,1,-1)}" class="flex items-center space-x-2">
+                          <span class="text-sm text-gray-600" th:text="${star} + '점'">5점</span>
                           <div class="flex-1 bg-gray-200 rounded-full h-2">
-                            <div
-                              class="bg-yellow-400 h-2 rounded-full"
-                              style="width: 85%"
-                            ></div>
+                            <div class="bg-yellow-400 h-2 rounded-full"
+                                 th:style="|width: ${totalReviews > 0 && reviewCountsByRating.get(star) != null ? (reviewCountsByRating.get(star) * 100.0 / totalReviews) : 0}%;|"></div>
                           </div>
-                          <span class="text-sm text-gray-600">85%</span>
-                        </div>
-                        <div class="flex items-center space-x-2">
-                          <span class="text-sm text-gray-600">4점</span>
-                          <div class="flex-1 bg-gray-200 rounded-full h-2">
-                            <div
-                              class="bg-yellow-400 h-2 rounded-full"
-                              style="width: 10%"
-                            ></div>
-                          </div>
-                          <span class="text-sm text-gray-600">10%</span>
-                        </div>
-                        <div class="flex items-center space-x-2">
-                          <span class="text-sm text-gray-600">3점</span>
-                          <div class="flex-1 bg-gray-200 rounded-full h-2">
-                            <div
-                              class="bg-yellow-400 h-2 rounded-full"
-                              style="width: 3%"
-                            ></div>
-                          </div>
-                          <span class="text-sm text-gray-600">3%</span>
+                          <span class="text-sm text-gray-600" th:text="${ratingPercentMap.get(star)}">85%</span>
                         </div>
                       </div>
                     </div>
                   </div>
 
-                  <!-- Review List -->
-                  <div class="space-y-6">
+                  <div class="space-y-6" th:each="review : ${reviews}">
                     <div class="border-b border-gray-200 pb-6">
                       <div class="flex items-start justify-between mb-3">
                         <div class="flex items-center space-x-3">
                           <div class="w-10 h-10 bg-gray-300 rounded-full"></div>
                           <div>
-                            <div class="font-medium text-gray-800">김**</div>
+                            <div class="font-medium text-gray-800" th:text="${review.user.name}">김**</div>
                             <div class="flex items-center space-x-1">
-                              <i
-                                class="fas fa-star text-yellow-400 text-sm"
-                              ></i>
-                              <i
-                                class="fas fa-star text-yellow-400 text-sm"
-                              ></i>
-                              <i
-                                class="fas fa-star text-yellow-400 text-sm"
-                              ></i>
-                              <i
-                                class="fas fa-star text-yellow-400 text-sm"
-                              ></i>
-                              <i
-                                class="fas fa-star text-yellow-400 text-sm"
-                              ></i>
+                              <i th:each="i : ${#numbers.sequence(1,5)}"
+                                 th:class="${i <= review.rating} ? 'fas fa-star text-yellow-400 text-sm' : 'far fa-star text-gray-300 text-sm'"></i>
                             </div>
                           </div>
                         </div>
-                        <span class="text-sm text-gray-500">2024.01.15</span>
+                        <span class="text-sm text-gray-500" th:text="${#temporals.format(review.createdAt, 'yyyy.MM.dd')}">2024.01.15</span>
                       </div>
-                      <p class="text-gray-700 mb-3">
-                        정말 예쁜 향이에요! 봄날의 꽃향 같아서 기분이
-                        좋아집니다. 지속력도 괜찮고 포장도 예뻐요.
+                      <p class="text-gray-700 mb-3" th:text="${review.content}">
+                        정말 예쁜 향이에요! 봄날의 꽃향 같아서 기분이 좋아집니다. 지속력도 괜찮고 포장도 예뻐요.
                       </p>
-                      <div
-                        class="flex items-center space-x-4 text-sm text-gray-500"
-                      >
-                        <span>도움됨 12</span>
-                        <button class="hover:text-gray-700">답글</button>
+                      <!-- 썸네일 이미지 -->
+                      <div class="mt-2">
+                        <img th:if="${review.imageUrl != null}"
+                             th:src="@{${review.imageUrl}}"
+                             alt="리뷰 이미지"
+                             class="w-24 h-24 object-cover rounded-md cursor-pointer"
+                             onclick="openImageModal(this.src)" />
+                      </div>
+
+                      <!-- 모달 (처음엔 숨김) -->
+                      <div id="imageModal" class="fixed inset-0 bg-black bg-opacity-60 flex items-center justify-center z-50 hidden">
+                        <div class="relative">
+                          <img id="modalImage" src="" alt="확대 이미지" class="max-w-full max-h-[80vh] rounded-md shadow-lg" />
+                          <button onclick="closeImageModal()"
+                                  class="absolute top-2 right-2 text-white bg-black bg-opacity-50 rounded-full p-1 hover:bg-opacity-80">
+                            ✕
+                          </button>
+                        </div>
                       </div>
                     </div>
                   </div>
@@ -615,18 +589,21 @@
                         상품 이름
                       </h4>
                       <div class="flex items-center justify-between">
-                        <span
-                                class="font-bold text-gray-800"
-                                th:text="|${#numbers.formatInteger(perfume.price - perfume.discount, 3, 'COMMA')}원|"
-                        >
+                        <span class="font-bold text-gray-800"
+                              th:text="|${#numbers.formatInteger(perfume.price - perfume.discount, 3, 'COMMA')}원|">
                           가격
                         </span>
-                        <span
-                                class="text-sm text-gray-400 line-through"
-                                th:if="${perfume.discount > 0}"
-                                th:text="|${#numbers.formatInteger(perfume.price, 3, 'COMMA')}원|"
-                        >
+
+                        <span class="text-sm text-gray-400 line-through ml-auto"
+                              th:if="${perfume.discount > 0}"
+                              th:text="|${#numbers.formatInteger(perfume.price, 3, 'COMMA')}원|">
                           원래가격
+                        </span>
+
+                        <span class="text-xs text-red-500"
+                              th:if="${perfume.discount > 0}"
+                              th:text="${#numbers.formatDecimal((perfume.discount * 100.0) / perfume.price, 0, 0)} + '% 할인'">
+                          할인율
                         </span>
                       </div>
                     </div>
@@ -650,6 +627,17 @@
       // Image slider functionality
       const mainImage = document.getElementById('mainImage');
       const thumbnailBtns = document.querySelectorAll('.thumbnail-btn');
+
+      const p = document.getElementById("description");
+      const maxCharsPerLine = 80; // 줄마다 80자 기준
+      const originalText = p.innerText;
+      let result = "";
+
+      for (let i = 0; i < originalText.length; i += maxCharsPerLine) {
+        result += originalText.slice(i, i + maxCharsPerLine) + "<br/>";
+      }
+
+      p.innerHTML = result;
 
       const priceElem = document.getElementById('price');
       const price = parseInt(priceElem.textContent, 10);
@@ -707,16 +695,160 @@
         });
       });
 
+      function checkLoginBeforeSubmit(event) {
+        const isLoggedIn = document.getElementById("isLoggedIn").value === "true";
+        if (!isLoggedIn) {
+          event.preventDefault(); // form 제출 막기
+          document.getElementById("loginAlertModal").style.display = "flex";
+          return false;
+        }
+        return true;
+      }
+
+      function closeLoginModal() {
+        document.getElementById("loginAlertModal").style.display = "none";
+      }
+
+      // 모달창 열기
+      function openImageModal(src) {
+        const modal = document.getElementById('imageModal');
+        const modalImg = document.getElementById('modalImage');
+        modalImg.src = src;
+        modal.classList.remove('hidden');
+      }
+
+      // 모달창 닫기
+      function closeImageModal() {
+        const modal = document.getElementById('imageModal');
+        modal.classList.add('hidden');
+      }
+
+      // 줌 이미지 모달
+      document.addEventListener('DOMContentLoaded', () => {
+        const mainImage = document.getElementById('mainImage');
+        const zoomBtn = document.getElementById('zoomButton');
+        const modal = document.getElementById('zoomImageModal');
+        const modalImg = document.getElementById('zoomModalImage');
+        const closeBtn = document.getElementById('closeModal');
+
+        // 썸네일 클릭 시 메인 이미지 변경
+        document.querySelectorAll('.thumbnail-btn').forEach(btn => {
+          btn.addEventListener('click', () => {
+            const newSrc = btn.getAttribute('data-image');
+            mainImage.src = newSrc;
+
+            // 줌버튼의 data-image도 함께 바꿔주면 관리가 쉬움 (선택사항)
+            zoomBtn.setAttribute('data-image', newSrc);
+          });
+        });
+
+        // 줌 버튼 클릭 시 현재 메인 이미지 확대
+        zoomBtn.addEventListener('click', () => {
+          // 여기서 data-image 속성을 읽어서 모달 이미지로 띄우기
+          const zoomSrc = zoomBtn.getAttribute('data-image') || mainImage.src;
+          modalImg.src = zoomSrc;
+          modal.classList.remove('hidden');
+        });
+
+        // 모달 닫기 버튼 클릭
+        closeBtn.addEventListener('click', () => {
+          modal.classList.add('hidden');
+          modalImg.src = '';
+        });
+
+        // 모달 외부 클릭 시 닫기
+        modal.addEventListener('click', (e) => {
+          if (e.target === modal) {
+            modal.classList.add('hidden');
+            modalImg.src = '';
+          }
+        });
+      });
+
+      function animateAddToCart() {
+        // 메인 이미지에서 애니메이션용 이미지 복제
+        const $mainImage = $('#mainImage');
+        const $cartIcon = $('#cart-count').parent(); // 장바구니 아이콘 <a> 태그 선택
+
+        if ($mainImage.length === 0 || $cartIcon.length === 0) {
+          console.warn('필요한 요소가 존재하지 않습니다.');
+          return;
+        }
+
+        // 이미지 위치 및 크기 정보
+        const imgOffset = $mainImage.offset();
+        const imgWidth = $mainImage.width();
+        const imgHeight = $mainImage.height();
+
+        // 카트 아이콘 위치
+        const cartOffset = $cartIcon.offset();
+
+        // 복제 이미지 생성
+        const $flyImg = $mainImage.clone()
+                .css({
+                  position: 'absolute',
+                  top: imgOffset.top,
+                  left: imgOffset.left,
+                  width: imgWidth,
+                  height: imgHeight,
+                  borderRadius: '10px',
+                  zIndex: 1000,
+                  pointerEvents: 'none',
+                  opacity: 0.8,
+                  transition: 'all 0.8s ease-in-out',
+                })
+                .appendTo('body');
+
+        // 애니메이션 시작 (이미지 크기 줄이고 카트 위치로 이동)
+        setTimeout(() => {
+          $flyImg.css({
+            top: cartOffset.top + 10,    // 약간 여유를 줌
+            left: cartOffset.left + 10,
+            width: 30,
+            height: 30,
+            opacity: 0,
+          });
+        }, 10);
+
+        // 애니메이션 종료 후 제거
+        $flyImg.on('transitionend', () => {
+          $flyImg.remove();
+        });
+      }
+
+      $(document).ready(function() {
+        $('#addToCartBtn').on('click', function(e) {
+          e.preventDefault();
+          const productId = $(this).data('product-id');
+          $.ajax({
+            type: 'POST',
+            url: '/cart/add',
+            data: JSON.stringify({ perfumeId: productId, quantity: 1 }),
+            contentType: 'application/json',
+            success: function(response) {
+              $('#cart-count').text(response.cartItemCount);
+              animateAddToCart();
+            },
+            error: function(err) {
+              alert('장바구니 추가 실패: ' + err.responseText);
+              console.log("productId 확인:", productId);
+            }
+          });
+        });
+      });
+
       document.addEventListener('DOMContentLoaded', () => {
         // 수량 줄이기
         document.querySelectorAll('.decreaseQty').forEach(btn => {
           btn.addEventListener('click', () => {
             const section = btn.closest('.product-section');
             const input = section.querySelector('.quantityInput');
+            const warning = section.querySelector('.stock-warning');
             let qty = parseInt(input.value) || 1;
             if (qty > 1) {
               input.value = qty - 1;
               updateTotal(section);
+              warning.classList.add('hidden');
             }
           });
         });
@@ -725,11 +857,16 @@
         document.querySelectorAll('.increaseQty').forEach(btn => {
           btn.addEventListener('click', () => {
             const section = btn.closest('.product-section');
+            const stock = parseInt(section.dataset.stock);
             const input = section.querySelector('.quantityInput');
+            const warning = section.querySelector('.stock-warning');
             let qty = parseInt(input.value) || 1;
-            if (qty < 99) {
+            if (qty < stock) {
               input.value = qty + 1;
               updateTotal(section);
+              warning.classList.add('hidden');
+            } else {
+              warning.classList.remove('hidden');
             }
           });
         });
@@ -738,6 +875,18 @@
         document.querySelectorAll('.quantityInput').forEach(input => {
           input.addEventListener('input', () => {
             const section = input.closest('.product-section');
+            const warning = section.querySelector('.stock-warning');
+            const stock = parseInt(section.dataset.stock);
+            let qty = parseInt(input.value) || 1;
+
+            if (qty > stock) {
+              warning.classList.remove('hidden'); // 경고 메시지 보이기
+              input.value = stock; // 재고 수량으로 자동 보정
+              qty = stock;
+            } else {
+              warning.classList.add('hidden'); // 경고 메시지 숨기기
+            }
+
             updateTotal(section);
           });
         });
@@ -751,6 +900,26 @@
           display.textContent = total.toLocaleString() + '원';
         }
       });
+
+      // 공유하기 버튼
+      function copyToClipboard() {
+        const url = window.location.href;
+        navigator.clipboard.writeText(url)
+                .then(() => showToast("링크가 복사되었습니다!"))
+                .catch(() => showToast("복사에 실패했습니다."));
+      }
+
+      function showToast(message) {
+        const toast = document.getElementById('toast');
+        toast.textContent = message;
+        toast.style.visibility = 'visible';
+        toast.style.opacity = '1';
+
+        setTimeout(() => {
+          toast.style.opacity = '0';
+          toast.style.visibility = 'hidden';
+        }, 2000); // 2초 후 사라짐
+      }
 
       // Wishlist functionality
       const wishlistBtn = document.querySelector('.fa-heart').parentElement;
@@ -767,5 +936,51 @@
         }
       });
     </script>
+    <!-------------------------------- 여기는 그냥 모달 배경 스타일 지정해주는 곳임.   --------------------------------->
+    <!-- 모달 배경 및 창 -->
+    <div id="loginAlertModal" style="
+      position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+      background: rgba(0, 0, 0, 0.4); display: none;
+      align-items: center; justify-content: center; z-index: 1000;">
+      <div style="
+        background: white; padding: 30px; border-radius: 10px;
+        font-size: 16px; text-align: center; box-shadow: 0 5px 20px rgba(0,0,0,0.2);">
+        로그인이 필요한 기능입니다.
+        <br/><br/>
+        <button onclick="closeLoginModal()" style="
+          background: #ef4444; color: white; border: none;
+          padding: 10px 20px; border-radius: 6px; cursor: pointer;">
+              닫기
+        </button>
+      </div>
+    </div>
+
+    <div id="toast" style="
+      visibility: hidden;
+      min-width: 200px;
+      background-color: #4ade80; /* 연한 초록 */
+      color: white;
+      text-align: center;
+      border-radius: 8px;
+      padding: 12px;
+      position: fixed;
+      z-index: 10000;
+      left: 50%;
+      bottom: 30px;
+      font-size: 14px;
+      transform: translateX(-50%);
+      box-shadow: 0 2px 8px rgba(0,0,0,0.2);
+      transition: visibility 0s, opacity 0.5s linear;
+      opacity: 0;
+    "></div>
+
+    <!-- 이미지 확대 모달 -->
+    <div id="zoomImageModal" class="fixed inset-0 bg-black bg-opacity-70 flex items-center justify-center z-50 hidden">
+      <div class="relative">
+        <img id="zoomModalImage" src="" alt="확대 이미지" class="max-w-4xl max-h-[80vh] rounded-lg shadow-lg" />
+        <button id="closeModal" class="absolute top-2 right-2 text-white text-2xl">&times;</button>
+      </div>
+    </div>
+
   </body>
 </html>

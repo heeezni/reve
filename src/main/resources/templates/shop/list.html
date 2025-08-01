@@ -19,7 +19,7 @@
             </div>
 
             <!-- 관리자용 버튼 영역 -->
-            <div class="space-x-2">
+            <div class="space-x-2" th:if="${#authentication != null and #authorization.expression('hasRole(''ADMIN'')')}">
               <a
                       href="/admin/shop/regist"
                       class="px-4 py-2 bg-blue-600 text-white text-sm rounded-md hover:bg-blue-700 transition"
@@ -172,7 +172,7 @@
                   <a th:href="@{'/shop/detail?id=' + ${perfume.perfumeId}}" th:text="${perfume.perfumeName}">상품명</a>
                 </h3>
 
-                <p class="text-sm text-gray-600 mb-3" th:text="${perfume.description}">
+                <p class="text-sm text-gray-600 mb-3" th:text="${perfume.descriptionTitle}">
                   향 설명
                 </p>
 
