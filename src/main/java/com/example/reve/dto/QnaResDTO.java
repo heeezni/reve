@@ -6,7 +6,9 @@ import com.example.reve.domain.Qna;
 
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import lombok.Setter;
 
+@Setter
 @Getter
 @NoArgsConstructor
 public class QnaResDTO {
@@ -15,10 +17,12 @@ public class QnaResDTO {
   private String content;
   private String answer;
   private Boolean isSecret;
+  private Boolean isAnswered;
   private String category;
   private String attachment;
   private String userName;
   private String perfumeName;
+  private Long perfumeId; // 상품 ID
   private LocalDateTime createdAt;
   private LocalDateTime updatedAt;
   private Long prevQnaId; // 이전 글 ID
@@ -30,10 +34,12 @@ public class QnaResDTO {
     this.content = qna.getContent();
     this.answer = qna.getAnswer();
     this.isSecret = qna.getIsSecret();
+    this.isAnswered = qna.getAnswer() != null && !qna.getAnswer().trim().isEmpty();
     this.category = qna.getCategory();
     this.attachment = qna.getAttachment();
     this.userName = (qna.getUser() != null) ? qna.getUser().getName() : "비회원";
     this.perfumeName = qna.getPerfume().getPerfumeName();
+    this.perfumeId = qna.getPerfume().getPerfumeId();
     this.createdAt = qna.getCreatedAt();
     this.updatedAt = qna.getUpdatedAt();
   }

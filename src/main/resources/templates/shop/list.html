@@ -19,7 +19,7 @@
             </div>
 
             <!-- 관리자용 버튼 영역 -->
-            <div class="space-x-2">
+            <div class="space-x-2" th:if="${#authentication != null and #authorization.expression('hasRole(''ADMIN'')')}">
               <a
                       href="/admin/shop/regist"
                       class="px-4 py-2 bg-blue-600 text-white text-sm rounded-md hover:bg-blue-700 transition"
@@ -139,11 +139,8 @@
 
                 <!-- Quick Actions -->
                 <div class="absolute top-4 right-4 space-y-2 opacity-0 group-hover:opacity-100 transition-opacity duration-300">
-                  <button class="w-8 h-8 bg-white rounded-full flex items-center justify-center shadow-md hover:bg-gray-50 transition-colors">
+                  <button type="button" class="w-8 h-8 bg-white rounded-full flex items-center justify-center shadow-md hover:bg-gray-50 transition-colors">
                     <i class="far fa-heart text-gray-600"></i>
-                  </button>
-                  <button class="w-8 h-8 bg-white rounded-full flex items-center justify-center shadow-md hover:bg-gray-50 transition-colors">
-                    <i class="fas fa-search text-gray-600"></i>
                   </button>
                 </div>
               </div>
@@ -172,7 +169,7 @@
                   <a th:href="@{'/shop/detail?id=' + ${perfume.perfumeId}}" th:text="${perfume.perfumeName}">상품명</a>
                 </h3>
 
-                <p class="text-sm text-gray-600 mb-3" th:text="${perfume.description}">
+                <p class="text-sm text-gray-600 mb-3" th:text="${perfume.descriptionTitle}">
                   향 설명
                 </p>
 

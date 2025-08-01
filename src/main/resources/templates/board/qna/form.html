@@ -1,7 +1,6 @@
 <!DOCTYPE html>
-<html lang="ko" xmlns:th="http://www.thymeleaf.org">
-  <head th:replace="~{fragments/header :: head}">
-    <title>Q&A 작성 - Rêve</title>
+<html lang="ko" xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+  <head th:replace="~{fragments/header :: head(title='Q&A 작성 | Rêve')}">
   </head>
   <body class="font-sans text-gray-800">
     <!-- Header Fragment -->
@@ -33,13 +32,32 @@
           </div>
 
           <!-- Q&A Form -->
-          <div class="bg-white rounded-lg shadow-sm p-8">
+          <div sec:authorize="!isAuthenticated()" class="bg-white rounded-lg shadow-sm p-8 text-center">
+            <p class="text-lg text-gray-700">Q&A 작성은 회원만 가능합니다.</p>
+            <a href="/member/login" class="mt-4 inline-block px-6 py-3 bg-gray-800 text-white rounded-md hover:bg-gray-700">로그인</a>
+          </div>
+
+          <div sec:authorize="isAuthenticated()" class="bg-white rounded-lg shadow-sm p-8">
             <form id="qna-form" class="space-y-8">
               <!-- Hidden fields for IDs -->
-              <input type="hidden" id="user-id" name="loginId" th:value="${#authentication.isAuthenticated() ? #authentication.name : ''}" />
-              <input type="hidden" id="perfume-id" name="perfumeId" value="1" /> <!-- 상품 상세 페이지에서 넘어올 경우 동적으로 설정 -->
-              <!-- 로그인 상태를 나타내는 hidden input 추가 -->
-              <input type="hidden" id="is-logged-in" th:value="${#authentication.isAuthenticated() ? 'true' : 'false'}" />
+              <!-- Product Selection -->
+              <div>
+                <label
+                  for="perfume-select"
+                  class="block text-sm font-medium text-gray-700 mb-3"
+                >
+                  관련 상품 <span class="text-red-500">*</span>
+                </label>
+                <select
+                  id="perfume-select"
+                  name="perfumeId"
+                  class="w-full border border-gray-300 rounded-md px-4 py-3 focus:outline-none focus:ring-2 focus:ring-gray-800 focus:border-transparent"
+                  required
+                >
+                  <option value="">상품을 선택해주세요</option>
+                  <option th:each="perfume : ${perfumes}" th:value="${perfume.perfumeId}" th:text="${perfume.perfumeName}"></option>
+                </select>
+              </div>
 
               <!-- Category Selection -->
               <div>
@@ -189,24 +207,6 @@
                 </div>
               </div>
 
-              <!-- Password for Secret Post -->
-              <div id="password-section" style="display: none">
-                <label
-                  for="qna-password"
-                  class="block text-sm font-medium text-gray-700 mb-3"
-                >
-                  비밀번호 <span class="text-red-500">*</span>
-                </label>
-                <input
-                  type="password"
-                  id="qna-password"
-                  name="password"
-                  placeholder="비밀글의 비밀번호를 4자리 이상 입력해주세요"
-                  class="w-full border border-gray-300 rounded-md px-4 py-3 focus:outline-none focus:ring-2 focus:ring-gray-800 focus:border-transparent"
-                  minlength="4"
-                />
-              </div>
-
               <!-- Notice -->
               <div class="bg-blue-50 border-l-4 border-blue-400 p-4">
                 <div class="flex">
@@ -237,12 +237,6 @@
                   목록으로
                 </a>
                 <div class="flex space-x-3">
-                  <button
-                    type="button"
-                    class="inline-flex items-center px-6 py-3 border border-gray-300 rounded-md text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-gray-800 focus:border-transparent font-medium"
-                  >
-                    임시저장
-                  </button>
                   <button
                     type="button"
                     id="submit-qna"
@@ -432,25 +426,22 @@
       }
 
       // 비밀글 선택 시 비밀번호 필드 표시/숨김
-      const passwordSection = $('#password-section');
-      const isLoggedIn = $('#is-logged-in').val() === 'true'; // hidden input에서 값 가져오기
-
-      function updatePasswordSection() {
-        const isSecretSelected = $('input[name="isSecret"]:checked').val() === 'true';
-        if (isSecretSelected) {
-          passwordSection.show();
-        } else {
-          passwordSection.hide();
-          $('#qna-password').val(''); // 비밀번호 필드 숨길 때 값 초기화
-        }
-      }
-
-      $('input[name="isSecret"]').on('change', updatePasswordSection);
+      // const passwordSection = $('#password-section'); // 주석 처리 또는 삭제
+      // function updatePasswordSection() { // 주석 처리 또는 삭제
+      //   const isSecretSelected = $('input[name="isSecret"]:checked').val() === 'true'; // 주석 처리 또는 삭제
+      //   if (isSecretSelected) { // 주석 처리 또는 삭제
+      //     passwordSection.show(); // 주석 처리 또는 삭제
+      //   } else { // 주석 처리 또는 삭제
+      //     passwordSection.hide(); // 주석 처리 또는 삭제
+      //     $('#qna-password').val(''); // 비밀번호 필드 숨길 때 값 초기화 // 주석 처리 또는 삭제
+      //   } // 주석 처리 또는 삭제
+      // } // 주석 처리 또는 삭제
+      // $('input[name="isSecret"]').on('change', updatePasswordSection); // 주석 처리 또는 삭제
 
       // 초기 로드 시 비밀번호 섹션 상태 업데이트
       $(document).ready(function() {
         console.log("DOM 로드 완료");
-        updatePasswordSection();
+        // updatePasswordSection(); // 주석 처리 또는 삭제
 
         const submitButton = $('#submit-qna');
         console.log('submitButton :', submitButton); // 버튼 요소가 제대로 찾아졌는지 확인
@@ -461,16 +452,17 @@
           console.log('Submit button 클릭이벤트 실행'); // 클릭 이벤트 핸들러 실행 확인
 
           // 1. 폼 데이터 가져오기
-          const loginId = $('#user-id').val(); // userId 대신 loginId 가져오기
-          console.log('전송 전 loginId :', loginId);
-          const perfumeId = $('#perfume-id').val();
+          const perfumeId = $('#perfume-select').val();
           const title = $('#qna-title').val();
           const content = $('#qna-content').val();
           const isSecret = $('input[name="isSecret"]:checked').val();
-          const password = $('#qna-password').val();
           const category = $('#qna-category').val();
 
           // 2. 유효성 검사
+          if (!perfumeId) {
+            alert('관련 상품을 선택해주세요.');
+            return;
+          }
           if (!category) {
             alert('문의 분류를 선택해주세요.');
             return;
@@ -483,21 +475,12 @@
             alert('문의 내용을 입력해주세요.');
             return;
           }
-          // 비밀글일 경우 비밀번호 유효성 검사
-          if (isSecret === 'true' && password.length < 4) {
-            alert('비밀번호를 4자리 이상 입력해주세요.');
-            return;
-          }
 
           // 3. FormData 객체 생성
           const formData = new FormData();
-          if (loginId) { // loginId가 있을 경우에만 추가 (회원일 경우)
-              formData.append('loginId', loginId); // userId 대신 loginId 사용
-          }
-          formData.append('perfumeId', parseInt(perfumeId, 10));
+          formData.append('perfumeId', perfumeId);
           formData.append('title', title);
           formData.append('content', content);
-          formData.append('password', password);
           formData.append('isSecret', isSecret);
           formData.append('category', category);
 

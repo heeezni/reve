@@ -1,7 +1,6 @@
 <!DOCTYPE html>
 <html lang="ko" xmlns:th="http://www.thymeleaf.org">
-  <head th:replace="~{fragments/header :: head}">
-    <title>Q&A 상세 - Rêve</title>
+  <head th:replace="~{fragments/header :: head(title=${qna.title} + ' | Rêve')}">
   </head>
   <body class="font-sans text-gray-800">
     <!-- Header Fragment -->
@@ -24,8 +23,14 @@
             </ol>
           </nav>
 
+          <!-- Access Denied Message for Secret Posts -->
+          <div th:if="${qna.isSecret and !isAuthor and !isAdmin}" class="bg-red-100 border-l-4 border-red-500 text-red-700 p-4 mb-6" role="alert">
+            <p class="font-bold">접근 권한 없음</p>
+            <p>이 게시글은 비밀글입니다. 작성자 또는 관리자만 열람할 수 있습니다.</p>
+          </div>
+
           <!-- Question Section -->
-          <div class="bg-white rounded-lg shadow-sm p-8 mb-6">
+          <div th:unless="${qna.isSecret and !isAuthor and !isAdmin}" class="bg-white rounded-lg shadow-sm p-8 mb-6">
             <div class="border-b border-gray-200 pb-6 mb-6">
               <!-- Category and Status -->
               <div class="flex items-center space-x-3 mb-4">
@@ -51,6 +56,7 @@
                 >
                   <!-- Status -->
                 </span>
+                
                 <span
                   th:if="${qna.isSecret}"
                   class="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-gray-100 text-gray-600"
@@ -60,11 +66,32 @@
                 </span>
               </div>
 
-              <h1 class="text-2xl font-bold text-gray-800 mb-4 leading-tight"
+              <h1 class="text-2xl font-bold text-gray-800 mb-2 leading-tight"
                 th:text="${qna.title}"
               >
                 <!-- Title -->
               </h1>
+              <!-- Admin/Author Buttons -->
+              <div th:if="${(isAuthor != null && isAuthor) || (isAdmin != null && isAdmin)}" class="flex items-center justify-end space-x-2 mb-4">
+                <a
+                  th:href="@{/board/qna/edit/{qnaId}(qnaId=${qna.qnaId})}"
+                  class="inline-flex items-center px-4 py-2 bg-blue-500 text-white rounded-md hover:bg-blue-600 transition-colors font-medium text-sm"
+                >
+                  <i class="fas fa-edit mr-2"></i>
+                  수정
+                </a>
+                <button
+                  type="button"
+                  th:onclick="|deleteQna(${qna.qnaId})|"
+                  class="inline-flex items-center px-4 py-2 bg-red-500 text-white rounded-md hover:bg-red-600 transition-colors font-medium text-sm"
+                >
+                  <i class="fas fa-trash-alt mr-2"></i>
+                  삭제
+                </button>
+              </div>
+              <span th:if="${qna.perfumeName}" class="text-sm text-gray-600 mb-4">
+                관련 상품: <span class="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium bg-orange-100 text-orange-800" th:text="${qna.perfumeName}"></span>
+              </span>
 
               <!-- Question Meta -->
               <div
@@ -132,6 +159,25 @@
             </div>
           </div>
 
+          <!-- Answer Form for Admin -->
+          <div th:if="${isAdmin and qna.answer == null}" class="bg-white rounded-lg shadow-sm p-8 mb-6">
+            <h3 class="text-lg font-semibold text-gray-800 mb-4 flex items-center">
+              <i class="fas fa-reply text-purple-500 mr-2"></i>
+              답변 작성
+            </h3>
+            <form th:action="@{/admin/board/qna/{qnaId}/answer(qnaId=${qna.qnaId})}" method="post" class="space-y-4">
+              <div>
+                <label for="answerContent" class="sr-only">답변 내용</label>
+                <textarea id="answerContent" name="answerContent" rows="6" class="w-full border border-gray-300 rounded-md px-4 py-3 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent" placeholder="답변 내용을 입력하세요." required></textarea>
+              </div>
+              <div class="flex justify-end">
+                <button type="submit" class="inline-flex items-center px-6 py-3 bg-purple-600 text-white rounded-md hover:bg-purple-700 font-medium">
+                  <i class="fas fa-paper-plane mr-2"></i> 답변 등록
+                </button>
+              </div>
+            </form>
+          </div>
+
           <!-- Answer Section -->
           <div th:if="${qna.answer}" class="bg-white rounded-lg shadow-sm p-8 mb-6">
             <div class="mb-6">
@@ -141,16 +187,29 @@
                 <i class="fas fa-comment-dots text-green-500 mr-2"></i>
                 답변
               </h3>
-              <div class="flex items-center space-x-4 mb-4">
-                <div class="flex items-center space-x-2">
-                  <i class="fas fa-user-tie text-gray-600"></i>
-                  <span class="text-sm font-medium text-gray-800"
-                    >Rêve 고객센터</span
-                  >
+              <div class="flex items-center justify-between mb-4">
+                <div class="flex items-center space-x-4">
+                  <div class="flex items-center space-x-2">
+                    <i class="fas fa-user-tie text-gray-600"></i>
+                    <span class="text-sm font-medium text-gray-800"
+                      >Rêve 고객센터</span
+                    >
+                  </div>
+                  <span class="text-sm text-gray-500"
+                    th:text="${#temporals.format(qna.updatedAt, 'yyyy.MM.dd')}"
+                  ></span>
                 </div>
-                <span class="text-sm text-gray-500"
-                  th:text="${#temporals.format(qna.updatedAt, 'yyyy.MM.dd')}"
-                ></span>
+                <div th:if="${isAdmin}" class="flex space-x-2">
+                  <button type="button" onclick="editAnswer()" class="inline-flex items-center px-3 py-1 border border-gray-300 rounded-md text-sm font-medium text-gray-700 bg-white hover:bg-gray-50">
+                    <i class="fas fa-edit mr-1"></i> 수정
+                  </button>
+                  <form th:action="@{/admin/board/qna/{qnaId}/answer(qnaId=${qna.qnaId})}" method="post" onsubmit="return confirm('답변을 삭제하시겠습니까?');">
+                    <input type="hidden" name="_method" value="delete" />
+                    <button type="submit" class="inline-flex items-center px-3 py-1 bg-red-500 text-white rounded-md hover:bg-red-600 text-sm font-medium">
+                      <i class="fas fa-trash-alt mr-1"></i> 삭제
+                    </button>
+                  </form>
+                </div>
               </div>
             </div>
 
@@ -158,9 +217,30 @@
               class="bg-green-50 border-l-4 border-green-400 p-6 rounded-r-lg"
             >
               <div class="text-gray-800 leading-relaxed space-y-4">
-                <p th:text="${qna.answer}"></p>
+                <p id="answerContentDisplay" th:text="${qna.answer}"></p>
               </div>
             </div>
+          </div>
+
+          <!-- Answer Form for Admin (Edit Mode) -->
+          <div id="answerEditForm" th:if="${isAdmin and qna.answer != null}" style="display:none;" class="bg-white rounded-lg shadow-sm p-8 mb-6">
+            <h3 class="text-lg font-semibold text-gray-800 mb-4 flex items-center">
+              <i class="fas fa-reply text-purple-500 mr-2"></i>
+              답변 수정
+            </h3>
+            <form id="answerForm" th:action="@{/admin/board/qna/{qnaId}/answer(qnaId=${qna.qnaId})}" method="post" class="space-y-4">
+              <input type="hidden" name="_method" value="put" />
+              <div>
+                <label for="answerContentEdit" class="sr-only">답변 내용</label>
+                <textarea id="answerContentEdit" name="answerContent" rows="6" class="w-full border border-gray-300 rounded-md px-4 py-3 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent" required></textarea>
+              </div>
+              <div class="flex justify-end space-x-2">
+                <button type="button" onclick="cancelEdit()" class="inline-flex items-center px-6 py-3 border border-gray-300 rounded-md text-gray-700 bg-white hover:bg-gray-50 font-medium">취소</button>
+                <button type="submit" class="inline-flex items-center px-6 py-3 bg-purple-600 text-white rounded-md hover:bg-purple-700 font-medium">
+                  <i class="fas fa-save mr-2"></i> 답변 저장
+                </button>
+              </div>
+            </form>
           </div>
 
           <!-- Navigation Buttons -->
@@ -174,34 +254,6 @@
             </a>
 
             <div class="flex items-center space-x-2">
-              <!-- 수정 버튼 -->
-              <a
-                th:if="${(isAuthor != null && isAuthor) || (isAdmin != null && isAdmin)}"
-                th:href="@{/board/qna/edit/{qnaId}(qnaId=${qna.qnaId})}"
-                class="inline-flex items-center px-4 py-2 bg-blue-500 text-white rounded-md hover:bg-blue-600 transition-colors font-medium text-sm"
-              >
-                <i class="fas fa-edit mr-2"></i>
-                수정
-              </a>
-
-              <!-- 삭제 버튼 -->
-              <form
-                th:if="${(isAuthor != null && isAuthor) || (isAdmin != null && isAdmin)}"
-                th:action="@{/board/qna/{qnaId}(qnaId=${qna.qnaId})}"
-                th:method="post"
-                style="display: inline;"
-                onsubmit="return confirm('정말로 이 Q&A를 삭제하시겠습니까?');"
-              >
-                <input type="hidden" name="_method" value="delete" />
-                <button
-                  type="submit"
-                  class="inline-flex items-center px-4 py-2 bg-red-500 text-white rounded-md hover:bg-red-600 transition-colors font-medium text-sm"
-                >
-                  <i class="fas fa-trash-alt mr-2"></i>
-                  삭제
-                </button>
-              </form>
-
               <a
                 th:if="${qna.prevQnaId}"
                 th:href="@{/board/qna/detail/{qnaId}(qnaId=${qna.prevQnaId})}"
@@ -287,6 +339,22 @@
 
     <script src="/js/script.js"></script>
     <script th:inline="javascript">
+      function deleteQna(qnaId) {
+        if (confirm('정말로 이 Q&A를 삭제하시겠습니까?')) {
+          $.ajax({
+            url: '/board/qna/' + qnaId,
+            type: 'DELETE',
+            success: function(result) {
+              alert('Q&A가 삭제되었습니다.');
+              window.location.href = '/board/qna/list';
+            },
+            error: function(xhr, status, error) {
+              alert('Q&A 삭제에 실패했습니다: ' + (xhr.responseText || error));
+            }
+          });
+        }
+      }
+
       // File download simulation (for non-image attachments)
       document.querySelectorAll('a[href^="/uploads/"]').forEach((link) => {
         // th:href 속성이 /uploads/로 시작하는 링크에만 이벤트 리스너 추가
@@ -298,6 +366,29 @@
           // 실제 다운로드를 원하면 e.preventDefault()를 제거하고 서버에서 파일 스트리밍 로직 구현 필요
         });
       });
+
+      function editAnswer() {
+        const answerDisplay = document.querySelector('.bg-green-50.border-l-4');
+        const answerEditForm = document.getElementById('answerEditForm');
+        const answerContentEdit = document.getElementById('answerContentEdit');
+        const answerContentDisplay = document.getElementById('answerContentDisplay');
+
+        if (answerDisplay && answerEditForm && answerContentEdit && answerContentDisplay) {
+          answerDisplay.style.display = 'none';
+          answerEditForm.style.display = 'block';
+          answerContentEdit.value = answerContentDisplay.innerText;
+        }
+      }
+
+      function cancelEdit() {
+        const answerDisplay = document.querySelector('.bg-green-50.border-l-4');
+        const answerEditForm = document.getElementById('answerEditForm');
+
+        if (answerDisplay && answerEditForm) {
+          answerDisplay.style.display = 'block';
+          answerEditForm.style.display = 'none';
+        }
+      }
     </script>
   </body>
 </html>

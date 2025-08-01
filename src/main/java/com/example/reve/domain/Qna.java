@@ -26,10 +26,6 @@ public class Qna extends BaseEntity {
   @Column(nullable = false, columnDefinition = "TEXT")
   private String content;
 
-  // Q&A 작성 비밀번호(Q&A 수정이나 삭제 시 필요)
-  @Column(nullable = true)
-  private String password;
-
   // Q&A 작성글에 대한 답변
   @Column(nullable = true, columnDefinition = "TEXT")
   private String answer;

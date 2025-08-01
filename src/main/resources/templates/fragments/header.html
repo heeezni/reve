@@ -1,10 +1,4 @@
-<!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/extras/spring-security" lang="ko">
-  <head>
-    <meta charset="UTF-8" />
-    <title></title>
-  </head>
-  <body>
     <!-- Header Fragment -->
     <header
       th:fragment="header"
@@ -33,7 +27,13 @@
             <a
               href="/board/qna/list"
               class="text-gray-800 font-medium hover:text-gray-600 transition-colors"
-              >Q&A</a
+              sec:authorize="!hasRole('ADMIN')"
+              >Q&A</a>
+            <a
+              href="/admin/board/qna/list"
+              class="text-gray-800 font-medium hover:text-gray-600 transition-colors"
+              sec:authorize="hasRole('ADMIN')"
+              >Q&A (관리자)</a
             >
           </nav>
 
@@ -111,14 +111,14 @@
     </header>
 
     <!-- Common Head Fragment -->
-    <head th:fragment="head">
+    <head th:fragment="head(title)">
       <meta charset="UTF-8" />
       <meta
         name="viewport"
         content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0"
       />
       <meta http-equiv="X-UA-Compatible" content="ie=edge" />
-      <title>Rêve</title>
+      <title th:text="${title} ?: 'Rêve'">Rêve</title>
       <!-- Tailwind CSS CDN -->
       <script src="https://cdn.tailwindcss.com"></script>
       <!-- jQuery CDN -->
@@ -160,5 +160,4 @@
         };
       </script>
     </head>
-  </body>
-</html>
+  

@@ -2,6 +2,8 @@ package com.example.reve.controller.user;
 
 import java.io.IOException;
 import java.security.Principal;
+import java.util.List;
+import java.util.NoSuchElementException;
 
 import jakarta.validation.Valid;
 
@@ -11,6 +13,8 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.web.PageableDefault;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
@@ -23,6 +27,8 @@ import com.example.reve.domain.User;
 import com.example.reve.dto.QnaReqDTO;
 import com.example.reve.dto.QnaResDTO;
 import com.example.reve.repository.UserRepository;
+import com.example.reve.service.NoticeService;
+import com.example.reve.service.PerfumeService;
 import com.example.reve.service.QnaService;
 
 import lombok.RequiredArgsConstructor;
@@ -34,14 +40,16 @@ import lombok.extern.slf4j.Slf4j;
 @RequiredArgsConstructor
 public class BoardController {
 
-  private final QnaService qnaService; // 서비스 주입 (QnaService)
-  private final UserRepository userRepository; // UserRepository 주입
+  private final QnaService qnaService;
+  private final UserRepository userRepository;
+  private final PerfumeService perfumeService;
+  private final NoticeService noticeService;
 
   // Q&A 생성 API
   @PostMapping("/qna")
   @ResponseBody // View가 아닌 데이터(JSON)를 반환
   public ResponseEntity<?> createQna(
-      @Valid @ModelAttribute QnaReqDTO reqDto, BindingResult bindingResult) {
+      @Valid @ModelAttribute QnaReqDTO reqDto, BindingResult bindingResult, Principal principal) {
     // QnaReqDTO의 유효성 검사 수행
     if (bindingResult.hasErrors()) {
       StringBuilder errorMessage = new StringBuilder();
@@ -52,14 +60,13 @@ public class BoardController {
       return ResponseEntity.badRequest().body(errorMessage.toString());
     }
     try {
-      log.info("createQna: Received loginId from reqDto: {}", reqDto.getLoginId()); // 로그 추가
-      QnaResDTO qna = qnaService.createQna(reqDto);
+      QnaResDTO qna = qnaService.createQna(reqDto, principal);
       return ResponseEntity.ok(qna); // 성공(200 OK) 응답과 함께 생성된 Q&A 정보 반환
     } catch (IOException e) {
       // 파일 업로드 관련 예외 처리
       return ResponseEntity.badRequest().body("파일 업로드 실패: " + e.getMessage());
     } catch (IllegalArgumentException e) {
-      // 서비스 로직에서 발생하는 유효성 검사 예외 처리 (예: 비밀글 비밀번호 누락)
+      // 서비스 로직에서 발생하는 유효성 검사 예외 처리
       return ResponseEntity.badRequest().body("문의 등록 실패: " + e.getMessage());
     } catch (Exception e) {
       // 그 외 예상치 못한 예외 처리
@@ -68,13 +75,82 @@ public class BoardController {
   }
 
   @GetMapping("/notice/list")
-  public String noticeList() {
+  public String noticeList(
+      Model model,
+      @PageableDefault(size = 10, sort = "createdAt", direction = Sort.Direction.DESC)
+          Pageable pageable,
+      @RequestParam(required = false) String keyword,
+      @RequestParam(required = false) String category,
+      @RequestParam(required = false, defaultValue = "createdAt,desc") String sort, // sort 파라미터 추가
+      Principal principal) {
+    model.addAttribute("isAdmin", isAdmin(principal));
+
+    // sort 파라미터 파싱
+    Sort sortObj;
+    if (sort.equals("createdAt,desc")) {
+      sortObj =
+          Sort.by(Sort.Direction.DESC, "important").and(Sort.by(Sort.Direction.DESC, "createdAt"));
+    } else if (sort.equals("hit,desc")) {
+      sortObj = Sort.by(Sort.Direction.DESC, "important").and(Sort.by(Sort.Direction.DESC, "hit"));
+    } else if (sort.equals("title,asc")) {
+      sortObj = Sort.by(Sort.Direction.DESC, "important").and(Sort.by(Sort.Direction.ASC, "title"));
+    } else {
+      sortObj =
+          Sort.by(Sort.Direction.DESC, "important")
+              .and(Sort.by(Sort.Direction.DESC, "createdAt")); // 기본 정렬
+    }
+
+    Pageable sortedPageable =
+        PageRequest.of(pageable.getPageNumber(), pageable.getPageSize(), sortObj);
+
+    // 공지사항 목록을 가져오는 로직 추가
+    Page<com.example.reve.domain.Notice> noticePage =
+        noticeService.getAllNotices(sortedPageable, keyword, category); // sortedPageable 전달
+    model.addAttribute("notices", noticePage);
+    model.addAttribute("keyword", keyword);
+    model.addAttribute("category", category);
+    model.addAttribute("sort", sort); // sort 값도 모델에 추가
+
     return "board/notice/list";
   }
 
-  @GetMapping("/notice/detail")
-  public String noticeDetail() {
-    return "board/notice/detail";
+  @GetMapping("/notice/detail/{noticeId}")
+  public String noticeDetail(@PathVariable Long noticeId, Model model, Principal principal) {
+    model.addAttribute("isAdmin", isAdmin(principal));
+
+    try {
+      // 공지사항 상세 내용을 가져오는 로직 추가
+      com.example.reve.domain.Notice notice = noticeService.getNoticeById(noticeId);
+      model.addAttribute("notice", notice);
+
+      // 이전/다음 공지사항 가져오기
+      noticeService
+          .getPrevNotice(noticeId)
+          .ifPresent(prevNotice -> model.addAttribute("prevNotice", prevNotice));
+      noticeService
+          .getNextNotice(noticeId)
+          .ifPresent(nextNotice -> model.addAttribute("nextNotice", nextNotice));
+
+      // 관련 공지사항 가져오기 (현재 공지사항 제외, 같은 카테고리 내에서, 최신순 5개)
+      List<com.example.reve.domain.Notice> relatedNotices =
+          noticeService.getRelatedNotices(noticeId, notice.getCategory(), 5);
+      model.addAttribute("relatedNotices", relatedNotices);
+
+      return "board/notice/detail";
+    } catch (NoSuchElementException e) {
+      model.addAttribute("errorMessage", e.getMessage());
+      return "common/error"; // 또는 공지사항 목록 페이지로 리다이렉트
+    }
+  }
+
+  private boolean isAdmin(Principal principal) {
+    if (principal == null) {
+      return false;
+    }
+    Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+    return authentication != null
+        && authentication.getAuthorities().stream()
+            .anyMatch(a -> a.getAuthority().equals("ROLE_ADMIN"));
   }
 
   @GetMapping("/qna/list")
@@ -118,7 +194,7 @@ public class BoardController {
     log.info("qnaDetail: Accessing Q&A with ID: {}", qnaId); // Q&A ID 로깅
     try {
       // 비밀번호 없이 조회를 시도. 공개글이거나 관리자면 성공.
-      QnaResDTO qna = qnaService.getQnaById(qnaId, principal, null);
+      QnaResDTO qna = qnaService.getQnaById(qnaId, principal);
       model.addAttribute("qna", qna);
 
       // 현재 로그인한 사용자 정보 확인
@@ -164,8 +240,16 @@ public class BoardController {
     } catch (IllegalAccessException e) {
       log.error(
           "qnaDetail: IllegalAccessException for Q&A ID {}: {}", qnaId, e.getMessage()); // 에러 로깅
-      // 비밀글이고 권한이 없으면 비밀번호 입력 페이지로 이동
-      return "redirect:/board/qna/password/" + qnaId;
+      // 비밀글이고 권한이 없으면 접근 거부 메시지를 표시하도록 모델에 플래그 추가
+      model.addAttribute("accessDenied", true);
+      // 최소한의 QnaResDTO 객체를 생성하여 isSecret을 true로 설정 (템플릿 조건 처리를 위함)
+      QnaResDTO dummyQna = new QnaResDTO();
+      dummyQna.setIsSecret(true);
+      model.addAttribute("qna", dummyQna);
+      model.addAttribute("qnaId", qnaId); // qnaId도 함께 전달
+      model.addAttribute("isAuthor", false); // 접근 권한이 없으므로 false
+      model.addAttribute("isAdmin", false); // 접근 권한이 없으므로 false
+      return "board/qna/detail";
     } catch (IllegalArgumentException e) {
       model.addAttribute("errorMessage", e.getMessage());
       return "common/error";
@@ -174,56 +258,58 @@ public class BoardController {
 
   // Q&A 삭제 API
   @DeleteMapping("/qna/{qnaId}")
-  public String deleteQna(@PathVariable Long qnaId, RedirectAttributes redirectAttributes) {
+  @ResponseBody
+  public ResponseEntity<?> deleteQna(@PathVariable Long qnaId, Principal principal) {
     try {
-      qnaService.deleteQna(qnaId);
-      redirectAttributes.addFlashAttribute("successMessage", "Q&A가 성공적으로 삭제되었습니다.");
-      return "redirect:/board/qna/list";
-    } catch (IllegalArgumentException e) {
-      redirectAttributes.addFlashAttribute("errorMessage", e.getMessage());
-      return "redirect:/board/qna/detail/" + qnaId;
+      qnaService.deleteQna(qnaId, principal);
+      return ResponseEntity.ok().body("Q&A가 성공적으로 삭제되었습니다.");
+    } catch (IllegalAccessException | IllegalArgumentException e) {
+      return ResponseEntity.badRequest().body("Q&A 삭제 실패: " + e.getMessage());
     } catch (IOException e) {
-      redirectAttributes.addFlashAttribute("errorMessage", "파일 삭제 중 오류가 발생했습니다: " + e.getMessage());
-      return "redirect:/board/qna/detail/" + qnaId;
+      return ResponseEntity.status(500).body("파일 삭제 중 오류가 발생했습니다: " + e.getMessage());
     } catch (Exception e) {
-      redirectAttributes.addFlashAttribute("errorMessage", "Q&A 삭제 중 알 수 없는 오류가 발생했습니다.");
-      return "redirect:/board/qna/detail/" + qnaId;
+      return ResponseEntity.status(500).body("Q&A 삭제 중 알 수 없는 오류가 발생했습니다.");
     }
   }
 
   @GetMapping("/qna/form")
-  public String qnaForm() {
+  public String qnaForm(Model model) {
+    model.addAttribute("perfumes", perfumeService.getAllPerfumes());
     return "board/qna/form";
   }
 
-  // 비밀글 비밀번호 입력 폼을 보여주는 엔드포인트
-  @GetMapping("/qna/password/{qnaId}")
-  public String showPasswordForm(@PathVariable Long qnaId, Model model) {
-    model.addAttribute("qnaId", qnaId);
-    return "board/qna/password_check";
-  }
-
-  // 비밀글 비밀번호를 검증하고 상세 페이지를 보여주는 엔드포인트
-  @PostMapping("/qna/password/{qnaId}")
-  public String verifyPassword(
-      @PathVariable Long qnaId,
-      @RequestParam String password,
-      Model model,
-      Principal principal,
-      RedirectAttributes redirectAttributes) {
+  @GetMapping("/qna/edit/{qnaId}")
+  public String editQnaForm(@PathVariable Long qnaId, Model model, Principal principal) {
     try {
-      // 비밀번호와 함께 조회를 시도
-      QnaResDTO qna = qnaService.getQnaById(qnaId, principal, password);
+      QnaResDTO qna = qnaService.getQnaById(qnaId, principal);
       model.addAttribute("qna", qna);
-      return "board/qna/detail"; // 성공 시 상세 페이지 보여주기
+      model.addAttribute("perfumes", perfumeService.getAllPerfumes());
+      return "board/qna/edit";
     } catch (IllegalAccessException e) {
-      // 비밀번호가 틀렸을 경우, 에러 메시지와 함께 비밀번호 입력 페이지로 리다이렉트
-      redirectAttributes.addFlashAttribute("errorMessage", e.getMessage());
-      return "redirect:/board/qna/password/" + qnaId;
-    } catch (IllegalArgumentException e) {
-      // 존재하지 않는 Q&A 등 다른 에러 처리
       model.addAttribute("errorMessage", e.getMessage());
       return "common/error";
+    }
+  }
+
+  @PostMapping("/qna/edit/{qnaId}")
+  public String updateQna(
+      @PathVariable Long qnaId,
+      @Valid @ModelAttribute QnaReqDTO reqDto,
+      BindingResult bindingResult,
+      Principal principal,
+      RedirectAttributes redirectAttributes) {
+    if (bindingResult.hasErrors()) {
+      redirectAttributes.addFlashAttribute(
+          "org.springframework.validation.BindingResult.qnaReqDTO", bindingResult);
+      redirectAttributes.addFlashAttribute("qnaReqDTO", reqDto);
+      return "redirect:/board/qna/edit/" + qnaId;
+    }
+    try {
+      qnaService.updateQna(qnaId, reqDto, principal);
+      return "redirect:/board/qna/detail/" + qnaId;
+    } catch (IOException | IllegalAccessException e) {
+      redirectAttributes.addFlashAttribute("errorMessage", e.getMessage());
+      return "redirect:/board/qna/edit/" + qnaId;
     }
   }
 }

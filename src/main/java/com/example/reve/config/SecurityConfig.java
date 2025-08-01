@@ -2,6 +2,7 @@ package com.example.reve.config;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.http.HttpMethod;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
@@ -22,18 +23,37 @@ public class SecurityConfig {
    *
    * @param http 제외 처리할 페이지를 설정 할 객체
    * @return http.build()
-   * @throws Exception
    */
   @Bean
   public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
-    http.authorizeHttpRequests(authorize -> authorize.requestMatchers("/**").permitAll())
+    http.authorizeHttpRequests(
+            authorize ->
+                authorize
+                    .requestMatchers(
+                        "/css/**",
+                        "/js/**",
+                        "/images/**",
+                        "/uploads/**",
+                        "/webjars/**",
+                        "/favicon.ico")
+                    .permitAll()
+                    .requestMatchers(
+                        "/", "/member/signup", "/shop/**", "/board/notice/**", "/info/**")
+                    .permitAll()
+                    .requestMatchers(HttpMethod.GET, "/board/qna/list")
+                    .permitAll()
+                    .requestMatchers("/admin/**")
+                    .hasRole("ADMIN")
+                    .anyRequest()
+                    .authenticated())
         .csrf(AbstractHttpConfigurer::disable)
         .formLogin(
             form ->
-                form.loginPage("/member/login") // 로그인 페이지 URL
+                form.loginPage("/member/login?error=true") // 로그인 페이지 URL
                     .loginProcessingUrl("/member/login") // 로그인 처리 URL
                     .usernameParameter("loginId") // 사용자 이름 파라미터 (기본값 username)
                     .passwordParameter("password") // 비밀번호 파라미터 (기본값 password)
+                    .defaultSuccessUrl("/", true) // 로그인 성공 시 기본 리다이렉트 URL
                     .permitAll())
         .logout(
             logout ->
@@ -64,7 +84,6 @@ public class SecurityConfig {
    * @param userDetailsService UserService (UserDetailsService 구현체)
    * @param passwordEncoder PasswordEncoder
    * @return AuthenticationManager
-   * @throws Exception
    */
   @Bean
   public AuthenticationManager authenticationManager(

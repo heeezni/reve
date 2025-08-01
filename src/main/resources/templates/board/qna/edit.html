@@ -1,0 +1,205 @@
+<!DOCTYPE html>
+<html lang="ko" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments/header :: head(title='Q&A 수정 | Rêve')}">
+</head>
+<body class="font-sans text-gray-800">
+<!-- Header Fragment -->
+<div th:replace="~{fragments/header :: header}"></div>
+
+<!-- Main Content -->
+<main class="pt-20">
+    <div class="min-h-screen bg-gray-50 py-12">
+        <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
+            <!-- Page Title -->
+            <div class="mb-8">
+                <h1 class="text-3xl font-bold text-gray-800 mb-2">Q&A 수정</h1>
+            </div>
+
+            <!-- Q&A Form -->
+            <div class="bg-white rounded-lg shadow-sm p-8">
+                <form id="qna-form" th:action="@{/board/qna/edit/{qnaId}(qnaId=${qna.qnaId})}" method="post" enctype="multipart/form-data" class="space-y-8">
+                    <input type="hidden" name="_method" value="post" />
+
+                    <!-- Product Selection -->
+                    <div>
+                        <label for="perfume-select" class="block text-sm font-medium text-gray-700 mb-3">관련 상품 <span class="text-red-500">*</span></label>
+                        <select id="perfume-select" name="perfumeId" class="w-full border border-gray-300 rounded-md px-4 py-3 focus:outline-none focus:ring-2 focus:ring-gray-800 focus:border-transparent" required>
+                            <option value="">상품을 선택해주세요</option>
+                            <option th:each="perfume : ${perfumes}" th:value="${perfume.perfumeId}" th:text="${perfume.perfumeName}" th:selected="${perfume.perfumeId == qna.perfumeId}"></option>
+                        </select>
+                    </div>
+
+                    <!-- Category Selection -->
+                    <div>
+                        <label for="qna-category" class="block text-sm font-medium text-gray-700 mb-3">문의 분류 <span class="text-red-500">*</span></label>
+                        <select id="qna-category" name="category" class="w-full border border-gray-300 rounded-md px-4 py-3 focus:outline-none focus:ring-2 focus:ring-gray-800 focus:border-transparent">
+                            <option value="product" th:selected="${qna.category == 'product'}">상품문의</option>
+                            <option value="delivery" th:selected="${qna.category == 'delivery'}">배송문의</option>
+                            <option value="payment" th:selected="${qna.category == 'payment'}">결제문의</option>
+                            <option value="return" th:selected="${qna.category == 'return'}">반품/교환</option>
+                            <option value="other" th:selected="${qna.category == 'other'}">기타</option>
+                        </select>
+                    </div>
+
+                    <!-- Title -->
+                    <div>
+                        <label for="qna-title" class="block text-sm font-medium text-gray-700 mb-3">제목 <span class="text-red-500">*</span></label>
+                        <input type="text" id="qna-title" name="title" th:value="${qna.title}" class="w-full border border-gray-300 rounded-md px-4 py-3 focus:outline-none focus:ring-2 focus:ring-gray-800 focus:border-transparent" maxlength="100"/>
+                    </div>
+
+                    <!-- Content -->
+                    <div>
+                        <label for="qna-content" class="block text-sm font-medium text-gray-700 mb-3">문의 내용 <span class="text-red-500">*</span></label>
+                        <textarea id="qna-content" name="content" rows="10" class="w-full border border-gray-300 rounded-md px-4 py-3 focus:outline-none focus:ring-2 focus:ring-gray-800 focus:border-transparent resize-none" maxlength="2000" th:text="${qna.content}"></textarea>
+                    </div>
+
+                    <!-- File Upload -->
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-3">첨부파일</label>
+                        <!-- File List (Existing + New) -->
+                        <div id="fileList" class="mt-4 space-y-2"></div>
+                        <div id="deleted-files-container"></div>
+                        <div class="border-2 border-dashed border-gray-300 rounded-lg p-6 text-center hover:border-gray-400 transition-colors mt-4">
+                            <div class="space-y-4">
+                                <i class="fas fa-cloud-upload-alt text-3xl text-gray-400"></i>
+                                <div>
+                                    <p class="text-sm text-gray-600 mb-2">새 파일을 추가하거나 기존 파일을 관리하세요.</p>
+                                    <p class="text-xs text-gray-500">최대 5개 파일, 각 파일 10MB 이하</p>
+                                </div>
+                                <input type="file" multiple name="attachmentFiles" accept=".jpg,.jpeg,.png,.pdf,.doc,.docx" class="hidden" id="fileInput"/>
+                                <button type="button" onclick="document.getElementById('fileInput').click()" class="inline-flex items-center px-4 py-2 border border-gray-300 rounded-md text-sm font-medium text-gray-700 bg-white hover:bg-gray-50">
+                                    <i class="fas fa-folder-open mr-2"></i> 파일 선택
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Privacy Settings -->
+                    <div class="space-y-4">
+                        <label class="block text-sm font-medium text-gray-700">공개 설정</label>
+                        <div class="space-y-3">
+                            <label class="flex items-center">
+                                <input type="radio" name="isSecret" value="false" class="w-4 h-4 text-gray-800 border-gray-300" th:checked="${!qna.isSecret}"/>
+                                <span class="ml-3 text-sm text-gray-700">전체 공개</span>
+                            </label>
+                            <label class="flex items-center">
+                                <input type="radio" name="isSecret" value="true" class="w-4 h-4 text-gray-800 border-gray-300" th:checked="${qna.isSecret}"/>
+                                <span class="ml-3 text-sm text-gray-700">비밀글</span>
+                            </label>
+                        </div>
+                    </div>
+
+                    <!-- Submit Buttons -->
+                    <div class="flex items-center justify-between pt-6 border-t border-gray-200">
+                        <a th:href="@{/board/qna/detail/{qnaId}(qnaId=${qna.qnaId})}" class="inline-flex items-center px-6 py-3 border border-gray-300 rounded-md text-gray-700 bg-white hover:bg-gray-50 font-medium">취소</a>
+                        <button type="submit" class="inline-flex items-center px-6 py-3 bg-gray-800 text-white rounded-md hover:bg-gray-700 font-medium">수정 완료</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</main>
+
+<!-- Footer Fragment -->
+<div th:replace="~{fragments/footer :: footer}"></div>
+
+<script th:inline="javascript">
+    document.addEventListener('DOMContentLoaded', function () {
+        const fileInput = document.getElementById('fileInput');
+        const fileListContainer = document.getElementById('fileList');
+        const deletedFilesContainer = document.getElementById('deleted-files-container');
+        const dataTransfer = new DataTransfer();
+
+        // 기존 파일 목록 초기화
+        const existingFilesRaw = /*[[${qna.attachment}]]*/ null;
+        const existingFiles = (existingFilesRaw && existingFilesRaw.trim() !== '') ? existingFilesRaw.split(',') : [];
+        
+        if (existingFiles.length > 0) {
+            existingFiles.forEach(url => {
+                if(url && url.trim() !== '') {
+                    const preview = createPreview(url, 'existing');
+                    fileListContainer.appendChild(preview);
+                }
+            });
+        }
+
+        fileInput.addEventListener('change', () => {
+            Array.from(fileInput.files).forEach(file => {
+                dataTransfer.items.add(file);
+                const preview = createPreview(file, 'new');
+                fileListContainer.appendChild(preview);
+            });
+            fileInput.files = dataTransfer.files;
+        });
+
+        function createPreview(fileOrUrl, type) {
+            const isNewUrl = typeof fileOrUrl === 'object';
+            const fileId = isNewUrl ? fileOrUrl.name : fileOrUrl;
+            const fileName = isNewUrl ? fileOrUrl.name : fileOrUrl.substring(fileOrUrl.lastIndexOf('_') + 1);
+
+            const fileItem = document.createElement('div');
+            fileItem.className = 'flex items-center justify-between p-3 bg-gray-50 rounded-md';
+            fileItem.dataset.id = fileId;
+
+            const fileInfoContainer = document.createElement('div');
+            fileInfoContainer.className = 'flex items-center space-x-3';
+
+            if (isNewUrl && fileOrUrl.type.startsWith('image/')) {
+                const reader = new FileReader();
+                reader.onload = function (e) {
+                    const img = document.createElement('img');
+                    img.src = e.target.result;
+                    img.className = 'w-16 h-16 object-cover rounded-md';
+                    fileInfoContainer.prepend(img);
+                };
+                reader.readAsDataURL(fileOrUrl);
+            } else if (!isNewUrl && (fileOrUrl.endsWith('.jpg') || fileOrUrl.endsWith('.jpeg') || fileOrUrl.endsWith('.png'))) {
+                 const img = document.createElement('img');
+                 img.src = fileOrUrl;
+                 img.className = 'w-16 h-16 object-cover rounded-md';
+                 fileInfoContainer.prepend(img);
+            } else {
+                fileInfoContainer.innerHTML = '<i class="fas fa-file text-gray-500 text-2xl w-16 text-center"></i>';
+            }
+
+            const textInfo = document.createElement('div');
+            textInfo.innerHTML = `<span class="text-sm text-gray-700">${fileName}</span>`;
+            fileInfoContainer.appendChild(textInfo);
+
+            const removeBtn = document.createElement('button');
+            removeBtn.type = 'button';
+            removeBtn.innerHTML = '<i class="fas fa-times"></i>';
+            removeBtn.className = 'text-red-500 hover:text-red-700';
+            removeBtn.onclick = () => removeFile(fileId, type);
+
+            fileItem.appendChild(fileInfoContainer);
+            fileItem.appendChild(removeBtn);
+            return fileItem;
+        }
+
+        window.removeFile = (fileId, type) => {
+            const previewElement = fileListContainer.querySelector(`[data-id='${fileId}']`);
+            if (previewElement) {
+                previewElement.remove();
+            }
+
+            if (type === 'existing') {
+                const hiddenInput = document.createElement('input');
+                hiddenInput.type = 'hidden';
+                hiddenInput.name = 'deletedAttachments';
+                hiddenInput.value = fileId;
+                deletedFilesContainer.appendChild(hiddenInput);
+            } else if (type === 'new') {
+                const newFiles = Array.from(dataTransfer.files);
+                const filteredFiles = newFiles.filter(f => f.name !== fileId);
+                const newDataTransfer = new DataTransfer();
+                filteredFiles.forEach(f => newDataTransfer.items.add(f));
+                dataTransfer.items.clear();
+                filteredFiles.forEach(f => dataTransfer.items.add(f));
+                fileInput.files = dataTransfer.files;
+            }
+        };
+    });
+</script>
+</body>
+</html>

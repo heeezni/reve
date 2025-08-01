@@ -5,6 +5,10 @@ import java.util.List;
 
 import jakarta.persistence.*;
 
+import org.hibernate.annotations.Formula;
+import org.hibernate.annotations.OnDelete;
+import org.hibernate.annotations.OnDeleteAction;
+
 import lombok.*;
 
 /*
@@ -65,9 +69,27 @@ public class Perfume extends BaseEntity {
   @Column(nullable = false)
   private String hoverImageUrl;
 
+  @Formula("(SELECT COUNT(*) FROM review r WHERE r.perfume_id = perfume_id)")
+  private int reviewCount;
+
   // 관계 설정
   // 향수와 리뷰와의 관계 (1 : N)
-  @OneToMany(mappedBy = "perfume", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+  @OnDelete(action = OnDeleteAction.CASCADE)
+  @OneToMany(
+      mappedBy = "perfume",
+      cascade = CascadeType.ALL,
+      orphanRemoval = true, // 이걸 추가해 주세요
+      fetch = FetchType.LAZY)
   @Builder.Default
   private List<Review> reviewList = new ArrayList<>();
+
+  // 향수와 QnA와의 관계 (1 : N)
+  @OnDelete(action = OnDeleteAction.CASCADE)
+  @OneToMany(
+      mappedBy = "perfume",
+      cascade = CascadeType.ALL,
+      orphanRemoval = true,
+      fetch = FetchType.LAZY)
+  @Builder.Default
+  private List<Qna> qnaList = new ArrayList<>();
 }

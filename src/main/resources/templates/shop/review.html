@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html lang="ko" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>리뷰 작성</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css" rel="stylesheet" />
+    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet" />
+</head>
+<body class="bg-gray-50 min-h-screen flex flex-col items-center p-6">
+
+<div class="w-full max-w-lg bg-white rounded-lg shadow-md p-6">
+    <h1 class="text-2xl font-semibold mb-6 text-gray-800">리뷰 작성하기</h1>
+
+    <form th:action="@{/review/create}" method="post" enctype="multipart/form-data" class="space-y-6">
+
+        <!-- 별점 선택 -->
+        <div>
+            <label class="block text-gray-700 font-medium mb-2">별점 선택</label>
+            <div class="flex space-x-2">
+                <label th:each="star : ${#numbers.sequence(1,5)}" class="cursor-pointer">
+                    <input type="radio" name="rating" th:id="${'rating' + star}" th:value="${star}" class="hidden peer" required />
+                    <svg xmlns="http://www.w3.org/2000/svg"
+                         class="h-6 w-6 text-gray-300 peer-checked:text-yellow-400"
+                         fill="currentColor" viewBox="0 0 20 20" >
+                        <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.286 3.946a1 1 0 00.95.69h4.15c.969 0 1.371 1.24.588 1.81l-3.36 2.44a1 1 0 00-.364 1.118l1.287 3.947c.3.922-.755 1.688-1.54 1.118L10 13.347l-3.36 2.44c-.784.57-1.838-.196-1.539-1.118l1.286-3.947a1 1 0 00-.364-1.118L3.622 9.374c-.783-.57-.38-1.81.588-1.81h4.15a1 1 0 00.95-.69l1.286-3.947z"/>
+                    </svg>
+                </label>
+            </div>
+        </div>
+
+        <!-- 리뷰 내용 -->
+        <div>
+            <label for="content" class="block text-gray-700 font-medium mb-2">리뷰 내용</label>
+            <textarea id="content" name="content" rows="5" required
+                      class="w-full px-4 py-3 border border-gray-300 rounded-md resize-none
+              focus:outline-none focus:ring-2 focus:ring-yellow-400 focus:border-yellow-400"
+                      placeholder="리뷰를 작성해 주세요."></textarea>
+        </div>
+
+        <!-- 이미지 업로드 -->
+        <div>
+            <label for="imageUrl" class="block text-gray-700 font-medium mb-2">사진 첨부 (선택)</label>
+            <input type="file" id="imageUrl" name="imageUrl" accept="image/*"
+                   class="w-full text-gray-700" />
+        </div>
+
+        <!-- 제출 버튼 -->
+        <div class="text-right">
+            <button type="submit"
+                    class="bg-yellow-400 text-white font-semibold px-6 py-2 rounded-md hover:bg-yellow-500
+            focus:outline-none focus:ring-2 focus:ring-yellow-400 focus:ring-offset-2">
+                작성 완료
+            </button>
+        </div>
+
+        <input type="hidden" name="perfumeId" th:value="${perfumeId}" />
+    </form>
+</div>
+
+</body>
+</html>
+<script>
+    document.addEventListener('DOMContentLoaded', () => {
+        const stars = document.querySelectorAll('input[name="rating"]');
+        const starIcons = document.querySelectorAll('label > svg');
+
+        stars.forEach((star, idx) => {
+            star.addEventListener('change', () => {
+                const selectedIndex = idx;
+
+                starIcons.forEach((icon, i) => {
+                    if (i <= selectedIndex) {
+                        icon.classList.add('text-yellow-400');
+                        icon.classList.remove('text-gray-300');
+                    } else {
+                        icon.classList.remove('text-yellow-400');
+                        icon.classList.add('text-gray-300');
+                    }
+                });
+            });
+        });
+    });
+</script>

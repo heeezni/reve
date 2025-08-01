@@ -279,6 +279,6 @@ public class PerfumeService {
 
     Pageable pageable = PageRequest.of(page, size, sort);
 
-    return perfumeRepository.findBySearchAndScent(search, scent, pageable);
+    return perfumeRepository.findBySearchAndScentWithReviewJoin(search, scent, pageable);
   }
 }

@@ -2,14 +2,12 @@ package com.example.reve.service;
 
 import java.io.IOException;
 import java.security.Principal;
-import java.util.List;
-import java.util.UUID;
+import java.util.*;
 import java.util.stream.Collectors;
 
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
-import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -36,31 +34,19 @@ public class QnaService {
   private final UserRepository userRepository;
   private final PerfumeRepository perfumeRepository;
   private final FileUploadService fileUploadService;
-  private final PasswordEncoder passwordEncoder;
 
   @Transactional
-  public QnaResDTO createQna(QnaReqDTO reqDto) throws IOException {
-
-    log.debug("QnaService - createQna: Received loginId = {}", reqDto.getLoginId());
+  public QnaResDTO createQna(QnaReqDTO reqDto, Principal principal) throws IOException {
 
     // 파일 업로드 실패 시 롤백을 위해 임시 디렉토리 이름 생성
     String tempDirectoryName = UUID.randomUUID().toString();
 
     try {
       // 1. DTO에서 받은 userId로 진짜 유저가 DB에 있는지 찾기
-      User user = null;
-      // loginId가 null이 아니고 비어있지 않으며 "anonymousUser"가 아닌 경우에만 사용자 조회
-      if (reqDto.getLoginId() != null
-          && !reqDto.getLoginId().isEmpty()
-          && !reqDto.getLoginId().equals("anonymousUser")) {
-        user =
-            userRepository
-                .findByLoginId(reqDto.getLoginId()) // findById 대신 findByLoginId 사용
-                .orElseThrow(
-                    () ->
-                        new IllegalArgumentException(
-                            "해당 유저를 찾을 수 없습니다. 로그인 ID: " + reqDto.getLoginId()));
-      }
+      User user =
+          userRepository
+              .findByLoginId(principal.getName())
+              .orElseThrow(() -> new IllegalArgumentException("해당 유저를 찾을 수 없습니다."));
 
       // 3. perfumeId로 진짜 상품이 DB에 있는지 확인
       Perfume perfume =
@@ -81,16 +67,6 @@ public class QnaService {
 
       // isSecret 값은 reqDto에서 받은 대로 사용
       qna.setIsSecret(reqDto.getIsSecret());
-
-      // 6. 비밀글일 경우 비밀번호 암호화하여 저장
-      if (qna.getIsSecret()) {
-        if (reqDto.getPassword() == null || reqDto.getPassword().isEmpty()) {
-          throw new IllegalArgumentException("비밀글은 비밀번호가 필수입니다.");
-        }
-        qna.setPassword(passwordEncoder.encode(reqDto.getPassword()));
-      } else {
-        qna.setPassword(null); // 공개글일 경우 비밀번호는 null
-      }
 
       String savedAttachmentUrls = null;
       boolean hasAttachment =
@@ -147,11 +123,14 @@ public class QnaService {
    * @throws IOException 파일 처리 중 오류 발생 시
    */
   @Transactional
-  public QnaResDTO updateQna(Long qnaId, QnaReqDTO reqDto) throws IOException {
+  public QnaResDTO updateQna(Long qnaId, QnaReqDTO reqDto, Principal principal)
+      throws IOException, IllegalAccessException {
     Qna qna =
         qnaRepository
             .findById(qnaId)
             .orElseThrow(() -> new IllegalArgumentException("해당 Q&A를 찾을 수 없습니다. ID: " + qnaId));
+
+    validateUserPermission(principal, qna);
 
     // Q&A 내용 업데이트
     qna.setTitle(reqDto.getTitle());
@@ -159,31 +138,41 @@ public class QnaService {
     qna.setCategory(reqDto.getCategory());
     qna.setIsSecret(reqDto.getIsSecret());
 
-    // 비밀글 비밀번호 처리
-    if (qna.getIsSecret()) {
-      if (reqDto.getPassword() == null || reqDto.getPassword().isEmpty()) {
-        throw new IllegalArgumentException("비밀글은 비밀번호가 필수입니다.");
+    // 관련 상품 업데이트
+    Perfume perfume =
+        perfumeRepository
+            .findById(reqDto.getPerfumeId())
+            .orElseThrow(
+                () ->
+                    new IllegalArgumentException("해당 상품을 찾을 수 없습니다. ID: " + reqDto.getPerfumeId()));
+    qna.setPerfume(perfume);
+
+    // --- 파일 처리 로직 ---
+    List<String> existingAttachments = new ArrayList<>();
+    if (qna.getAttachment() != null && !qna.getAttachment().isEmpty()) {
+      existingAttachments.addAll(Arrays.asList(qna.getAttachment().split(",")));
+    }
+
+    // 2. 삭제 요청된 파일 처리
+    if (reqDto.getDeletedAttachments() != null) {
+      for (String deletedUrl : reqDto.getDeletedAttachments()) {
+        fileUploadService.deleteFile(deletedUrl);
+        existingAttachments.remove(deletedUrl);
       }
-      qna.setPassword(passwordEncoder.encode(reqDto.getPassword()));
-    } else {
-      qna.setPassword(null); // 공개글로 전환 시 비밀번호 제거
     }
 
-    // 파일 처리 (기존 파일 삭제 후 새 파일 저장)
-    String existingAttachment = qna.getAttachment();
-    String newAttachmentUrls = null;
-    String directoryName = "qna_" + qna.getQnaId();
-
-    // 기존 파일이 있고, 새로운 파일이 없거나 기존 파일이 변경된 경우 기존 파일 삭제
-    if (existingAttachment != null && !existingAttachment.isEmpty()) {
-      fileUploadService.deleteDirectory(directoryName); // 기존 디렉토리 삭제
-    }
-
-    // 새로운 파일이 있는 경우 저장
+    // 3. 새로 추가된 파일 처리
     if (reqDto.getAttachmentFiles() != null && !reqDto.getAttachmentFiles().isEmpty()) {
-      newAttachmentUrls = fileUploadService.saveFiles(reqDto.getAttachmentFiles(), directoryName);
+      String newAttachmentUrls =
+          fileUploadService.saveFiles(reqDto.getAttachmentFiles(), "qna_" + qnaId);
+      if (newAttachmentUrls != null && !newAttachmentUrls.isEmpty()) {
+        existingAttachments.addAll(Arrays.asList(newAttachmentUrls.split(",")));
+      }
     }
-    qna.setAttachment(newAttachmentUrls);
+
+    // 최종 파일 목록을 문자열로 변환. 목록이 비어있으면 null 저장
+    String finalAttachments = String.join(",", existingAttachments);
+    qna.setAttachment(finalAttachments.isEmpty() ? null : finalAttachments);
 
     Qna updatedQna = qnaRepository.save(qna);
     return new QnaResDTO(updatedQna);
@@ -213,50 +202,76 @@ public class QnaService {
    *
    * @param qnaId Q&A ID
    * @param principal 현재 로그인한 사용자 정보
-   * @param password 입력된 비밀번호 (없을 경우 null)
    * @return QnaResDTO 객체
    * @throws IllegalAccessException 접근 권한이 없는 경우
    */
-  public QnaResDTO getQnaById(Long qnaId, Principal principal, String password)
-      throws IllegalAccessException {
+  public QnaResDTO getQnaById(Long qnaId, Principal principal) throws IllegalAccessException {
     Qna qna =
         qnaRepository
             .findById(qnaId)
             .orElseThrow(() -> new IllegalArgumentException("해당 Q&A를 찾을 수 없습니다. ID: " + qnaId));
 
-    // 이전/다음 Q&A ID 조회
-    Long prevQnaId = qnaRepository.findPrevQnaId(qnaId).orElse(null);
-    Long nextQnaId = qnaRepository.findNextQnaId(qnaId).orElse(null);
-
     // 공개글이면 바로 반환
     if (!qna.getIsSecret()) {
-      return new QnaResDTO(qna, prevQnaId, nextQnaId); // prev/next QnaId 포함하여 반환
+      Long prevQnaId = findAccessiblePrevQnaId(qnaId, principal);
+      Long nextQnaId = findAccessibleNextQnaId(qnaId, principal);
+      return new QnaResDTO(qna, prevQnaId, nextQnaId);
     }
 
     // 비밀글인 경우, 접근 권한 확인
-    // 1. 관리자인지 확인
-    if (principal != null) {
-      String loggedInUsername = principal.getName();
-      boolean isAdmin =
-          userRepository
-              .findByLoginId(loggedInUsername)
-              .map(user -> user.getRole().equals(Role.ADMIN))
-              .orElse(false);
-      if (isAdmin) {
-        return new QnaResDTO(qna, prevQnaId, nextQnaId); // 관리자면 접근 허용
+    validateUserPermission(principal, qna);
+
+    Long prevQnaId = findAccessiblePrevQnaId(qnaId, principal);
+    Long nextQnaId = findAccessibleNextQnaId(qnaId, principal);
+    return new QnaResDTO(qna, prevQnaId, nextQnaId);
+  }
+
+  private Long findAccessiblePrevQnaId(Long currentQnaId, Principal principal) {
+    Long prevId = currentQnaId;
+    while (true) {
+      Optional<Long> foundId = qnaRepository.findPrevQnaId(prevId);
+      if (foundId.isEmpty()) {
+        return null; // 더 이상 이전 글이 없음
+      }
+      prevId = foundId.get();
+      try {
+        Qna qna = qnaRepository.findById(prevId).orElse(null);
+        if (qna != null) {
+          if (!qna.getIsSecret()) { // 공개글이면 바로 반환
+            return prevId;
+          } else { // 비밀글이면 권한 확인
+            validateUserPermission(principal, qna);
+            return prevId; // 권한 있으면 반환
+          }
+        }
+      } catch (IllegalAccessException e) {
+        // 접근 권한이 없으면 계속 이전 글 탐색
       }
     }
+  }
 
-    // 2. 비밀번호 확인 (관리자가 아닌 경우)
-    if (password == null) {
-      throw new IllegalAccessException("비밀글입니다. 비밀번호를 입력해주세요.");
+  private Long findAccessibleNextQnaId(Long currentQnaId, Principal principal) {
+    Long nextId = currentQnaId;
+    while (true) {
+      Optional<Long> foundId = qnaRepository.findNextQnaId(nextId);
+      if (foundId.isEmpty()) {
+        return null; // 더 이상 다음 글이 없음
+      }
+      nextId = foundId.get();
+      try {
+        Qna qna = qnaRepository.findById(nextId).orElse(null);
+        if (qna != null) {
+          if (!qna.getIsSecret()) { // 공개글이면 바로 반환
+            return nextId;
+          } else { // 비밀글이면 권한 확인
+            validateUserPermission(principal, qna);
+            return nextId; // 권한 있으면 반환
+          }
+        }
+      } catch (IllegalAccessException e) {
+        // 접근 권한이 없으면 계속 다음 글 탐색
+      }
     }
-    if (!passwordEncoder.matches(password, qna.getPassword())) {
-      throw new IllegalAccessException("비밀번호가 일치하지 않습니다.");
-    }
-
-    // 비밀번호가 일치하면 접근 허용
-    return new QnaResDTO(qna, prevQnaId, nextQnaId); // prev/next QnaId 포함하여 반환
   }
 
   /**
@@ -266,11 +281,14 @@ public class QnaService {
    * @throws IOException 파일 삭제 중 오류 발생 시
    */
   @Transactional
-  public void deleteQna(Long qnaId) throws IOException {
+  public void deleteQna(Long qnaId, Principal principal)
+      throws IOException, IllegalAccessException {
     Qna qna =
         qnaRepository
             .findById(qnaId)
             .orElseThrow(() -> new IllegalArgumentException("해당 Q&A를 찾을 수 없습니다. ID: " + qnaId));
+
+    validateUserPermission(principal, qna);
 
     // 첨부 파일 디렉토리 삭제
     if (qna.getAttachment() != null && !qna.getAttachment().isEmpty()) {
@@ -279,5 +297,101 @@ public class QnaService {
     }
 
     qnaRepository.delete(qna);
+  }
+
+  /**
+   * Q&A 게시글에 답변 추가 (관리자)
+   *
+   * @param qnaId 답변할 Q&A ID
+   * @param answerContent 답변 내용
+   * @param principal 현재 로그인한 사용자 정보 (관리자 권한 확인용)
+   * @return 업데이트된 QnaResDTO
+   * @throws IllegalAccessException 관리자 권한이 없는 경우
+   */
+  @Transactional
+  public QnaResDTO addAnswer(Long qnaId, String answerContent, Principal principal)
+      throws IllegalAccessException {
+    Qna qna =
+        qnaRepository
+            .findById(qnaId)
+            .orElseThrow(() -> new IllegalArgumentException("해당 Q&A를 찾을 수 없습니다. ID: " + qnaId));
+
+    validateAdminPermission(principal);
+
+    qna.setAnswer(answerContent);
+    Qna updatedQna = qnaRepository.save(qna);
+    return new QnaResDTO(updatedQna);
+  }
+
+  /**
+   * Q&A 게시글 답변 수정
+   *
+   * @param qnaId 수정할 Q&A ID
+   * @param updatedAnswerContent 수정된 답변 내용
+   * @param principal 현재 로그인한 사용자 정보 (관리자 권한 확인용)
+   * @return 업데이트된 QnaResDTO
+   * @throws IllegalAccessException 관리자 권한이 없는 경우
+   */
+  @Transactional
+  public QnaResDTO updateAnswer(Long qnaId, String updatedAnswerContent, Principal principal)
+      throws IllegalAccessException {
+    Qna qna =
+        qnaRepository
+            .findById(qnaId)
+            .orElseThrow(() -> new IllegalArgumentException("해당 Q&A를 찾을 수 없습니다. ID: " + qnaId));
+
+    validateAdminPermission(principal);
+
+    qna.setAnswer(updatedAnswerContent);
+    Qna updatedQna = qnaRepository.save(qna);
+    return new QnaResDTO(updatedQna);
+  }
+
+  /**
+   * Q&A 게시글 답변 삭제
+   *
+   * @param qnaId 삭제할 Q&A ID
+   * @param principal 현재 로그인한 사용자 정보 (관리자 권한 확인용)
+   * @throws IllegalAccessException 관리자 권한이 없는 경우
+   */
+  @Transactional
+  public void deleteAnswer(Long qnaId, Principal principal) throws IllegalAccessException {
+    Qna qna =
+        qnaRepository
+            .findById(qnaId)
+            .orElseThrow(() -> new IllegalArgumentException("해당 Q&A를 찾을 수 없습니다. ID: " + qnaId));
+
+    validateAdminPermission(principal);
+
+    qna.setAnswer(null);
+    qnaRepository.save(qna);
+  }
+
+  private void validateUserPermission(Principal principal, Qna qna) throws IllegalAccessException {
+    if (principal == null) {
+      throw new IllegalAccessException("로그인이 필요합니다.");
+    }
+    User user =
+        userRepository
+            .findByLoginId(principal.getName())
+            .orElseThrow(() -> new IllegalAccessException("사용자 정보를 찾을 수 없습니다."));
+
+    if (user.getRole() != Role.ADMIN && !user.getUserId().equals(qna.getUser().getUserId())) {
+      throw new IllegalAccessException("해당 게시글에 대한 권한이 없습니다.");
+    }
+  }
+
+  private void validateAdminPermission(Principal principal) throws IllegalAccessException {
+    if (principal == null) {
+      throw new IllegalAccessException("로그인이 필요합니다.");
+    }
+    User user =
+        userRepository
+            .findByLoginId(principal.getName())
+            .orElseThrow(() -> new IllegalAccessException("사용자 정보를 찾을 수 없습니다."));
+
+    if (user.getRole() != Role.ADMIN) {
+      throw new IllegalAccessException("관리자 권한이 필요합니다.");
+    }
   }
 }

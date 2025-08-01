@@ -1,6 +1,6 @@
 <!DOCTYPE html>
 <html lang="ko" xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
-  <head th:replace="~{fragments/header :: head(title='Q&A | Rêve')}">
+  <head th:replace="~{fragments/header :: head(title='관리자 Q&A | Rêve')}">
   </head>
   <body class="font-sans text-gray-800">
     <!-- Header Fragment -->
@@ -12,15 +12,15 @@
         <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
           <!-- Page Title -->
           <div class="mb-8">
-            <h1 class="text-3xl font-bold text-gray-800 mb-2">Q&A</h1>
+            <h1 class="text-3xl font-bold text-gray-800 mb-2">관리자 Q&A</h1>
             <p class="text-gray-600">
-              궁금한 점이 있으시면 언제든 문의해 주세요
+              Q&A 문의를 관리합니다.
             </p>
           </div>
 
           <!-- Search and Filter Section -->
           <div class="bg-white rounded-lg shadow-sm p-6 mb-6">
-            <form th:action="@{/board/qna/list}" th:method="get" class="flex flex-col md:flex-row md:items-center md:justify-between space-y-4 md:space-y-0">
+            <form th:action="@{/admin/board/qna/list}" th:method="get" class="flex flex-col md:flex-row md:items-center md:justify-between space-y-4 md:space-y-0">
               <!-- Search Bar -->
               <div class="flex-1 max-w-md">
                 <div class="relative">
@@ -41,7 +41,7 @@
                 </div>
               </div>
 
-              <!-- Filter Options and Write Button -->
+              <!-- Filter Options -->
               <div class="flex items-center space-x-4">
                 <label>
                   <select
@@ -70,13 +70,6 @@
                   </select>
                 </label>
                 <button type="submit" class="hidden"></button> <!-- Hidden submit button for search input -->
-                <a
-                  href="/board/qna/form"
-                  class="inline-flex items-center px-4 py-2 bg-gray-800 text-white rounded-md hover:bg-gray-700 transition-colors font-medium text-sm"
-                >
-                  <i class="fas fa-pen mr-2"></i>
-                  문의하기
-                </a>
               </div>
             </form>
           </div>
@@ -169,7 +162,7 @@
               <!-- Previous Page -->
               <a
                 th:if="${!qnas.first}"
-                th:href="@{/board/qna/list(page=${qnas.number - 1}, keyword=${param.keyword}, category=${param.category}, filterAndSort=${param.filterAndSort})}"
+                th:href="@{/admin/board/qna/list(page=${qnas.number - 1}, keyword=${param.keyword}, category=${param.category}, filterAndSort=${param.filterAndSort})}"
                 class="px-3 py-2 text-sm font-medium text-gray-500 bg-white border border-gray-300 rounded-md hover:bg-gray-50"
               >
                 <i class="fas fa-chevron-left"></i>
@@ -185,7 +178,7 @@
               <!-- Page Numbers -->
               <th:block th:if="${qnas.totalPages > 0}" th:each="i : ${#numbers.sequence(0, qnas.totalPages - 1)}">
                 <a
-                  th:href="@{/board/qna/list(page=${i}, keyword=${param.keyword}, category=${param.category}, filterAndSort=${param.filterAndSort})}"
+                  th:href="@{/admin/board/qna/list(page=${i}, keyword=${param.keyword}, category=${param.category}, filterAndSort=${param.filterAndSort})}"
                   th:classappend="${i == qnas.number ? 'text-white bg-gray-800 border-gray-800' : 'text-gray-700 bg-white border-gray-300 hover:bg-gray-50'}"
                   class="px-3 py-2 text-sm font-medium rounded-md"
                   th:text="${i + 1}"
@@ -196,7 +189,7 @@
               <!-- Next Page -->
               <a
                 th:if="${!qnas.last}"
-                th:href="@{/board/qna/list(page=${qnas.number + 1}, keyword=${param.keyword}, category=${param.category}, filterAndSort=${param.filterAndSort})}"
+                th:href="@{/admin/board/qna/list(page=${qnas.number + 1}, keyword=${param.keyword}, category=${param.category}, filterAndSort=${param.filterAndSort})}"
                 class="px-3 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-md hover:bg-gray-50"
               >
                 <i class="fas fa-chevron-right"></i>
@@ -209,100 +202,6 @@
                 <i class="fas fa-chevron-right"></i>
               </button>
             </nav>
-          </div>
-
-          <!-- FAQ Section -->
-          <div class="mt-8 bg-white rounded-lg shadow-sm p-6">
-            <h3 class="text-lg font-semibold text-gray-800 mb-4">
-              자주 묻는 질문
-            </h3>
-            <div class="grid md:grid-cols-2 gap-6">
-              <div class="space-y-4">
-                <div class="border-b border-gray-200 pb-4">
-                  <h4 class="font-medium text-gray-800 mb-2">
-                    Q. 배송은 얼마나 걸리나요?
-                  </h4>
-                  <p class="text-sm text-gray-600 whitespace-normal break-words">
-                    주문 완료 후 1-2일 내 배송되며, 배송 완료까지 2-3일
-                    소요됩니다.
-                  </p>
-                </div>
-                <div class="border-b border-gray-200 pb-4">
-                  <h4 class="font-medium text-gray-800 mb-2">
-                    Q. 반품/교환이 가능한가요?
-                  </h4>
-                  <p class="text-sm text-gray-600 whitespace-normal break-words">
-                    배송 완료 후 7일 이내에 반품/교환이 가능합니다. 단, 사용
-                    흔적이 있는 경우 <br> 제한될 수 있습니다.
-                  </p>
-                </div>
-                <div class="border-b border-gray-200 pb-4">
-                  <h4 class="font-medium text-gray-800 mb-2">
-                    Q. 퍼퓸의 지속력은 어느 정도인가요?
-                  </h4>
-                  <p class="text-sm text-gray-600 whitespace-normal break-words">
-                    Rêve 퍼퓸은 평균 4-6시간 지속되며, 개인의 체질과 사용 환경에
-                    따라<br> 차이가 있을 수 있습니다.
-                  </p>
-                </div>
-              </div>
-              <div class="space-y-4">
-                <div class="border-b border-gray-200 pb-4">
-                  <h4 class="font-medium text-gray-800 mb-2">
-                    Q. 결제 방법은 어떤 것들이 있나요?
-                  </h4>
-                  <p class="text-sm text-gray-600 whitespace-normal break-words">
-                    신용카드, 체크카드, 무통장입금, 카카오페이, 네이버페이 등
-                    다양한 결제 방법을 지원합니다.
-                  </p>
-                </div>
-                <div class="border-b border-gray-200 pb-4">
-                  <h4 class="font-medium text-gray-800 mb-2">
-                    Q. 회원 등급 혜택은 어떻게 되나요?
-                  </h4>
-                  <p class="text-sm text-gray-600 whitespace-normal break-words">
-                    구매 금액에 따라 등급이 결정되며, 등급별로 할인율과 포인트
-                    적립률이 차등 적용됩니다.
-                  </p>
-                </div>
-                <div class="border-b border-gray-200 pb-4">
-                  <h4 class="font-medium text-gray-800 mb-2">
-                    Q. 개인정보는 안전하게 보호되나요?
-                  </h4>
-                  <p class="text-sm text-gray-600 whitespace-normal break-words">
-                    네, 고객님의 개인정보는 암호화되어 안전하게 보호되며,
-                    제3자에게 제공되지 않습니다.
-                  </p>
-                </div>
-              </div>
-            </div>
-          </div>
-
-          <!-- Contact Information -->
-          <div class="mt-8 bg-white rounded-lg shadow-sm p-6">
-            <h3 class="text-lg font-semibold text-gray-800 mb-4">
-              고객센터 연락처
-            </h3>
-            <div class="grid md:grid-cols-3 gap-6">
-              <div class="text-center">
-                <i class="fas fa-phone text-2xl text-blue-500 mb-2"></i>
-                <p class="font-medium text-gray-800">전화 문의</p>
-                <p class="text-sm text-gray-600">1588-1234</p>
-                <p class="text-xs text-gray-500">평일 09:00-18:00</p>
-              </div>
-              <div class="text-center">
-                <i class="fas fa-envelope text-2xl text-green-500 mb-2"></i>
-                <p class="font-medium text-gray-800">이메일 문의</p>
-                <p class="text-sm text-gray-600">cs@reve.com</p>
-                <p class="text-xs text-gray-500">24시간 접수 가능</p>
-              </div>
-              <div class="text-center">
-                <i class="fas fa-comments text-2xl text-purple-500 mb-2"></i>
-                <p class="font-medium text-gray-800">실시간 채팅</p>
-                <p class="text-sm text-gray-600">채팅 상담</p>
-                <p class="text-xs text-gray-500">평일 09:00-18:00</p>
-              </div>
-            </div>
           </div>
         </div>
       </div>
