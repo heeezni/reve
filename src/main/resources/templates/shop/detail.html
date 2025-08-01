@@ -68,10 +68,10 @@
                     </span>
                   </div>
 
-                  <!-- Zoom Button -->
-                  <button
-                    class="absolute top-4 right-4 w-10 h-10 bg-white rounded-full flex items-center justify-center shadow-md hover:bg-gray-50 transition-colors"
-                  >
+                  <!-- 줌 버튼 -->
+                  <button id="zoomButton"
+                          class="absolute top-4 right-4 w-10 h-10 bg-white rounded-full flex items-center justify-center shadow-md hover:bg-gray-50 transition-colors"
+                          th:attr="data-image=@{${perfume.hoverImageUrl}}">
                     <i class="fas fa-search-plus text-gray-600"></i>
                   </button>
                 </div>
@@ -258,7 +258,9 @@
                 <!-- Action Buttons -->
                 <div class="flex space-x-3">
                   <button
-                    class="flex-1 bg-gray-800 text-white py-4 px-6 rounded-md hover:bg-gray-700 transition-colors font-medium"
+                          id="addToCartBtn"
+                          th:data-product-id="${perfume.perfumeId}"
+                          class="flex-1 bg-gray-800 text-white py-4 px-6 rounded-md hover:bg-gray-700 transition-colors font-medium"
                   >
                     <i class="fas fa-shopping-cart mr-2"></i>
                     장바구니 담기
@@ -449,7 +451,10 @@
                   <div class="bg-gray-50 p-6 rounded-lg">
                     <div class="flex items-center justify-between mb-4">
                       <h3 class="text-lg font-semibold text-gray-800">리뷰 요약</h3>
-                      <button class="text-sm text-blue-600 hover:underline">리뷰 작성하기</button>
+                      <a th:href="@{/shop/review(perfumeId=${perfume.perfumeId})}"
+                         class="text-sm text-blue-600 hover:underline">
+                        리뷰 작성하기
+                      </a>
                     </div>
                     <div class="grid md:grid-cols-3 gap-6">
                       <div class="text-center">
@@ -481,7 +486,8 @@
                           <div>
                             <div class="font-medium text-gray-800" th:text="${review.user.name}">김**</div>
                             <div class="flex items-center space-x-1">
-                              <i class="fas fa-star text-yellow-400 text-sm" th:each="i : ${#numbers.sequence(1, review.rating)}"></i>
+                              <i th:each="i : ${#numbers.sequence(1,5)}"
+                                 th:class="${i <= review.rating} ? 'fas fa-star text-yellow-400 text-sm' : 'far fa-star text-gray-300 text-sm'"></i>
                             </div>
                           </div>
                         </div>
@@ -490,6 +496,25 @@
                       <p class="text-gray-700 mb-3" th:text="${review.content}">
                         정말 예쁜 향이에요! 봄날의 꽃향 같아서 기분이 좋아집니다. 지속력도 괜찮고 포장도 예뻐요.
                       </p>
+                      <!-- 썸네일 이미지 -->
+                      <div class="mt-2">
+                        <img th:if="${review.imageUrl != null}"
+                             th:src="@{${review.imageUrl}}"
+                             alt="리뷰 이미지"
+                             class="w-24 h-24 object-cover rounded-md cursor-pointer"
+                             onclick="openImageModal(this.src)" />
+                      </div>
+
+                      <!-- 모달 (처음엔 숨김) -->
+                      <div id="imageModal" class="fixed inset-0 bg-black bg-opacity-60 flex items-center justify-center z-50 hidden">
+                        <div class="relative">
+                          <img id="modalImage" src="" alt="확대 이미지" class="max-w-full max-h-[80vh] rounded-md shadow-lg" />
+                          <button onclick="closeImageModal()"
+                                  class="absolute top-2 right-2 text-white bg-black bg-opacity-50 rounded-full p-1 hover:bg-opacity-80">
+                            ✕
+                          </button>
+                        </div>
+                      </div>
                     </div>
                   </div>
                 </div>
@@ -684,6 +709,134 @@
         document.getElementById("loginAlertModal").style.display = "none";
       }
 
+      // 모달창 열기
+      function openImageModal(src) {
+        const modal = document.getElementById('imageModal');
+        const modalImg = document.getElementById('modalImage');
+        modalImg.src = src;
+        modal.classList.remove('hidden');
+      }
+
+      // 모달창 닫기
+      function closeImageModal() {
+        const modal = document.getElementById('imageModal');
+        modal.classList.add('hidden');
+      }
+
+      // 줌 이미지 모달
+      document.addEventListener('DOMContentLoaded', () => {
+        const mainImage = document.getElementById('mainImage');
+        const zoomBtn = document.getElementById('zoomButton');
+        const modal = document.getElementById('zoomImageModal');
+        const modalImg = document.getElementById('zoomModalImage');
+        const closeBtn = document.getElementById('closeModal');
+
+        // 썸네일 클릭 시 메인 이미지 변경
+        document.querySelectorAll('.thumbnail-btn').forEach(btn => {
+          btn.addEventListener('click', () => {
+            const newSrc = btn.getAttribute('data-image');
+            mainImage.src = newSrc;
+
+            // 줌버튼의 data-image도 함께 바꿔주면 관리가 쉬움 (선택사항)
+            zoomBtn.setAttribute('data-image', newSrc);
+          });
+        });
+
+        // 줌 버튼 클릭 시 현재 메인 이미지 확대
+        zoomBtn.addEventListener('click', () => {
+          // 여기서 data-image 속성을 읽어서 모달 이미지로 띄우기
+          const zoomSrc = zoomBtn.getAttribute('data-image') || mainImage.src;
+          modalImg.src = zoomSrc;
+          modal.classList.remove('hidden');
+        });
+
+        // 모달 닫기 버튼 클릭
+        closeBtn.addEventListener('click', () => {
+          modal.classList.add('hidden');
+          modalImg.src = '';
+        });
+
+        // 모달 외부 클릭 시 닫기
+        modal.addEventListener('click', (e) => {
+          if (e.target === modal) {
+            modal.classList.add('hidden');
+            modalImg.src = '';
+          }
+        });
+      });
+
+      function animateAddToCart() {
+        // 메인 이미지에서 애니메이션용 이미지 복제
+        const $mainImage = $('#mainImage');
+        const $cartIcon = $('#cart-count').parent(); // 장바구니 아이콘 <a> 태그 선택
+
+        if ($mainImage.length === 0 || $cartIcon.length === 0) {
+          console.warn('필요한 요소가 존재하지 않습니다.');
+          return;
+        }
+
+        // 이미지 위치 및 크기 정보
+        const imgOffset = $mainImage.offset();
+        const imgWidth = $mainImage.width();
+        const imgHeight = $mainImage.height();
+
+        // 카트 아이콘 위치
+        const cartOffset = $cartIcon.offset();
+
+        // 복제 이미지 생성
+        const $flyImg = $mainImage.clone()
+                .css({
+                  position: 'absolute',
+                  top: imgOffset.top,
+                  left: imgOffset.left,
+                  width: imgWidth,
+                  height: imgHeight,
+                  borderRadius: '10px',
+                  zIndex: 1000,
+                  pointerEvents: 'none',
+                  opacity: 0.8,
+                  transition: 'all 0.8s ease-in-out',
+                })
+                .appendTo('body');
+
+        // 애니메이션 시작 (이미지 크기 줄이고 카트 위치로 이동)
+        setTimeout(() => {
+          $flyImg.css({
+            top: cartOffset.top + 10,    // 약간 여유를 줌
+            left: cartOffset.left + 10,
+            width: 30,
+            height: 30,
+            opacity: 0,
+          });
+        }, 10);
+
+        // 애니메이션 종료 후 제거
+        $flyImg.on('transitionend', () => {
+          $flyImg.remove();
+        });
+      }
+
+      $(document).ready(function() {
+        $('#addToCartBtn').on('click', function(e) {
+          e.preventDefault();
+          const productId = $(this).data('product-id');
+          $.ajax({
+            type: 'POST',
+            url: '/cart/add',
+            data: JSON.stringify({ perfumeId: productId, quantity: 1 }),
+            contentType: 'application/json',
+            success: function(response) {
+              $('#cart-count').text(response.cartItemCount);
+              animateAddToCart();
+            },
+            error: function(err) {
+              alert('장바구니 추가 실패: ' + err.responseText);
+              console.log("productId 확인:", productId);
+            }
+          });
+        });
+      });
+
       document.addEventListener('DOMContentLoaded', () => {
         // 수량 줄이기
         document.querySelectorAll('.decreaseQty').forEach(btn => {
@@ -783,6 +936,7 @@
         }
       });
     </script>
+    <!-------------------------------- 여기는 그냥 모달 배경 스타일 지정해주는 곳임.   --------------------------------->
     <!-- 모달 배경 및 창 -->
     <div id="loginAlertModal" style="
       position: fixed; top: 0; left: 0; width: 100%; height: 100%;
@@ -819,6 +973,14 @@
       transition: visibility 0s, opacity 0.5s linear;
       opacity: 0;
     "></div>
+
+    <!-- 이미지 확대 모달 -->
+    <div id="zoomImageModal" class="fixed inset-0 bg-black bg-opacity-70 flex items-center justify-center z-50 hidden">
+      <div class="relative">
+        <img id="zoomModalImage" src="" alt="확대 이미지" class="max-w-4xl max-h-[80vh] rounded-lg shadow-lg" />
+        <button id="closeModal" class="absolute top-2 right-2 text-white text-2xl">&times;</button>
+      </div>
+    </div>
 
   </body>
 </html>
