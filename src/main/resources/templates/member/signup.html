@@ -41,21 +41,29 @@
                   <label class="block text-sm font-medium text-gray-700 mb-2">
                     아이디 <span class="text-red-500">*</span>
                   </label>
-                  <label>
+
+                  <div class="flex items-center space-x-2">
                     <input
-                      type="text"
-                      name="loginId"
-                      id="loginId"
-                      required
-                      class="w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-gray-800 focus:border-transparent"
-                      placeholder="아이디를 입력하세요"
+                        type="text"
+                        name="loginId"
+                        id="loginId"
+                        required
+                        class="w-64 border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-gray-800 focus:border-transparent"
+                        placeholder="아이디를 입력하세요"
                     />
-                  </label>
-                  <p class="text-xs text-gray-500 mt-1">
-                    (영문소문자/숫자, 4~16자)
-                  </p>
+                    <button
+                      type="button"
+                      id="checkLoginIdBtn"
+                      class="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-500"
+                    >
+                      중복 확인
+                    </button>
+                  </div>
+
+                  <p class="text-xs text-gray-500 mt-1">(영문소문자/숫자, 4~16자)</p>
                   <p id="loginIdError" class="text-red-500 text-sm mt-1 hidden"></p>
                 </div>
+
 
                 <!-- Password -->
                 <div class="mb-4">
@@ -117,49 +125,45 @@
                 <!-- Address -->
 
                 <!-- Phone Numbers -->
-                <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
-                  <div>
-                    <label class="block text-sm font-medium text-gray-700 mb-2">
-                      휴대전화 <span class="text-red-500">*</span>
-                    </label>
-                    <div class="flex space-x-2">
-                      <label>
-                        <select name="firstNum"
-                          class="border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-gray-800 focus:border-transparent"
-                        >
-                          <option>010</option>
-                          <option>011</option>
-                          <option>016</option>
-                          <option>017</option>
-                          <option>018</option>
-                          <option>019</option>
-                        </select>
-                      </label>
-                      <label>
-                        <input
-                          type="text"
-                          name="middleNum"
-                          id="middleNum"
-                          required
-                          class="flex-1 border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-gray-800 focus:border-transparent"
-                          placeholder="-"
-                        />
-                      </label>
-                      <label>
-                        <input
-                          type="text"
-                          name="lastNum"
-                          id="lastNum"
-                          required
-                          class="flex-1 border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-gray-800 focus:border-transparent"
-                          placeholder="-"
-                        />
-                      </label>
-                    </div>
-                      <p id="middleNumError" class="text-red-500 hidden text-sm mt-1"></p>
-                      <p id="lastNumError" class="text-red-500 hidden text-sm mt-1"></p>
+                <div class="mb-4">
+                  <label class="block text-sm font-medium text-gray-700 mb-2">
+                    휴대전화 <span class="text-red-500">*</span>
+                  </label>
+                  <div class="flex items-center space-x-2 w-full">
+                    <select name="firstNum"
+                            class="w-1/4 border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-gray-800 focus:border-transparent">
+                      <option>010</option>
+                      <option>011</option>
+                      <option>016</option>
+                      <option>017</option>
+                      <option>018</option>
+                      <option>019</option>
+                    </select>
+                    <input
+                      type="text"
+                      name="middleNum"
+                      id="middleNum"
+                      required
+                      maxlength="4"
+                      class="w-1/3 border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-gray-800 focus:border-transparent"
+                    />
+                    <span class="text-gray-500 text-lg">-</span>
+                    <input
+                      type="text"
+                      name="lastNum"
+                      id="lastNum"
+                      required
+                      maxlength="4"
+                      class="w-1/3 border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-gray-800 focus:border-transparent"
+                    />
+                  </div>
+
+                  <div class="flex space-x-4 mt-1">
+                    <p id="middleNumError" class="text-red-500 hidden text-sm"></p>
+                    <p id="lastNumError" class="text-red-500 hidden text-sm"></p>
                   </div>
                 </div>
+
 
                 <!-- Email -->
                 <div class="mb-6">
