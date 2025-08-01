@@ -83,6 +83,7 @@ public class UserService implements UserDetailsService { // UserDetailsService �
 
   // 아이디 중복 검사
   public boolean checklogin(String loginId) {
+    log.info("아이디 중복 검사 {}",userRepository.existsByLoginId(loginId) );
     return userRepository.existsByLoginId(loginId);
   }
 
