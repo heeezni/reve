@@ -35,6 +35,7 @@ public class SecurityConfig {
                         "/images/**",
                         "/uploads/**",
                         "/webjars/**",
+                        "/member/check/**",
                         "/favicon.ico")
                     .permitAll()
                     .requestMatchers(
