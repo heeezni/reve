@@ -73,9 +73,9 @@ public class CouponService {
   public void couponByMonth() {
     LocalDate today = LocalDate.now();
     LocalDate issuedAt = LocalDate.now();
-    LocalDate birthday = null;
-    LocalDate expiresDate = null;
-    LocalDate validFrom = null;
+    LocalDate birthday ;
+    LocalDate expiresDate;
+    LocalDate validFrom ;
 
     int month = today.getMonthValue();
     List<User> userList = userRepository.findAll();
