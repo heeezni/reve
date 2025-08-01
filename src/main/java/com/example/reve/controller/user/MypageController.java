@@ -1,5 +1,7 @@
 package com.example.reve.controller.user;
 
+import java.util.List;
+
 import jakarta.servlet.http.HttpSession;
 
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
@@ -10,8 +12,10 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 
 import com.example.reve.domain.CustomUserDetails;
+import com.example.reve.dto.CouponDTO;
 import com.example.reve.dto.NewPasswordDTO;
 import com.example.reve.dto.UpdateProfileDTO;
+import com.example.reve.service.CouponService;
 import com.example.reve.service.UserService;
 
 import lombok.RequiredArgsConstructor;
@@ -24,6 +28,7 @@ import lombok.extern.slf4j.Slf4j;
 public class MypageController {
 
   private final UserService userService;
+  private final CouponService couponService;
 
   @GetMapping
   public String mypage(Model model, @AuthenticationPrincipal CustomUserDetails customUserDetails) {
@@ -49,7 +54,13 @@ public class MypageController {
 
   // 쿠폰 목록
   @GetMapping("/coupons")
-  public String cupons() {
+  public String cupons(Model model, @AuthenticationPrincipal CustomUserDetails customUserDetails) {
+    // 특정 회원 찾기
+    Long userId = customUserDetails.getUser().getUserId();
+    List<CouponDTO> couponList = couponService.getCoupon(userId);
+    model.addAttribute("couponList", couponList);
+    log.info("회원이 가지고 있는 쿠폰 리스트 couponList {}", model.addAttribute("couponList", couponList));
+
     return "user/mypage/coupons";
   }
 

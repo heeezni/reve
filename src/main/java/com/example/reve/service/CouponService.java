@@ -2,6 +2,7 @@ package com.example.reve.service;
 
 import java.time.LocalDate;
 import java.time.Year;
+import java.util.ArrayList;
 import java.util.List;
 
 import org.springframework.stereotype.Service;
@@ -10,6 +11,7 @@ import org.springframework.transaction.annotation.Transactional;
 import com.example.reve.domain.Coupon;
 import com.example.reve.domain.CouponName;
 import com.example.reve.domain.User;
+import com.example.reve.dto.CouponDTO;
 import com.example.reve.repository.CouponRepository;
 import com.example.reve.repository.UserRepository;
 
@@ -94,6 +96,30 @@ public class CouponService {
     }
   }
 
+  // 쿠폰 조회
+  public List<CouponDTO> getCoupon(Long userId) {
+    // 필요한 쿠폰 정보를 담을 리스트
+    List<CouponDTO> result = new ArrayList<>();
+    // 사용자가 가지고 있는 쿠폰들의 리스트
+    List<Coupon> coupons = couponRepository.findByUser_UserId(userId);
+    log.info("회원이 가지고 있는 쿠폰 : {}", coupons);
+    for (Coupon coupon : coupons) {
+      CouponDTO couponDTO = new CouponDTO();
+      // 쿠폰명
+      couponDTO.setCouponName(coupon.getCouponName());
+      // 쿠폰 만료일
+      couponDTO.setExpiresAt(coupon.getExpiresAt());
+      // 사용가능여부
+      couponDTO.setIsUsed(coupon.getIsUsed());
+      // 쿠폰 유효 시작일
+      couponDTO.setValidFrom(coupon.getValidFrom());
+      // 쿠폰들 담기
+      result.add(couponDTO);
+    }
+    return result;
+  }
+
+  // 쿠폰 발급 메서드
   public void saveCoupon(
       Coupon coupon, User user, LocalDate expiresDate, LocalDate validFrom, LocalDate issuedAt) {
     // 중복발급 확인
