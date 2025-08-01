@@ -5,6 +5,7 @@ import java.util.List;
 import java.util.Optional;
 
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Query;
 
 import com.example.reve.domain.Coupon;
 import com.example.reve.domain.CouponName;
@@ -24,4 +25,14 @@ public interface CouponRepository extends JpaRepository<Coupon, Long> {
 
   // 아직 사용되지 않는 쿠폰만 조회
   List<Coupon> findByIsUsedFalse();
+
+  // 유효한 쿠폰 갯수 구하기
+  @Query(
+      """
+    select count(c) from com.example.reve.domain.Coupon c where c.user.userId = :userId
+        and c.expiresAt >= current_timestamp
+        and c.validFrom <= current_timestamp
+        and c.isUsed = false
+    """)
+  long countUsableCoupons(Long userId);
 }

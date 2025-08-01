@@ -39,6 +39,8 @@ public class MypageController {
     String loginId = customUserDetails.getUsername();
     if (loginId != null) {
       model.addAttribute("mypage", userService.selectMypage(loginId));
+      int result = couponService.countCoupon(loginId);
+      model.addAttribute("countCoupon", result);
       return "user/mypage/index";
     } else {
       log.error("loginId is {}", loginId);

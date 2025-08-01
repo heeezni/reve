@@ -139,6 +139,13 @@ public class CouponService {
     return result;
   }
 
+  // 유효한 쿠폰 갯수
+  public int countCoupon(String loginId) {
+    User user = userRepository.findByLoginId(loginId).orElseThrow();
+    Long userId = user.getUserId();
+    return (int) couponRepository.countUsableCoupons(userId);
+  }
+
   // 쿠폰 발급 메서드
   public void saveCoupon(
       Coupon coupon, User user, LocalDate expiresDate, LocalDate validFrom, LocalDate issuedAt) {
