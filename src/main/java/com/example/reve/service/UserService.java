@@ -123,6 +123,8 @@ public class UserService implements UserDetailsService { // UserDetailsService �
     user.setBirthday(updateProfileDTO.getBirthday());
     // 휴대폰 번호
     user.setPhone(updateProfileDTO.getPhone());
+    // 닉네임
+    user.setNickname(updateProfileDTO.getNickname());
 
     log.info("회원 정보 변경 : {}", user);
     // 수정하기
