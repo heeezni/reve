@@ -19,7 +19,6 @@ public class QnaReqDTO {
   @Size(max = 2000, message = "내용은 2000자를 초과할 수 없습니다.")
   private String content; // QnA 내용
 
-  private String password; // QnA 비밀번호
   private Boolean isSecret; // 비밀글 여부
   private String category; // QnA 문의 분류
   private String loginId; // 작성자 로그인 ID
@@ -27,4 +26,6 @@ public class QnaReqDTO {
 
   @Size(max = 5, message = "최대 5개의 파일만 첨부할 수 있습니다.")
   private List<MultipartFile> attachmentFiles; // 첨부 파일 리스트
+
+  private List<String> deletedAttachments; // 삭제할 첨부 파일 URL 리스트
 }

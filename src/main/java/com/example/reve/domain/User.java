@@ -1,5 +1,8 @@
 package com.example.reve.domain;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import jakarta.persistence.*;
 
 import lombok.*;
@@ -51,4 +54,7 @@ public class User extends BaseEntity {
   @Builder.Default
   @Enumerated(EnumType.STRING)
   private Role role = Role.USER;
+
+  @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
+  private List<Qna> qnaList = new ArrayList<>();
 }

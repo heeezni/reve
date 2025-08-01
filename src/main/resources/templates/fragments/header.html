@@ -33,7 +33,13 @@
             <a
               href="/board/qna/list"
               class="text-gray-800 font-medium hover:text-gray-600 transition-colors"
-              >Q&A</a
+              sec:authorize="!hasRole('ADMIN')"
+              >Q&A</a>
+            <a
+              href="/admin/board/qna/list"
+              class="text-gray-800 font-medium hover:text-gray-600 transition-colors"
+              sec:authorize="hasRole('ADMIN')"
+              >Q&A (관리자)</a
             >
           </nav>
 

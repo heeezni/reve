@@ -23,6 +23,7 @@ import com.example.reve.domain.User;
 import com.example.reve.dto.QnaReqDTO;
 import com.example.reve.dto.QnaResDTO;
 import com.example.reve.repository.UserRepository;
+import com.example.reve.service.PerfumeService;
 import com.example.reve.service.QnaService;
 
 import lombok.RequiredArgsConstructor;
@@ -36,12 +37,13 @@ public class BoardController {
 
   private final QnaService qnaService; // 서비스 주입 (QnaService)
   private final UserRepository userRepository; // UserRepository 주입
+  private final PerfumeService perfumeService; // PerfumeService 주입
 
   // Q&A 생성 API
   @PostMapping("/qna")
   @ResponseBody // View가 아닌 데이터(JSON)를 반환
   public ResponseEntity<?> createQna(
-      @Valid @ModelAttribute QnaReqDTO reqDto, BindingResult bindingResult) {
+      @Valid @ModelAttribute QnaReqDTO reqDto, BindingResult bindingResult, Principal principal) {
     // QnaReqDTO의 유효성 검사 수행
     if (bindingResult.hasErrors()) {
       StringBuilder errorMessage = new StringBuilder();
@@ -52,14 +54,13 @@ public class BoardController {
       return ResponseEntity.badRequest().body(errorMessage.toString());
     }
     try {
-      log.info("createQna: Received loginId from reqDto: {}", reqDto.getLoginId()); // 로그 추가
-      QnaResDTO qna = qnaService.createQna(reqDto);
+      QnaResDTO qna = qnaService.createQna(reqDto, principal);
       return ResponseEntity.ok(qna); // 성공(200 OK) 응답과 함께 생성된 Q&A 정보 반환
     } catch (IOException e) {
       // 파일 업로드 관련 예외 처리
       return ResponseEntity.badRequest().body("파일 업로드 실패: " + e.getMessage());
     } catch (IllegalArgumentException e) {
-      // 서비스 로직에서 발생하는 유효성 검사 예외 처리 (예: 비밀글 비밀번호 누락)
+      // 서비스 로직에서 발생하는 유효성 검사 예외 처리
       return ResponseEntity.badRequest().body("문의 등록 실패: " + e.getMessage());
     } catch (Exception e) {
       // 그 외 예상치 못한 예외 처리
@@ -118,7 +119,7 @@ public class BoardController {
     log.info("qnaDetail: Accessing Q&A with ID: {}", qnaId); // Q&A ID 로깅
     try {
       // 비밀번호 없이 조회를 시도. 공개글이거나 관리자면 성공.
-      QnaResDTO qna = qnaService.getQnaById(qnaId, principal, null);
+      QnaResDTO qna = qnaService.getQnaById(qnaId, principal);
       model.addAttribute("qna", qna);
 
       // 현재 로그인한 사용자 정보 확인
@@ -164,8 +165,16 @@ public class BoardController {
     } catch (IllegalAccessException e) {
       log.error(
           "qnaDetail: IllegalAccessException for Q&A ID {}: {}", qnaId, e.getMessage()); // 에러 로깅
-      // 비밀글이고 권한이 없으면 비밀번호 입력 페이지로 이동
-      return "redirect:/board/qna/password/" + qnaId;
+      // 비밀글이고 권한이 없으면 접근 거부 메시지를 표시하도록 모델에 플래그 추가
+      model.addAttribute("accessDenied", true);
+      // 최소한의 QnaResDTO 객체를 생성하여 isSecret을 true로 설정 (템플릿 조건 처리를 위함)
+      QnaResDTO dummyQna = new QnaResDTO();
+      dummyQna.setIsSecret(true);
+      model.addAttribute("qna", dummyQna);
+      model.addAttribute("qnaId", qnaId); // qnaId도 함께 전달
+      model.addAttribute("isAuthor", false); // 접근 권한이 없으므로 false
+      model.addAttribute("isAdmin", false); // 접근 권한이 없으므로 false
+      return "board/qna/detail";
     } catch (IllegalArgumentException e) {
       model.addAttribute("errorMessage", e.getMessage());
       return "common/error";
@@ -174,12 +183,13 @@ public class BoardController {
 
   // Q&A 삭제 API
   @DeleteMapping("/qna/{qnaId}")
-  public String deleteQna(@PathVariable Long qnaId, RedirectAttributes redirectAttributes) {
+  public String deleteQna(
+      @PathVariable Long qnaId, Principal principal, RedirectAttributes redirectAttributes) {
     try {
-      qnaService.deleteQna(qnaId);
+      qnaService.deleteQna(qnaId, principal);
       redirectAttributes.addFlashAttribute("successMessage", "Q&A가 성공적으로 삭제되었습니다.");
       return "redirect:/board/qna/list";
-    } catch (IllegalArgumentException e) {
+    } catch (IllegalAccessException | IllegalArgumentException e) {
       redirectAttributes.addFlashAttribute("errorMessage", e.getMessage());
       return "redirect:/board/qna/detail/" + qnaId;
     } catch (IOException e) {
@@ -192,38 +202,43 @@ public class BoardController {
   }
 
   @GetMapping("/qna/form")
-  public String qnaForm() {
+  public String qnaForm(Model model) {
+    model.addAttribute("perfumes", perfumeService.getAllPerfumes());
     return "board/qna/form";
   }
 
-  // 비밀글 비밀번호 입력 폼을 보여주는 엔드포인트
-  @GetMapping("/qna/password/{qnaId}")
-  public String showPasswordForm(@PathVariable Long qnaId, Model model) {
-    model.addAttribute("qnaId", qnaId);
-    return "board/qna/password_check";
-  }
-
-  // 비밀글 비밀번호를 검증하고 상세 페이지를 보여주는 엔드포인트
-  @PostMapping("/qna/password/{qnaId}")
-  public String verifyPassword(
-      @PathVariable Long qnaId,
-      @RequestParam String password,
-      Model model,
-      Principal principal,
-      RedirectAttributes redirectAttributes) {
+  @GetMapping("/qna/edit/{qnaId}")
+  public String editQnaForm(@PathVariable Long qnaId, Model model, Principal principal) {
     try {
-      // 비밀번호와 함께 조회를 시도
-      QnaResDTO qna = qnaService.getQnaById(qnaId, principal, password);
+      QnaResDTO qna = qnaService.getQnaById(qnaId, principal);
       model.addAttribute("qna", qna);
-      return "board/qna/detail"; // 성공 시 상세 페이지 보여주기
+      model.addAttribute("perfumes", perfumeService.getAllPerfumes());
+      return "board/qna/edit";
     } catch (IllegalAccessException e) {
-      // 비밀번호가 틀렸을 경우, 에러 메시지와 함께 비밀번호 입력 페이지로 리다이렉트
-      redirectAttributes.addFlashAttribute("errorMessage", e.getMessage());
-      return "redirect:/board/qna/password/" + qnaId;
-    } catch (IllegalArgumentException e) {
-      // 존재하지 않는 Q&A 등 다른 에러 처리
       model.addAttribute("errorMessage", e.getMessage());
       return "common/error";
+    }
+  }
+
+  @PostMapping("/qna/edit/{qnaId}")
+  public String updateQna(
+      @PathVariable Long qnaId,
+      @Valid @ModelAttribute QnaReqDTO reqDto,
+      BindingResult bindingResult,
+      Principal principal,
+      RedirectAttributes redirectAttributes) {
+    if (bindingResult.hasErrors()) {
+      redirectAttributes.addFlashAttribute(
+          "org.springframework.validation.BindingResult.qnaReqDTO", bindingResult);
+      redirectAttributes.addFlashAttribute("qnaReqDTO", reqDto);
+      return "redirect:/board/qna/edit/" + qnaId;
+    }
+    try {
+      qnaService.updateQna(qnaId, reqDto, principal);
+      return "redirect:/board/qna/detail/" + qnaId;
+    } catch (IOException | IllegalAccessException e) {
+      redirectAttributes.addFlashAttribute("errorMessage", e.getMessage());
+      return "redirect:/board/qna/edit/" + qnaId;
     }
   }
 }
