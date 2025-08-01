@@ -54,6 +54,7 @@ public class SecurityConfig {
                     .usernameParameter("loginId") // 사용자 이름 파라미터 (기본값 username)
                     .passwordParameter("password") // 비밀번호 파라미터 (기본값 password)
                     .defaultSuccessUrl("/", true) // 로그인 성공 시 기본 리다이렉트 URL
+                    .failureUrl("/member/login?error=true") // 로그인 실패 처리 URL
                     .permitAll())
         .logout(
             logout ->
