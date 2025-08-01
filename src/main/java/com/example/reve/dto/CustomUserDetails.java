@@ -1,4 +1,4 @@
-package com.example.reve.domain;
+package com.example.reve.dto;
 
 import java.util.Collection;
 import java.util.Collections;
@@ -6,6 +6,8 @@ import java.util.Collections;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
+
+import com.example.reve.domain.User;
 
 import lombok.Getter;
 
@@ -41,10 +43,6 @@ public class CustomUserDetails implements UserDetails {
   // User 엔티티의 nickname 속성 노출
   public String getNickname() {
     return user.getNickname();
-  }
-
-  public String getEmail() {
-    return user.getEmail();
   }
 
   @Override

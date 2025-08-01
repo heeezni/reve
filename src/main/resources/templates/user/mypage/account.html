@@ -62,7 +62,6 @@
               <div id="profile" class="tab-content">
                 <div class="space-y-8">
                   <form th:action="@{/mypage/account/profile}" method="post" id="updateForm">
-                    <input class="hidden" name="loginId" th:value="${session.loginUser.loginId}">
                   <!-- Profile Image -->
                   <div>
                     <label class="block text-sm font-medium text-gray-700 mb-4"
@@ -107,7 +106,7 @@
                           <input
                             type="text"
                             name="name"
-                            th:value="${session.loginUser.name}"
+                            th:value="${profile.name}"
                             class="w-full border border-gray-300 rounded-md px-4 py-3 focus:outline-none focus:ring-2 focus:ring-gray-800 focus:border-transparent"
                           />
                         </label>
@@ -123,7 +122,7 @@
                           <input
                             type="text"
                             name="nickname"
-                            th:value="${session.loginUser.nickname != null} ? ${session.loginUser.nickname} : ''"
+                            th:value="${profile != null and profile.nickname != null ? profile.nickname : ''}"
                             class="w-full border border-gray-300 rounded-md px-4 py-3 focus:outline-none focus:ring-2 focus:ring-gray-800 focus:border-transparent"
                           />
                         </label>
@@ -138,7 +137,7 @@
                         <label>
                           <input
                             type="email"
-                            th:value="${session.loginUser.email}"
+                            th:value="${#authentication.principal.email}"
                             class="w-full border border-gray-300 rounded-md px-4 py-3 focus:outline-none focus:ring-2 focus:ring-gray-800 focus:border-transparent"
                             readonly
                           />
@@ -158,7 +157,7 @@
                           <input
                             type="date"
                             name="birthday"
-                            th:value="${session.loginUser.birthday != null} ? ${session.loginUser.birthday} : ''"
+                            th:value="${profile != null} ? ${profile.birthday} : ''"
                             class="w-full border border-gray-300 rounded-md px-4 py-3 focus:outline-none focus:ring-2 focus:ring-gray-800 focus:border-transparent"
                           />
                         </label>
@@ -184,7 +183,7 @@
                             <input
                               type="tel"
                               name="phone"
-                              th:value="${session.loginUser.phone}"
+                              th:value="${profile.phone}"
                               class="flex-1 border border-gray-300 rounded-md px-4 py-3 focus:outline-none focus:ring-2 focus:ring-gray-800 focus:border-transparent"
                             />
                           </label>
@@ -221,7 +220,6 @@
 
                     <div class="space-y-6">
                       <form th:action="@{/mypage/account/password}" method="post" id="passwordForm">
-                        <input class="hidden" name="loginId" th:value="${session.loginUser.loginId}">
                       <div>
                         <label
                           class="block text-sm font-medium text-gray-700 mb-2"
@@ -393,11 +391,43 @@
       </div>
     </main>
 
-    <!-- Footer Fragment -->
-    <div th:replace="~{fragments/footer :: footer}"></div>
-
     <!-- Login Modal Fragment -->
     <script src="/js/script.js"></script>
+    <!-- Footer Fragment -->
+    <div th:replace="~{fragments/footer :: footer}"></div>
+    <script>
+      document.getElementById('passwordForm').addEventListener('submit', function (e) {
+        const password = document.querySelector('input[name="password"]').value;
+        const newPassword = document.querySelector('input[name="newPassword"]').value;
+        const confirmPassword = document.querySelectorAll('input[type="password"]')[2].value;
+
+        if (!password || !newPassword || !confirmPassword) {
+          e.preventDefault();
+          alert('모든 항목을 입력해주세요.');
+          return;
+        }
+
+        if (newPassword === password) {
+          e.preventDefault();
+          alert('기존 비밀번호와 동일합니다.');
+          return;
+        }
+
+        if (newPassword !== confirmPassword) {
+          e.preventDefault();
+          alert('새 비밀번호와 일치하지 않습니다.');
+        }
+      });
+
+    </script>
+    <p>디버그 result = [[${result}]]</p>
+    <script th:if="${result}" >
+        alert("비밀번호가 일치하지 않습니다");
+    </script>
+
+    <script th:if="${result2 != null and result2}" >
+      alert("비밀번호가 변경되었습니다 다시 로그인 해 주세요");
+    </script>
     <script>
       // Tab functionality
       const tabBtns = document.querySelectorAll('.tab-btn');
@@ -430,55 +460,6 @@
       document.getElementById('updateForm').addEventListener('submit', function () {
       alert('정보가 성공적으로 수정되었습니다.');
       });
-
-      document.getElementById('passwordForm').addEventListener('submit', function (e) {
-        const password = document.querySelector('input[name="password"]').value;
-        const newPassword = document.querySelector('input[name="newPassword"]').value;
-        const confirmPassword = document.querySelectorAll('input[type="password"]')[2].value;
-
-        // 비어있는지 확인
-        if (!password || !newPassword || !confirmPassword) {
-          e.preventDefault();
-          alert('모든 항목을 입력해주세요.');
-          return;
-        }
-
-        // 새 비밀번호 일치 확인
-        if (newPassword !== confirmPassword) {
-          e.preventDefault();
-          alert('새 비밀번호가 일치하지 않습니다.');
-          return;
-        }
-
-        // 길이/조합 조건은 여기서 추가 가능
-
-        // 모든 조건 통과 시 alert만 띄우고 제출 계속 진행
-        alert('비밀번호가 변경되었습니다. 다시 로그인 해주세요.');
-        // 제출 막지 않음 → 서버로 전송됨
-      });
-
-      // Password change validation
-
-      const passwordInputs = document.querySelectorAll(
-        'input[type="password"]'
-      );
-      passwordInputs.forEach((input) => {
-        input.addEventListener('input', function () {
-          // Add password validation logic here
-        });
-      });
-      const passwordForm = document.getElementById('passwordForm');
-      if(passwordForm){
-        const result = [[${result}]];
-      }
-
-      // Address search functionality
-      Array.from(document.querySelectorAll('button'))
-        .find((button) => button.textContent.includes('주소검색'))
-        .addEventListener('click', function () {
-          // Add address search logic here
-          alert('주소 검색 기능이 실행됩니다.');
-        });
 
       // Account deletion confirmation
       Array.from(document.querySelectorAll('button'))

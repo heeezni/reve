@@ -294,8 +294,7 @@
 
                     <!-- 공유하기 버튼 -->
                     <button
-                            class="flex items-center space-x-2 text-gray-600 hover:text-gray-800 transition-colors"
-                            onclick="copyToClipboard()"
+
                     >
                       <i class="fas fa-share-alt text-lg"></i>
                       <span class="text-sm">공유하기</span>
@@ -935,52 +934,8 @@
           heart.style.color = '';
         }
       });
+
     </script>
-    <!-------------------------------- 여기는 그냥 모달 배경 스타일 지정해주는 곳임.   --------------------------------->
-    <!-- 모달 배경 및 창 -->
-    <div id="loginAlertModal" style="
-      position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-      background: rgba(0, 0, 0, 0.4); display: none;
-      align-items: center; justify-content: center; z-index: 1000;">
-      <div style="
-        background: white; padding: 30px; border-radius: 10px;
-        font-size: 16px; text-align: center; box-shadow: 0 5px 20px rgba(0,0,0,0.2);">
-        로그인이 필요한 기능입니다.
-        <br/><br/>
-        <button onclick="closeLoginModal()" style="
-          background: #ef4444; color: white; border: none;
-          padding: 10px 20px; border-radius: 6px; cursor: pointer;">
-              닫기
-        </button>
-      </div>
-    </div>
-
-    <div id="toast" style="
-      visibility: hidden;
-      min-width: 200px;
-      background-color: #4ade80; /* 연한 초록 */
-      color: white;
-      text-align: center;
-      border-radius: 8px;
-      padding: 12px;
-      position: fixed;
-      z-index: 10000;
-      left: 50%;
-      bottom: 30px;
-      font-size: 14px;
-      transform: translateX(-50%);
-      box-shadow: 0 2px 8px rgba(0,0,0,0.2);
-      transition: visibility 0s, opacity 0.5s linear;
-      opacity: 0;
-    "></div>
-
-    <!-- 이미지 확대 모달 -->
-    <div id="zoomImageModal" class="fixed inset-0 bg-black bg-opacity-70 flex items-center justify-center z-50 hidden">
-      <div class="relative">
-        <img id="zoomModalImage" src="" alt="확대 이미지" class="max-w-4xl max-h-[80vh] rounded-lg shadow-lg" />
-        <button id="closeModal" class="absolute top-2 right-2 text-white text-2xl">&times;</button>
-      </div>
-    </div>
 
   </body>
 </html>

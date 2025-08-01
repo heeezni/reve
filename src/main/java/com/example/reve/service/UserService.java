@@ -11,10 +11,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import com.example.reve.domain.CustomUserDetails;
 import com.example.reve.domain.User;
-import com.example.reve.dto.CreateUserDTO;
-import com.example.reve.dto.LoginUserDTO;
-import com.example.reve.dto.NewPasswordDTO;
-import com.example.reve.dto.UpdateProfileDTO;
+import com.example.reve.dto.*;
 import com.example.reve.repository.UserRepository;
 
 import lombok.RequiredArgsConstructor;
@@ -24,18 +21,19 @@ import lombok.extern.slf4j.Slf4j;
 @Slf4j
 @Transactional
 @RequiredArgsConstructor
-/** User 테이블에 대한 서비스 */
+/* User 테이블에 대한 서비스 */
 public class UserService implements UserDetailsService { // UserDetailsService 구현
 
   private final UserRepository userRepository;
   private final PasswordEncoder passwordEncoder;
+  private final CouponService couponService;
 
   /**
    * 회원 가입 서비스
    *
    * @param create (아이디,비밀번호, 이메일, 휴대폰 번호)
    */
-  public void signup(CreateUserDTO create) {
+  public Long signup(CreateUserDTO create) {
     log.info("회원 가입 서비스 호출");
     // 아이디 중복 확인
     if (userRepository.findByLoginId(create.getLoginId()).isPresent()) {
@@ -57,6 +55,7 @@ public class UserService implements UserDetailsService { // UserDetailsService �
             .build();
     log.info("회원 가입 유저 {}", user);
     userRepository.save(user);
+    return user.getUserId();
   }
 
   /**
@@ -105,15 +104,13 @@ public class UserService implements UserDetailsService { // UserDetailsService �
    * 회원 정보 수정 서비스
    *
    * @param updateProfileDTO (프로필 사진, 이름, 닉네임, 이메일, 생일,휴대폰 번호)
-   * @return
+   * @return user
    */
-  public User update(UpdateProfileDTO updateProfileDTO) {
+  public UpdateProfileDTO update(UpdateProfileDTO updateProfileDTO, String loginId) {
     // 로그인 아이디가 같은 회원
-    User user = userRepository.findByLoginId(updateProfileDTO.getLoginId()).orElseThrow();
+    User user = userRepository.findByLoginId(loginId).orElseThrow();
     // 이름
     user.setName(updateProfileDTO.getName());
-    // 닉네임
-    user.setNickname(updateProfileDTO.getNickname());
     // 프로필 사진 경로
     user.setProfileUrl(updateProfileDTO.getProfileUrl());
     // 생일
@@ -124,7 +121,15 @@ public class UserService implements UserDetailsService { // UserDetailsService �
     log.info("회원 정보 변경 : {}", user);
     // 수정하기
     userRepository.save(user);
-    return user;
+    // 생일 등록 시 생일쿠폰 발급
+    if (updateProfileDTO.getBirthday() != null) {
+      couponService.birthdayCoupon(user);
+    }
+    return userRepository.findUserUpdate(loginId);
+  }
+
+  public UpdateProfileDTO profileById(String loginId) {
+    return userRepository.findUserUpdate(loginId);
   }
 
   /**
@@ -132,24 +137,34 @@ public class UserService implements UserDetailsService { // UserDetailsService �
    *
    * @param newPasswordDTO (로그인 아이디, 기존 비밀번호, 변경 비밀번호)
    */
-  public boolean updatePassword(NewPasswordDTO newPasswordDTO) {
+  public boolean checkPassword(NewPasswordDTO newPasswordDTO, String loginId) {
     // 로그인 아이디가 같은 회원 정보 가져오기
-    User user = userRepository.findByLoginId(newPasswordDTO.getLoginId()).orElseThrow();
+    User user = userRepository.findByLoginId(loginId).orElseThrow();
     // 기존 비밀번호가 일치한지 확인하기
     if (passwordEncoder.matches(newPasswordDTO.getPassword(), user.getPassword())) {
-      // 새 비밀번호와 기존 비밀번호가 일치한지 비교
-      if (!newPasswordDTO.getPassword().equals(newPasswordDTO.getNewPassword())) {
-        // 새 비밀번호 암호화
-        String encodedNewPassword = passwordEncoder.encode(newPasswordDTO.getNewPassword());
-        user.setPassword(encodedNewPassword);
-        // 저장
-        userRepository.save(user);
-        return true;
-      } else {
-        throw new BadCredentialsException("비밀번호의 변경사함이 없음");
-      }
+      return true;
     } else {
-      throw new BadCredentialsException("비밀번호가 일치하지 않음");
+      log.error("비밀번호가 일치하지 않음");
+      return false;
     }
+  }
+
+  public boolean updatePassword(NewPasswordDTO newPasswordDTO, String loginId) {
+    User user = userRepository.findByLoginId(loginId).orElseThrow();
+    // 새 비밀번호와 기존 비밀번호가 일치한지 비교
+    if (!newPasswordDTO.getPassword().equals(newPasswordDTO.getNewPassword())) {
+      // 새 비밀번호 암호화
+      String encodedNewPassword = passwordEncoder.encode(newPasswordDTO.getNewPassword());
+      user.setPassword(encodedNewPassword);
+      // 저장
+      userRepository.save(user);
+      return true;
+    } else {
+      throw new BadCredentialsException("비밀번호의 변경사함이 없음");
+    }
+  }
+
+  public MypageDTO selectMypage(String loginId) {
+    return userRepository.findUserInfoByLoginId(loginId);
   }
 }
