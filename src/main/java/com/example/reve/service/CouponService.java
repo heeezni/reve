@@ -27,16 +27,17 @@ public class CouponService {
   private final UserRepository userRepository;
   private Coupon coupon;
 
-  //신규가입 쿠폰
-  public  void  newUserCoupon(Long userId){
+  // 신규가입 쿠폰
+  public void newUserCoupon(Long userId) {
     LocalDate issuedAt = LocalDate.now();
     LocalDate validFrom = LocalDate.now();
     LocalDate expiresDate = validFrom.plusDays(3);
     User user = userRepository.findById(userId).orElseThrow();
     // 쿠폰 발급
-    coupon.setCode("12341234");
+    coupon = new Coupon();
+    coupon.setCode("123123");
     coupon.setUser(user);
-    coupon.setCouponName(CouponName.BirthDay);
+    coupon.setCouponName(CouponName.NewMember);
     coupon.setDiscountRate(10);
     coupon.setExpiresAt(expiresDate.atTime(23, 59, 59));
     coupon.setIsUsed(false);
@@ -44,7 +45,6 @@ public class CouponService {
     coupon.setValidFrom(validFrom);
     couponRepository.save(coupon);
     log.info("신규가입 쿠폰{}", coupon);
-
   }
 
   // 생일 등록 시 첫번째로 조회 후 발급되는 생일쿠폰
@@ -93,9 +93,9 @@ public class CouponService {
   public void couponByMonth() {
     LocalDate today = LocalDate.now();
     LocalDate issuedAt = LocalDate.now();
-    LocalDate birthday ;
+    LocalDate birthday;
     LocalDate expiresDate;
-    LocalDate validFrom ;
+    LocalDate validFrom;
 
     int month = today.getMonthValue();
     List<User> userList = userRepository.findAll();

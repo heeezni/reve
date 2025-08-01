@@ -33,7 +33,7 @@ public class UserService implements UserDetailsService { // UserDetailsService �
    *
    * @param create (아이디,비밀번호, 이메일, 휴대폰 번호)
    */
-  public void signup(CreateUserDTO create) {
+  public Long signup(CreateUserDTO create) {
     log.info("회원 가입 서비스 호출");
     // 아이디 중복 확인
     if (userRepository.findByLoginId(create.getLoginId()).isPresent()) {
@@ -55,6 +55,7 @@ public class UserService implements UserDetailsService { // UserDetailsService �
             .build();
     log.info("회원 가입 유저 {}", user);
     userRepository.save(user);
+    return user.getUserId();
   }
 
   /**

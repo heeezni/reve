@@ -15,6 +15,7 @@ import com.example.reve.domain.CustomUserDetails;
 import com.example.reve.domain.User;
 import com.example.reve.dto.CreateUserDTO;
 import com.example.reve.dto.LoginUserDTO;
+import com.example.reve.service.CouponService;
 import com.example.reve.service.UserService;
 
 import lombok.RequiredArgsConstructor;
@@ -26,6 +27,7 @@ import lombok.extern.slf4j.Slf4j;
 @Slf4j
 public class MemberController {
   private final UserService userService;
+  private final CouponService couponService;
 
   @GetMapping("/login")
   public String login() {
@@ -61,7 +63,8 @@ public class MemberController {
   @PostMapping("/signup")
   public String signup(CreateUserDTO create) {
     log.info("가입 정보 {}", create);
-    userService.signup(create);
+    Long userId = userService.signup(create);
+    couponService.newUserCoupon(userId);
     return "index";
   }
 }
