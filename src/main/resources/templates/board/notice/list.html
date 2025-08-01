@@ -68,20 +68,19 @@
                     >
                       <option value="createdAt,desc" th:selected="${#strings.contains(sort, 'createdAt,desc')}">최신순</option>
                       <option value="hit,desc" th:selected="${#strings.contains(sort, 'hit,desc')}">조회순</option>
-                      <option value="title,asc" th:selected="${#strings.contains(sort, 'title,asc')}">제목순</option>
                     </select>
                   </label>
                 </div>
-                <!-- Admin Button: Register Notice -->
-                <div th:if="${isAdmin}">
-                  <a
-                    href="/admin/board/notice/register"
-                    class="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-purple-600 hover:bg-purple-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-purple-500"
-                  >
-                    <i class="fas fa-plus-circle mr-2"></i>
-                    공지사항 등록
-                  </a>
-                </div>
+              </div>
+              <!-- Admin Button: Register Notice -->
+              <div th:if="${isAdmin}" class="mt-4">
+                <a
+                  href="/admin/board/notice/register"
+                  class="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-purple-600 hover:bg-purple-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-purple-500"
+                >
+                  <i class="fas fa-plus-circle mr-2"></i>
+                  공지사항 등록
+                </a>
               </div>
             </form>
           </div>
