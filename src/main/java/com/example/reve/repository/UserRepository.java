@@ -13,6 +13,9 @@ public interface UserRepository extends JpaRepository<User, Long> {
 
   Optional<User> findByLoginId(String loginId);
 
+  // 아이디 중복 검사
+  boolean existsByLoginId(String loginId);
+
   @Query(
       "SELECT new com.example.reve.dto.MypageDTO(u.email, u.createdAt) FROM User u WHERE u.loginId = :loginId")
   MypageDTO findUserInfoByLoginId(String loginId);

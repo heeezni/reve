@@ -1,9 +1,11 @@
 package com.example.reve.controller.user;
 
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 
 import com.example.reve.dto.CreateUserDTO;
 import com.example.reve.service.CouponService;
@@ -28,6 +30,16 @@ public class MemberController {
   @GetMapping("/signup")
   public String signup() {
     return "member/signup";
+  }
+
+  @PostMapping("/check/loginId")
+  public ResponseEntity<String> checkLoginId(@RequestParam String loginId) {
+    boolean result = userService.checklogin(loginId);
+    if (result) {
+      return ResponseEntity.ok("duplicate");
+    } else {
+      return ResponseEntity.ok("available");
+    }
   }
 
   @PostMapping("/signup")

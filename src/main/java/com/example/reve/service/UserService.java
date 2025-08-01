@@ -81,6 +81,11 @@ public class UserService implements UserDetailsService { // UserDetailsService �
     return user;
   }
 
+  // 아이디 중복 검사
+  public boolean checklogin(String loginId) {
+    return userRepository.existsByLoginId(loginId);
+  }
+
   /**
    * Spring Security의 UserDetailsService 인터페이스 구현 사용자 이름(loginId)으로 사용자 정보를 로드
    *
