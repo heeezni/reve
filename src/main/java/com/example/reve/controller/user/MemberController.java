@@ -2,10 +2,7 @@ package com.example.reve.controller.user;
 
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.*;
 
 import com.example.reve.dto.CreateUserDTO;
 import com.example.reve.service.CouponService;
@@ -33,6 +30,7 @@ public class MemberController {
   }
 
   @PostMapping("/check/loginId")
+  @ResponseBody
   public ResponseEntity<String> checkLoginId(@RequestParam String loginId) {
     boolean result = userService.checklogin(loginId);
     if (result) {

@@ -53,13 +53,15 @@
                     />
                     <button
                       type="button"
-                      id="checkLoginIdBtn"
+                      id="bt_check"
                       class="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-500"
                     >
                       중복 확인
                     </button>
                   </div>
-
+                    <div id="loginIdCheckMessage"
+                      class="mt-2 px-4 py-2 rounded relative hidden text-sm" role="alert">
+                    </div>
                   <p class="text-xs text-gray-500 mt-1">(영문소문자/숫자, 4~16자)</p>
                   <p id="loginIdError" class="text-red-500 text-sm mt-1 hidden"></p>
                 </div>
@@ -263,58 +265,13 @@
 
     <script src="/js/script.js"></script>
     <script>
-
-      document.addEventListener("DOMContentLoaded", () => {
-        const agreeAll = document.getElementById("agreeAll");
-        const agreeItems = document.querySelectorAll(".agree-item");
-
-        if (agreeAll) {
-          // 전체 동의 클릭 시 -> 하위 항목 모두 선택
-          agreeAll.addEventListener("change", function () {
-            agreeItems.forEach((item) => {
-              item.checked = this.checked;
-            });
-          });
-
-          // 개별 항목 변경 시 -> 전체 동의 체크 상태 갱신
-          agreeItems.forEach((item) => {
-            item.addEventListener("change", () => {
-              const allChecked = Array.from(agreeItems).every((i) => i.checked);
-              agreeAll.checked = allChecked;
-            });
-          });
-        }
-      });
-
-
-      document.addEventListener("DOMContentLoaded", () => {
-        const agreeAll = document.getElementById("agreeAll");
-        const agreeItems = document.querySelectorAll(".agree-item");
-
-        if (agreeAll) {
-          agreeAll.addEventListener("change", function () {
-            agreeItems.forEach((item) => {
-              item.checked = this.checked;
-            });
-          });
-
-          agreeItems.forEach((item) => {
-            item.addEventListener("change", () => {
-              // 전체 항목이 체크되었는지 확인
-              const allChecked = Array.from(agreeItems).every((i) => i.checked);
-              agreeAll.checked = allChecked;
-            });
-          });
-        }
-      });
-
-
-
+      // ✅ 이모지 포함 여부 검사
       function containsEmoji(str) {
         const emojiRegex = /[\u{1F300}-\u{1FAFF}]/u;
         return emojiRegex.test(str);
       }
 
+      // ✅ 개별 유효성 검사 함수들
       function validateLoginId() {
         const id = document.getElementById("loginId").value.trim();
         const error = document.getElementById("loginIdError");
@@ -396,7 +353,6 @@
         const last = document.getElementById("lastNum").value.trim();
         const middleError = document.getElementById("middleNumError");
         const lastError = document.getElementById("lastNumError");
-
         let hasError = false;
 
         if (!/^\d{3,4}$/.test(middle)) {
@@ -430,67 +386,124 @@
         }
       }
 
+      // ✅ DOM이 준비된 후 실행할 메인 핸들러
       document.addEventListener("DOMContentLoaded", () => {
+        // ▶ [1] 약관 전체동의 체크 연동
+        const agreeAll = document.getElementById("agreeAll");
+        const agreeItems = document.querySelectorAll(".agree-item");
+
+        if (agreeAll) {
+          agreeAll.addEventListener("change", function () {
+            agreeItems.forEach((item) => (item.checked = this.checked));
+          });
+
+          agreeItems.forEach((item) => {
+            item.addEventListener("change", () => {
+              agreeAll.checked = Array.from(agreeItems).every((i) => i.checked);
+            });
+          });
+        }
+
+        // ▶ [2] 입력 필드 개별 유효성 검사
         const ids = ["loginId", "password", "passwordConfirm", "name", "email", "middleNum", "lastNum"];
         ids.forEach((id) => {
-          document.getElementById(id).addEventListener("input", () => {
-            // 각 필드 개별 검사만 실행
-            switch (id) {
-              case "loginId":
-                validateLoginId();
-                break;
-              case "password":
-                validatePassword();
-                break;
-              case "passwordConfirm":
-                validatePasswordConfirm();
-                break;
-              case "name":
-                validateName();
-                break;
-              case "email":
-                validateEmail();
-                break;
-              case "middleNum":
-              case "lastNum":
-                validatePhone();
-                break;
-            }
-          });
-        });
-
-        // 제출 시 전체 검사
-        document.querySelector("form").addEventListener("submit", function (e) {
-          const hasError =
-                  validateLoginId() ||
-                  validatePassword() ||
-                  validatePasswordConfirm() ||
-                  validateName() ||
-                  validateEmail() ||
-                  validatePhone();
-
-          if (hasError) {
-            e.preventDefault();
-            clearInvalidFields();
-
-            let alertDiv = document.getElementById("globalError");
-            if (!alertDiv) {
-              alertDiv = document.createElement("div");
-              alertDiv.id = "globalError";
-              alertDiv.className =
-                      "bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded relative mt-4";
-              alertDiv.innerHTML =
-                      "<strong class='font-bold'>입력값을 다시 확인해주세요.</strong>";
-              document.body.prepend(alertDiv);
-            } else {
-              alertDiv.classList.remove("hidden");
-            }
-
-            window.scrollTo({ top: 0, behavior: "smooth" });
+          const el = document.getElementById(id);
+          if (el) {
+            el.addEventListener("input", () => {
+              switch (id) {
+                case "loginId": validateLoginId(); break;
+                case "password": validatePassword(); break;
+                case "passwordConfirm": validatePasswordConfirm(); break;
+                case "name": validateName(); break;
+                case "email": validateEmail(); break;
+                case "middleNum":
+                case "lastNum": validatePhone(); break;
+              }
+            });
           }
         });
+
+        // ▶ [3] 전체 form 유효성 검사 + 오류 알림
+        const form = document.querySelector("form");
+        if (form) {
+          form.addEventListener("submit", function (e) {
+            const hasError =
+                    validateLoginId() ||
+                    validatePassword() ||
+                    validatePasswordConfirm() ||
+                    validateName() ||
+                    validateEmail() ||
+                    validatePhone();
+
+            if (hasError) {
+              e.preventDefault();
+              clearInvalidFields();
+
+              let alertDiv = document.getElementById("globalError");
+              if (!alertDiv) {
+                alertDiv = document.createElement("div");
+                alertDiv.id = "globalError";
+                alertDiv.className =
+                        "bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded relative mt-4";
+                alertDiv.innerHTML =
+                        "<strong class='font-bold'>입력값을 다시 확인해주세요.</strong>";
+                document.body.prepend(alertDiv);
+              } else {
+                alertDiv.classList.remove("hidden");
+              }
+
+              window.scrollTo({ top: 0, behavior: "smooth" });
+            }
+          });
+        }
+
+        // ▶ [4] 아이디 중복 확인 버튼과 메시지 처리
+        const checkBtn = document.getElementById("bt_check");
+        const messageDiv = document.getElementById("loginIdCheckMessage");
+
+        if (checkBtn && messageDiv) {
+          checkBtn.addEventListener("click", () => {
+            const loginId = document.getElementById("loginId").value.trim();
+
+            messageDiv.classList.add("hidden");
+            messageDiv.classList.remove(
+                    "text-green-600", "bg-green-100", "border-green-400",
+                    "text-red-700", "bg-red-100", "border-red-400"
+            );
+
+            if (!/^[a-z0-9]{4,16}$/.test(loginId)) {
+              messageDiv.textContent = "아이디는 영문 소문자 또는 숫자 4~16자여야 합니다.";
+              messageDiv.classList.add("text-red-700", "bg-red-100", "border", "border-red-400");
+              messageDiv.classList.remove("hidden");
+              return;
+            }
+
+            fetch("/member/check/loginId", {
+              method: "POST",
+              headers: {
+                "Content-Type": "application/x-www-form-urlencoded"
+              },
+              body: new URLSearchParams({ loginId })
+            })
+                    .then(res => res.text())
+                    .then(result => {
+                      if (result === "available") {
+                        messageDiv.textContent = "사용 가능한 아이디입니다.";
+                        messageDiv.classList.add("text-green-600", "bg-green-100", "border", "border-green-400");
+                      } else {
+                        messageDiv.textContent = "이미 사용 중인 아이디입니다.";
+                        messageDiv.classList.add("text-red-700", "bg-red-100", "border", "border-red-400");
+                      }
+                      messageDiv.classList.remove("hidden");
+                    })
+                    .catch(() => {
+                      messageDiv.textContent = "서버 오류가 발생했습니다.";
+                      messageDiv.classList.add("text-red-700", "bg-red-100", "border", "border-red-400");
+                      messageDiv.classList.remove("hidden");
+                    });
+          });
+        }
       });
     </script>
 
-  </body>
 </html>
