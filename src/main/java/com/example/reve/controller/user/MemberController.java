@@ -22,7 +22,7 @@ public class MemberController {
 
   @GetMapping("/login")
   public String login() {
-    return "index";
+    return "member/login";
   }
 
   @GetMapping("/signup")
