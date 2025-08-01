@@ -63,6 +63,7 @@ public class MypageController {
       @AuthenticationPrincipal CustomUserDetails customUserDetails,
       WishlistDTO wishlistDTO,
       HttpServletRequest request) {
+    log.info("위시리스트에 추가시작");
     Long userId = customUserDetails.getUser().getUserId();
     Long performId = wishlistDTO.getPerfume().getPerfumeId();
     // 목록 추가하기 요청

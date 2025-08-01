@@ -273,11 +273,16 @@
                 >
                   <div class="flex space-x-4">
                     <button
-                      class="flex items-center space-x-2 text-gray-600 hover:text-gray-800 transition-colors"
+                      class="like-button flex items-center space-x-2 transition-colors text-gray-600"
+                      data-liked="false"
+                      type="submit"
+                      th:attr="data-product-id=${perfume.perfumeId}"
+                      onclick="toggleWishlist(this)"
                     >
-                      <i class="far fa-heart text-lg"></i>
+                      <i class="heart-icon far fa-heart text-lg"></i>
                       <span class="text-sm">찜하기</span>
                     </button>
+
                     <button
                       class="flex items-center space-x-2 text-gray-600 hover:text-gray-800 transition-colors"
                     >
@@ -766,6 +771,40 @@
           heart.style.color = '';
         }
       });
+
     </script>
+    <script>
+      function toggleWishlist(button) {
+        const productId = button.getAttribute("data-product-id");
+        const isLiked = button.getAttribute("data-liked") === "true";
+        const icon = button.querySelector(".heart-icon");
+        const text = button.querySelector("span");
+
+        const url = isLiked ? "/mypage/wishlist/remove" : "/mypage/wishlist/add";
+        const formData = new FormData();
+        formData.append("perfume.perfumeId", productId);
+
+        fetch(url, {
+          method: "POST",
+          body: formData,
+        })
+                .then((response) => {
+                  if (response.ok) {
+                    // 토글 상태 변경
+                    button.setAttribute("data-liked", (!isLiked).toString());
+                    button.classList.toggle("text-red-500", !isLiked);
+                    button.classList.toggle("text-gray-600", isLiked);
+                    icon.className = !isLiked ? "heart-icon fas fa-heart text-lg" : "heart-icon far fa-heart text-lg";
+                    text.textContent = !isLiked ? "찜됨" : "찜하기";
+                  } else {
+                    alert("처리에 실패했습니다.");
+                  }
+                })
+                .catch((error) => {
+                  console.error("에러 발생:", error);
+                });
+      }
+    </script>
+
   </body>
 </html>

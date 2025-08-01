@@ -22,6 +22,7 @@ public class WishlistService {
 
   // 목록 추가하기
   public void addWishlist(Long userId, Long perfumeId) {
+    log.info("위시리스트 추가 서비스 호출");
     // 유저 찾기
     User user = userRepository.findById(userId).orElseThrow();
     // 상품 찾기
