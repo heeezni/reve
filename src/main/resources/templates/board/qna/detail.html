@@ -72,6 +72,33 @@
               >
                 <!-- Title -->
               </h1>
+              <div th:if="${(isAuthor != null && isAuthor) || (isAdmin != null && isAdmin)}" class="flex items-center justify-end space-x-2 mb-4">
+                <!-- 수정 버튼 -->
+                <a
+                  th:href="@{/board/qna/edit/{qnaId}(qnaId=${qna.qnaId})}"
+                  class="inline-flex items-center px-4 py-2 bg-blue-500 text-white rounded-md hover:bg-blue-600 transition-colors font-medium text-sm"
+                >
+                  <i class="fas fa-edit mr-2"></i>
+                  수정
+                </a>
+
+                <!-- 삭제 버튼 -->
+                <form
+                  th:action="@{/board/qna/{qnaId}(qnaId=${qna.qnaId})}"
+                  th:method="post"
+                  style="display: inline;"
+                  onsubmit="return confirm('정말로 이 Q&A를 삭제하시겠습니까?');"
+                >
+                  <input type="hidden" name="_method" value="delete" />
+                  <button
+                    type="submit"
+                    class="inline-flex items-center px-4 py-2 bg-red-500 text-white rounded-md hover:bg-red-600 transition-colors font-medium text-sm"
+                  >
+                    <i class="fas fa-trash-alt mr-2"></i>
+                    삭제
+                  </button>
+                </form>
+              </div>
               <span th:if="${qna.perfumeName}" class="text-sm text-gray-600 mb-4">
                 관련 상품: <span class="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium bg-orange-100 text-orange-800" th:text="${qna.perfumeName}"></span>
               </span>
@@ -237,34 +264,6 @@
             </a>
 
             <div class="flex items-center space-x-2">
-              <!-- 수정 버튼 -->
-              <a
-                th:if="${(isAuthor != null && isAuthor) || (isAdmin != null && isAdmin)}"
-                th:href="@{/board/qna/edit/{qnaId}(qnaId=${qna.qnaId})}"
-                class="inline-flex items-center px-4 py-2 bg-blue-500 text-white rounded-md hover:bg-blue-600 transition-colors font-medium text-sm"
-              >
-                <i class="fas fa-edit mr-2"></i>
-                수정
-              </a>
-
-              <!-- 삭제 버튼 -->
-              <form
-                th:if="${(isAuthor != null && isAuthor) || (isAdmin != null && isAdmin)}"
-                th:action="@{/board/qna/{qnaId}(qnaId=${qna.qnaId})}"
-                th:method="post"
-                style="display: inline;"
-                onsubmit="return confirm('정말로 이 Q&A를 삭제하시겠습니까?');"
-              >
-                <input type="hidden" name="_method" value="delete" />
-                <button
-                  type="submit"
-                  class="inline-flex items-center px-4 py-2 bg-red-500 text-white rounded-md hover:bg-red-600 transition-colors font-medium text-sm"
-                >
-                  <i class="fas fa-trash-alt mr-2"></i>
-                  삭제
-                </button>
-              </form>
-
               <a
                 th:if="${qna.prevQnaId}"
                 th:href="@{/board/qna/detail/{qnaId}(qnaId=${qna.prevQnaId})}"
