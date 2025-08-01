@@ -32,7 +32,7 @@ public class CouponService {
     LocalDate issuedAt = LocalDate.now();
     LocalDate validFrom = LocalDate.now();
     LocalDate expiresDate = validFrom.plusDays(3);
-    User user = userRepository.findById(userId).get();
+    User user = userRepository.findById(userId).orElseThrow();
     // 쿠폰 발급
     coupon.setCode("12341234");
     coupon.setUser(user);
