@@ -118,62 +118,60 @@
           </div>
 
           <!-- Navigation Buttons -->
-          
+          <div class="flex justify-between items-center mt-6 mb-6 p-4 bg-white rounded-lg shadow-sm">
+            <div th:if="${prevNotice}">
+              <a th:href="@{/board/notice/detail/{noticeId}(noticeId=${prevNotice.noticeId})}"
+                 class="inline-flex items-center px-4 py-2 border border-gray-300 rounded-md shadow-sm text-sm font-medium text-gray-700 bg-white hover:bg-gray-50">
+                <i class="fas fa-chevron-left mr-2"></i> 이전글
+              </a>
+            </div>
+            <div th:unless="${prevNotice}">
+              <span class="inline-flex items-center px-4 py-2 border border-gray-300 rounded-md shadow-sm text-sm font-medium text-gray-400 bg-gray-100 cursor-not-allowed">
+                <i class="fas fa-chevron-left mr-2"></i> 이전글 없음
+              </span>
+            </div>
+            <a href="/board/notice/list"
+               class="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-gray-800 hover:bg-gray-900 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-700">
+              목록으로
+            </a>
+            <div th:if="${nextNotice}">
+              <a th:href="@{/board/notice/detail/{noticeId}(noticeId=${nextNotice.noticeId})}"
+                 class="inline-flex items-center px-4 py-2 border border-gray-300 rounded-md shadow-sm text-sm font-medium text-gray-700 bg-white hover:bg-gray-50">
+                다음글 <i class="fas fa-chevron-right ml-2"></i>
+              </a>
+            </div>
+            <div th:unless="${nextNotice}">
+              <span class="inline-flex items-center px-4 py-2 border border-gray-300 rounded-md shadow-sm text-sm font-medium text-gray-400 bg-gray-100 cursor-not-allowed">
+                다음글 없음 <i class="fas fa-chevron-right ml-2"></i>
+              </span>
+            </div>
+          </div>
 
           <!-- Related Notices -->
-          <div class="bg-white rounded-lg shadow-sm p-6">
+          <div class="bg-white rounded-lg shadow-sm p-6 mt-6">
             <h3 class="text-lg font-semibold text-gray-800 mb-4">
               관련 공지사항
             </h3>
-            <div class="space-y-3">
+            <div th:if="${!relatedNotices.isEmpty()}" class="space-y-3">
               <a
-                href="#"
+                th:each="related : ${relatedNotices}"
+                th:href="@{/board/notice/detail/{noticeId}(noticeId=${related.noticeId})}"
                 class="flex items-center justify-between p-3 border border-gray-200 rounded-md hover:bg-gray-50 transition-colors"
               >
                 <div class="flex items-center space-x-3">
                   <span
-                    class="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-green-100 text-green-800"
+                    th:text="${related.category}"
+                    th:classappend="${related.category == '이벤트' ? 'bg-blue-100 text-blue-800' : (related.category == '배송' ? 'bg-green-100 text-green-800' : (related.category == '시스템' ? 'bg-purple-100 text-purple-800' : 'bg-gray-100 text-gray-800'))}"
+                    class="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium"
                   >
-                    배송
                   </span>
-                  <span class="text-gray-800"
-                    >배송 시스템 점검 안내 (2025년 2월 20일)</span
-                  >
+                  <span class="text-gray-800" th:text="${related.title}"></span>
                 </div>
-                <span class="text-sm text-gray-500">2025.02.17</span>
+                <span class="text-sm text-gray-500" th:text="${#temporals.format(related.createdAt, 'yyyy.MM.dd')}"></span>
               </a>
-
-              <a
-                href="#"
-                class="flex items-center justify-between p-3 border border-gray-200 rounded-md hover:bg-gray-50 transition-colors"
-              >
-                <div class="flex items-center space-x-3">
-                  <span
-                    class="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-gray-100 text-gray-800"
-                  >
-                    일반
-                  </span>
-                  <span class="text-gray-800">Rêve 회원 등급 혜택 안내</span>
-                </div>
-                <span class="text-sm text-gray-500">2025.02.16</span>
-              </a>
-
-              <a
-                href="#"
-                class="flex items-center justify-between p-3 border border-gray-200 rounded-md hover:bg-gray-50 transition-colors"
-              >
-                <div class="flex items-center space-x-3">
-                  <span
-                    class="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-purple-100 text-purple-800"
-                  >
-                    시스템
-                  </span>
-                  <span class="text-gray-800"
-                    >웹사이트 개편 및 서비스 개선 안내</span
-                  >
-                </div>
-                <span class="text-sm text-gray-500">2025.02.15</span>
-              </a>
+            </div>
+            <div th:unless="${!relatedNotices.isEmpty()}" class="px-6 py-4 text-center text-gray-500">
+                관련 공지사항이 없습니다.
             </div>
           </div>
 

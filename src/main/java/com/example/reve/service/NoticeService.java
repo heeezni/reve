@@ -5,6 +5,7 @@ import java.security.Principal;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.NoSuchElementException;
+import java.util.Optional;
 
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -101,6 +102,25 @@ public class NoticeService {
     return noticeRepository
         .findById(noticeId)
         .orElseThrow(() -> new NoSuchElementException("공지사항을 찾을 수 없습니다: " + noticeId));
+  }
+
+  // 이전 공지사항 가져오기
+  @Transactional(readOnly = true)
+  public Optional<Notice> getPrevNotice(Long currentNoticeId) {
+    return noticeRepository.findPrevNotice(currentNoticeId);
+  }
+
+  // 다음 공지사항 가져오기
+  @Transactional(readOnly = true)
+  public Optional<Notice> getNextNotice(Long currentNoticeId) {
+    return noticeRepository.findNextNotice(currentNoticeId);
+  }
+
+  // 관련 공지사항 가져오기 (현재 공지사항 제외, 같은 카테고리 내에서, 최신순)
+  @Transactional(readOnly = true)
+  public List<Notice> getRelatedNotices(Long currentNoticeId, String category, int limit) {
+    Pageable pageable = PageRequest.of(0, limit);
+    return noticeRepository.findRelatedNotices(category, currentNoticeId, pageable);
   }
 
   @Transactional

@@ -2,6 +2,8 @@ package com.example.reve.controller.user;
 
 import java.io.IOException;
 import java.security.Principal;
+import java.util.List;
+import java.util.NoSuchElementException;
 
 import jakarta.validation.Valid;
 
@@ -116,11 +118,29 @@ public class BoardController {
   public String noticeDetail(@PathVariable Long noticeId, Model model, Principal principal) {
     model.addAttribute("isAdmin", isAdmin(principal));
 
-    // 공지사항 상세 내용을 가져오는 로직 추가
-    com.example.reve.domain.Notice notice = noticeService.getNoticeById(noticeId);
-    model.addAttribute("notice", notice);
+    try {
+      // 공지사항 상세 내용을 가져오는 로직 추가
+      com.example.reve.domain.Notice notice = noticeService.getNoticeById(noticeId);
+      model.addAttribute("notice", notice);
 
-    return "board/notice/detail";
+      // 이전/다음 공지사항 가져오기
+      noticeService
+          .getPrevNotice(noticeId)
+          .ifPresent(prevNotice -> model.addAttribute("prevNotice", prevNotice));
+      noticeService
+          .getNextNotice(noticeId)
+          .ifPresent(nextNotice -> model.addAttribute("nextNotice", nextNotice));
+
+      // 관련 공지사항 가져오기 (현재 공지사항 제외, 같은 카테고리 내에서, 최신순 5개)
+      List<com.example.reve.domain.Notice> relatedNotices =
+          noticeService.getRelatedNotices(noticeId, notice.getCategory(), 5);
+      model.addAttribute("relatedNotices", relatedNotices);
+
+      return "board/notice/detail";
+    } catch (NoSuchElementException e) {
+      model.addAttribute("errorMessage", e.getMessage());
+      return "common/error"; // 또는 공지사항 목록 페이지로 리다이렉트
+    }
   }
 
   private boolean isAdmin(Principal principal) {
