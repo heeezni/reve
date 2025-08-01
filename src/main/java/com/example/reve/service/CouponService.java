@@ -27,6 +27,26 @@ public class CouponService {
   private final UserRepository userRepository;
   private Coupon coupon;
 
+  //신규가입 쿠폰
+  public  void  newUserCoupon(Long userId){
+    LocalDate issuedAt = LocalDate.now();
+    LocalDate validFrom = LocalDate.now();
+    LocalDate expiresDate = validFrom.plusDays(3);
+    User user = userRepository.findById(userId).get();
+    // 쿠폰 발급
+    coupon.setCode("12341234");
+    coupon.setUser(user);
+    coupon.setCouponName(CouponName.BirthDay);
+    coupon.setDiscountRate(10);
+    coupon.setExpiresAt(expiresDate.atTime(23, 59, 59));
+    coupon.setIsUsed(false);
+    coupon.setIssuedAt(issuedAt);
+    coupon.setValidFrom(validFrom);
+    couponRepository.save(coupon);
+    log.info("신규가입 쿠폰{}", coupon);
+
+  }
+
   // 생일 등록 시 첫번째로 조회 후 발급되는 생일쿠폰
   public void birthdayCoupon(User user) {
     LocalDate today = LocalDate.now();
