@@ -79,11 +79,8 @@ public class MypageController {
     try {
       // 수정된 회원 정보 가져오기
       String loginId = customUserDetails.getUsername();
-      model.addAttribute(
-          "profile", userService.update(updateProfileDTO, loginId));
-      log.info(
-          "회원 정보 수정 성공 : {}",
-          userService.update(updateProfileDTO, loginId).toString());
+      model.addAttribute("profile", userService.update(updateProfileDTO, loginId));
+      log.info("회원 정보 수정 성공 : {}", userService.update(updateProfileDTO, loginId).toString());
     } catch (Exception e) {
       log.error("회원 정보 수정 실패");
       throw new RuntimeException(e);

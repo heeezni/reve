@@ -105,8 +105,7 @@ public class UserService implements UserDetailsService { // UserDetailsService �
    * @param updateProfileDTO (프로필 사진, 이름, 닉네임, 이메일, 생일,휴대폰 번호)
    * @return user
    */
-  public UpdateProfileDTO update(
-      UpdateProfileDTO updateProfileDTO, String loginId) {
+  public UpdateProfileDTO update(UpdateProfileDTO updateProfileDTO, String loginId) {
     // 로그인 아이디가 같은 회원
     User user = userRepository.findByLoginId(loginId).orElseThrow();
     // 이름
@@ -123,7 +122,7 @@ public class UserService implements UserDetailsService { // UserDetailsService �
     userRepository.save(user);
     // 생일 등록 시 생일쿠폰 발급
     if (updateProfileDTO.getBirthday() != null) {
-            couponService.birthdayCoupon(user);
+      couponService.birthdayCoupon(user);
     }
     return userRepository.findUserUpdate(loginId);
   }

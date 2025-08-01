@@ -4,18 +4,17 @@ import java.time.LocalDate;
 import java.time.Year;
 import java.util.List;
 
-import com.example.reve.repository.UserRepository;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import com.example.reve.domain.Coupon;
 import com.example.reve.domain.CouponName;
 import com.example.reve.domain.User;
-import com.example.reve.dto.CouponByBirthdayDTO;
 import com.example.reve.repository.CouponRepository;
+import com.example.reve.repository.UserRepository;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.transaction.annotation.Transactional;
 
 @Service
 @RequiredArgsConstructor
@@ -24,8 +23,7 @@ public class CouponService {
 
   private final CouponRepository couponRepository;
   private final UserRepository userRepository;
-  private  Coupon coupon;
-
+  private Coupon coupon;
 
   // 생일 등록 시 첫번째로 조회 후 발급되는 생일쿠폰
   public void birthdayCoupon(User user) {
@@ -65,12 +63,12 @@ public class CouponService {
 
     // 쿠폰 발급
     coupon = new Coupon();
-    saveCoupon(coupon, user,expiresDate,validFrom,issuedAt);
+    saveCoupon(coupon, user, expiresDate, validFrom, issuedAt);
   }
 
   // 기본 회원들의 생일 조회 후  발급하기
   @Transactional
-  public  void couponByMonth() {
+  public void couponByMonth() {
     LocalDate today = LocalDate.now();
     LocalDate issuedAt = LocalDate.now();
     LocalDate birthday = null;
@@ -78,27 +76,30 @@ public class CouponService {
     LocalDate validFrom = null;
 
     int month = today.getMonthValue();
-    List<User>userList = userRepository.findAll();
-    for(User user : userList) {
-      if(user.getBirthday() !=null){
+    List<User> userList = userRepository.findAll();
+    for (User user : userList) {
+      if (user.getBirthday() != null) {
         birthday = LocalDate.parse(user.getBirthday());
-        if(birthday.getMonthValue() != month) {continue;}
-        LocalDate getYear = adjustLeapYearBirthday(birthday,today.getYear());
+        if (birthday.getMonthValue() != month) {
+          continue;
+        }
+        LocalDate getYear = adjustLeapYearBirthday(birthday, today.getYear());
         expiresDate = getYear.plusDays(6);
         validFrom = birthday;
-        //쿠폰 발급
+        // 쿠폰 발급
         coupon = new Coupon();
-        saveCoupon(coupon, user,expiresDate,validFrom,issuedAt);
-        log.info("기존 회원들 생일 조회 후 발급 성공 {}",user);
+        saveCoupon(coupon, user, expiresDate, validFrom, issuedAt);
+        log.info("기존 회원들 생일 조회 후 발급 성공 {}", user);
       }
-      }
+    }
   }
 
-  public void saveCoupon(Coupon coupon, User user,LocalDate expiresDate,LocalDate validFrom,LocalDate issuedAt) {
+  public void saveCoupon(
+      Coupon coupon, User user, LocalDate expiresDate, LocalDate validFrom, LocalDate issuedAt) {
     // 중복발급 확인
     boolean issued =
-            couponRepository.existsByUserAndCouponNameAndIssuedAtAndValidFrom(
-                    user, CouponName.BirthDay, validFrom, issuedAt);
+        couponRepository.existsByUserAndCouponNameAndIssuedAtAndValidFrom(
+            user, CouponName.BirthDay, validFrom, issuedAt);
     if (issued) {
       log.info("발급 받은 회원");
       return;
@@ -117,14 +118,11 @@ public class CouponService {
     log.info("첫번째 생일 등록 시 쿠폰 발급 하기{}", coupon);
   }
 
-  //2월 29일 생일자 설정
+  // 2월 29일 생일자 설정
   private LocalDate adjustLeapYearBirthday(LocalDate birthday, int year) {
     if (birthday.getMonthValue() == 2 && birthday.getDayOfMonth() == 29) {
-      return Year.isLeap(year) ?
-              LocalDate.of(year, 2, 29) :
-              LocalDate.of(year, 2, 28);
+      return Year.isLeap(year) ? LocalDate.of(year, 2, 29) : LocalDate.of(year, 2, 28);
     }
     return birthday.withYear(year);
   }
-
 }
