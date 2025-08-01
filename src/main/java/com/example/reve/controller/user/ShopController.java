@@ -37,6 +37,7 @@ public class ShopController {
   private final WishListService wishListService;
   private final ReviewService reviewService;
 
+  // 향수 목록을 가져오는 매핑임.
   @GetMapping("/list")
   public String productList(
       @RequestParam(defaultValue = "0") int page,
@@ -57,6 +58,7 @@ public class ShopController {
     return "shop/list";
   }
 
+  // 향수의 디테일 정보를 가져오는 매핑임.
   @GetMapping("/detail")
   public String productDetail(
       @RequestParam("id") Long perfumeId, Model model, Principal principal) {
@@ -107,5 +109,26 @@ public class ShopController {
     model.addAttribute("reviews", reviews);
 
     return "shop/detail";
+  }
+
+  // 리뷰 폼을 가져오는 매핑임.
+  @GetMapping("/review")
+  public String reviewForm(
+      @RequestParam("perfumeId") Long perfumeId, Model model, Principal principal) {
+    PerfumeDetailResponseDto perfumeDetail = perfumeService.getPerfumeDetail(perfumeId);
+    model.addAttribute("perfume", perfumeDetail);
+
+    model.addAttribute("perfumeId", perfumeId);
+
+    // 로그인한 사용자 정보 있으면 추가로 전달
+    if (principal != null) {
+      String loginId = principal.getName();
+      User user = userRepository.findByLoginId(loginId).orElse(null);
+      if (user != null) {
+        model.addAttribute("username", user.getName()); // 또는 닉네임 등
+      }
+    }
+
+    return "shop/review"; // 리뷰 작성 폼 HTML
   }
 }
