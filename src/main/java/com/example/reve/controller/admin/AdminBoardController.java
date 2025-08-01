@@ -80,6 +80,9 @@ public class AdminBoardController {
       @RequestParam("answerContent") String answerContent,
       Principal principal) {
     try {
+      if (answerContent == null || answerContent.trim().isEmpty()) {
+        throw new IllegalArgumentException("답변 내용은 비워둘 수 없습니다.");
+      }
       qnaService.addAnswer(qnaId, answerContent, principal);
       return "redirect:/board/qna/detail/" + qnaId;
     } catch (IllegalAccessException | IllegalArgumentException e) {
@@ -93,6 +96,9 @@ public class AdminBoardController {
       @RequestParam("answerContent") String answerContent,
       Principal principal) {
     try {
+      if (answerContent == null || answerContent.trim().isEmpty()) {
+        throw new IllegalArgumentException("답변 내용은 비워둘 수 없습니다.");
+      }
       qnaService.updateAnswer(qnaId, answerContent, principal);
       return "redirect:/board/qna/detail/" + qnaId;
     } catch (IllegalAccessException | IllegalArgumentException e) {
