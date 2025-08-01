@@ -28,7 +28,7 @@ public class CouponService {
 
 
   // 생일 등록 시 첫번째로 조회 후 발급되는 생일쿠폰
-  public void birthdayCoupon(CouponByBirthdayDTO couponByBirthdayDTO, User user) {
+  public void birthdayCoupon(User user) {
     LocalDate today = LocalDate.now();
     LocalDate issuedAt = LocalDate.now();
     LocalDate birthday = null;
@@ -64,6 +64,7 @@ public class CouponService {
     }
 
     // 쿠폰 발급
+    coupon = new Coupon();
     saveCoupon(coupon, user,expiresDate,validFrom,issuedAt);
   }
 
@@ -81,15 +82,16 @@ public class CouponService {
     for(User user : userList) {
       if(user.getBirthday() !=null){
         birthday = LocalDate.parse(user.getBirthday());
+        if(birthday.getMonthValue() != month) {continue;}
+        LocalDate getYear = adjustLeapYearBirthday(birthday,today.getYear());
+        expiresDate = getYear.plusDays(6);
+        validFrom = birthday;
+        //쿠폰 발급
+        coupon = new Coupon();
+        saveCoupon(coupon, user,expiresDate,validFrom,issuedAt);
+        log.info("기존 회원들 생일 조회 후 발급 성공 {}",user);
       }
-      if(birthday.getMonthValue() != month) {continue;}
-      LocalDate getYear = adjustLeapYearBirthday(birthday,today.getYear());
-      expiresDate = getYear.plusDays(6);
-      validFrom = birthday;
-      //쿠폰 발급
-      saveCoupon(coupon, user,expiresDate,validFrom,issuedAt);
-      log.info("기존 회원들 생일 조회 후 발급 성공 {}",user);
-    }
+      }
   }
 
   public void saveCoupon(Coupon coupon, User user,LocalDate expiresDate,LocalDate validFrom,LocalDate issuedAt) {
@@ -103,7 +105,6 @@ public class CouponService {
     }
 
     // 쿠폰 발급
-    coupon = new Coupon();
     coupon.setCode(user.getBirthday() + user.getPhone());
     coupon.setUser(user);
     coupon.setCouponName(CouponName.BirthDay);
