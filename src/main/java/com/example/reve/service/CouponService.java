@@ -24,6 +24,8 @@ public class CouponService {
 
   private final CouponRepository couponRepository;
   private final UserRepository userRepository;
+  private  Coupon coupon;
+
 
   // 생일 등록 시 첫번째로 조회 후 발급되는 생일쿠폰
   public void birthdayCoupon(CouponByBirthdayDTO couponByBirthdayDTO, User user) {
@@ -61,17 +63,47 @@ public class CouponService {
       return;
     }
 
+    // 쿠폰 발급
+    saveCoupon(coupon, user,expiresDate,validFrom,issuedAt);
+  }
+
+  // 기본 회원들의 생일 조회 후  발급하기
+  @Transactional
+  public  void couponByMonth() {
+    LocalDate today = LocalDate.now();
+    LocalDate issuedAt = LocalDate.now();
+    LocalDate birthday = null;
+    LocalDate expiresDate = null;
+    LocalDate validFrom = null;
+
+    int month = today.getMonthValue();
+    List<User>userList = userRepository.findAll();
+    for(User user : userList) {
+      if(user.getBirthday() !=null){
+        birthday = LocalDate.parse(user.getBirthday());
+      }
+      if(birthday.getMonthValue() != month) {continue;}
+      LocalDate getYear = adjustLeapYearBirthday(birthday,today.getYear());
+      expiresDate = getYear.plusDays(6);
+      validFrom = birthday;
+      //쿠폰 발급
+      saveCoupon(coupon, user,expiresDate,validFrom,issuedAt);
+      log.info("기존 회원들 생일 조회 후 발급 성공 {}",user);
+    }
+  }
+
+  public void saveCoupon(Coupon coupon, User user,LocalDate expiresDate,LocalDate validFrom,LocalDate issuedAt) {
     // 중복발급 확인
     boolean issued =
-        couponRepository.existsByUserAndCouponNameAndIssuedAtAndValidFrom(
-            user, CouponName.BirthDay, validFrom, issuedAt);
+            couponRepository.existsByUserAndCouponNameAndIssuedAtAndValidFrom(
+                    user, CouponName.BirthDay, validFrom, issuedAt);
     if (issued) {
       log.info("발급 받은 회원");
       return;
     }
 
     // 쿠폰 발급
-    Coupon coupon = new Coupon();
+    coupon = new Coupon();
     coupon.setCode(user.getBirthday() + user.getPhone());
     coupon.setUser(user);
     coupon.setCouponName(CouponName.BirthDay);
@@ -84,11 +116,14 @@ public class CouponService {
     log.info("첫번째 생일 등록 시 쿠폰 발급 하기{}", coupon);
   }
 
-  // 기본 회원들의 생일 조회 후  발급하기
-  @Transactional
-  public  void couponByMonth() {
-    LocalDate today = LocalDate.now();
-    int month = today.getMonthValue();
-    List<User>userList = userRepository.findAll();
+  //2월 29일 생일자 설정
+  private LocalDate adjustLeapYearBirthday(LocalDate birthday, int year) {
+    if (birthday.getMonthValue() == 2 && birthday.getDayOfMonth() == 29) {
+      return Year.isLeap(year) ?
+              LocalDate.of(year, 2, 29) :
+              LocalDate.of(year, 2, 28);
+    }
+    return birthday.withYear(year);
   }
+
 }
