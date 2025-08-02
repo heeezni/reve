@@ -4,6 +4,7 @@ import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
+import com.example.reve.dto.WishListShowDTO;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -56,5 +57,9 @@ public class WishListService {
     return wishList.stream()
         .map(wish -> wish.getPerfume().getPerfumeId())
         .collect(Collectors.toList());
+  }
+  //위시리스트 목록 보기
+  public List<WishListShowDTO> getWishList(Long userId) {
+    return null;
   }
 }
