@@ -1,10 +1,51 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
 <head>
     <meta charset="UTF-8">
-    <title>Title</title>
+    <title>회원 목록</title>
+    <style>
+        body { font-family: Arial, sans-serif; margin: 20px; }
+        table { width: 100%; border-collapse: collapse; margin-top: 20px; }
+        th, td { border: 1px solid #ddd; padding: 8px; text-align: left; }
+        th { background-color: #f2f2f2; }
+        .actions a { margin-right: 5px; text-decoration: none; color: #007bff; }
+        .actions a:hover { text-decoration: underline; }
+        .add-button { margin-bottom: 20px; padding: 10px 15px; background-color: #28a745; color: white; border: none; border-radius: 5px; cursor: pointer; text-decoration: none; }
+        .add-button:hover { background-color: #218838; }
+    </style>
 </head>
 <body>
-쇼핑몰 회원 목록 페이지 (권한/탈퇴 관리)
+    <h1>회원 목록</h1>
+
+    <a th:href="@{/admin/dashboard}" class="add-button" style="background-color: #6c757d; margin-bottom: 20px; display: inline-block;">대시보드로 돌아가기</a>
+
+    <table>
+        <thead>
+            <tr>
+                <th>ID</th>
+                <th>로그인 ID</th>
+                <th>이름</th>
+                <th>이메일</th>
+                <th>전화번호</th>
+                <th>권한</th>
+                <th>액션</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr th:each="user : ${users}">
+                <td th:text="${user.userId}"></td>
+                <td th:text="${user.loginId}"></td>
+                <td th:text="${user.name}"></td>
+                <td th:text="${user.email}"></td>
+                <td th:text="${user.phone}"></td>
+                <td th:text="${user.role}"></td>
+                <td class="actions">
+                    <!-- 권한 변경 및 삭제 기능은 백엔드 구현 필요 -->
+                    <a href="#">권한 변경</a>
+                    <a href="#" onclick="return confirm('정말로 이 회원을 삭제하시겠습니까?');">삭제</a>
+                </td>
+            </tr>
+        </tbody>
+    </table>
 </body>
 </html>

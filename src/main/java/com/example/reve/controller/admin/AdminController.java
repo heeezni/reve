@@ -1,20 +1,37 @@
 package com.example.reve.controller.admin;
 
 import org.springframework.stereotype.Controller;
+import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 
+import com.example.reve.service.PerfumeService;
+import com.example.reve.service.UserService;
+
+import lombok.RequiredArgsConstructor;
+
 @Controller
 @RequestMapping("/admin")
+@RequiredArgsConstructor
 public class AdminController {
 
+  private final PerfumeService perfumeService;
+  private final UserService userService;
+
   @GetMapping("/dashboard")
-  public String dashboard() {
+  public String dashboard(Model model) {
+    long totalPerfumeCount = perfumeService.getTotalPerfumeCount();
+    long totalUserCount = userService.getTotalUserCount();
+
+    model.addAttribute("totalPerfumeCount", totalPerfumeCount);
+    model.addAttribute("totalUserCount", totalUserCount);
+
     return "admin/dashboard";
   }
 
   @GetMapping("/product/list")
-  public String productList() {
+  public String productList(Model model) {
+    model.addAttribute("perfumes", perfumeService.getAllPerfumes());
     return "admin/product/list";
   }
 
@@ -34,7 +51,8 @@ public class AdminController {
   }
 
   @GetMapping("/member/list")
-  public String memberList() {
+  public String memberList(Model model) {
+    model.addAttribute("users", userService.getAllUsers());
     return "admin/member/list";
   }
 }

@@ -237,6 +237,11 @@ public class PerfumeService {
         .collect(Collectors.toList());
   }
 
+  // 전체 향수 개수 조회
+  public long getTotalPerfumeCount() {
+    return perfumeRepository.count();
+  }
+
   // 페이지 + 정렬 + 검색까지 적용된 필터링
   public Page<Perfume> getPerfumes(
       String search, String scent, String sortParam, int page, int size) {
