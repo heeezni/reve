@@ -17,7 +17,4 @@ public interface WishListRepository extends JpaRepository<WishList, Long> {
 
   // 향수를 찜한 총 유저 수 (찜 수)
   long countByPerfume_PerfumeId(Long perfumeId);
-
-  // 찜 목록에서 삭제
-  void deleteByUser_UserIdAndPerfume_PerfumeId(Long userId, Long perfumeId);
 }

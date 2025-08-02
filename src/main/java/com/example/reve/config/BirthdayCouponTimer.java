@@ -27,26 +27,26 @@ public class BirthdayCouponTimer {
   public void startCouponTimer() {
     // 주기적으로 실행하는 인터페이스->스레드 사용
     ScheduledExecutorService scheduler = Executors.newSingleThreadScheduledExecutor();
-      Runnable task =
-          () -> {
-            try {
-              // 매달 1일에 실행
-              if (LocalDate.now().getDayOfMonth() == 1) {
-                log.info("당월 쿠폰 발급 시작");
-                couponService.couponByMonth();
-              }
-            } catch (Exception e) {
-              log.error("쿠폰 자동발급 오류{}", e.getMessage());
-              throw new RuntimeException(e);
+    Runnable task =
+        () -> {
+          try {
+            // 매달 1일에 실행
+            if (LocalDate.now().getDayOfMonth() == 1) {
+              log.info("당월 쿠폰 발급 시작");
+              couponService.couponByMonth();
             }
-          };
-      long delayUntil = delayUntil();
-      // 24시간 반복
-      long oneday = TimeUnit.DAYS.toMillis(1);
+          } catch (Exception e) {
+            log.error("쿠폰 자동발급 오류{}", e.getMessage());
+            throw new RuntimeException(e);
+          }
+        };
+    long delayUntil = delayUntil();
+    // 24시간 반복
+    long oneday = TimeUnit.DAYS.toMillis(1);
 
-      // 일정 기간 반복
-      scheduler.scheduleAtFixedRate(task, delayUntil, oneday, TimeUnit.MILLISECONDS);
-    }
+    // 일정 기간 반복
+    scheduler.scheduleAtFixedRate(task, delayUntil, oneday, TimeUnit.MILLISECONDS);
+  }
 
   // 다음 2시까지 계산
   public long delayUntil() {
