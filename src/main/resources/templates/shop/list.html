@@ -191,11 +191,15 @@
                 </div>
 
                 <div class="flex space-x-2">
-                  <button class="add-to-cart-btn flex-1 bg-gray-800 text-white py-2 px-4 rounded-md hover:bg-gray-700 transition-colors text-sm font-medium"
-                          th:attr="data-product-name=${perfume.perfumeName},data-product-price=${perfume.price - perfume.discount}">
+                  <button
+                          type="button"
+                          class="add-to-cart-btn flex-1 bg-gray-800 text-white py-2 px-4 rounded-md hover:bg-gray-700 transition-colors text-sm font-medium"
+                          th:attr="data-product-id=${perfume.perfumeId}">
                     장바구니
                   </button>
-                  <button class="flex-1 border border-gray-300 text-gray-700 py-2 px-4 rounded-md hover:bg-gray-50 transition-colors text-sm font-medium">
+                  <button
+                          type="button"
+                          class="flex-1 border border-gray-300 text-gray-700 py-2 px-4 rounded-md hover:bg-gray-50 transition-colors text-sm font-medium">
                     구매하기
                   </button>
                 </div>
@@ -315,6 +319,7 @@
           </div>
         </div>
       </div>
+      <input type="hidden" id="isLoggedIn" th:value="${isLoggedIn}" />
     </main>
 
     <!-- Footer Fragment -->
@@ -448,92 +453,93 @@
         });
       });
 
-      // Cart animation functionality
-      document.querySelectorAll('.add-to-cart-btn').forEach((btn) => {
-        btn.addEventListener('click', function (e) {
+      // 비동기방식으로 카트에 담기
+      $(document).ready(function() {
+        $('.add-to-cart-btn').on('click', function(e) {
           e.preventDefault();
 
-          const productName = this.getAttribute('data-product-name');
-          const productPrice = this.getAttribute('data-product-price');
+          const isLoggedIn = $('#isLoggedIn').val() === "true";
+          if (!isLoggedIn) {
+            $('#loginAlertModal').css('display', 'flex');
+            return;
+          }
 
-          // Get button position
-          const buttonRect = this.getBoundingClientRect();
-          const cartIcon = document.querySelector('#cart-count');
-          const cartRect = cartIcon.getBoundingClientRect();
+          const productId = $(this).data('product-id');
+          // 리스트 페이지에서 수량 입력 필드가 없으면 기본 1로 고정
+          const quantity = 1;
 
-          // Create flying element
-          const flyingElement = document.createElement('div');
-          flyingElement.innerHTML = `
-            <div class="fixed z-50 bg-gray-800 text-white text-xs px-2 py-1 rounded-full shadow-lg">
-              ${productName}
-            </div>
-          `;
-          flyingElement.style.position = 'fixed';
-          flyingElement.style.left =
-            buttonRect.left + buttonRect.width / 2 + 'px';
-          flyingElement.style.top =
-            buttonRect.top + buttonRect.height / 2 + 'px';
-          flyingElement.style.zIndex = '9999';
-          flyingElement.style.pointerEvents = 'none';
-          flyingElement.style.transition =
-            'all 0.8s cubic-bezier(0.25, 0.46, 0.45, 0.94)';
-
-          document.body.appendChild(flyingElement);
-
-          // Animate to cart
-          setTimeout(() => {
-            flyingElement.style.left =
-              cartRect.left + cartRect.width / 2 + 'px';
-            flyingElement.style.top = cartRect.top + cartRect.height / 2 + 'px';
-            flyingElement.style.transform = 'scale(0.3)';
-            flyingElement.style.opacity = '0';
-          }, 50);
-
-          // Update cart count
-          setTimeout(() => {
-            const currentCount = parseInt(cartIcon.textContent);
-            cartIcon.textContent = currentCount + 1;
-
-            // Add bounce animation to cart count
-            cartIcon.style.transform = 'scale(1.3)';
-            setTimeout(() => {
-              cartIcon.style.transform = 'scale(1)';
-            }, 200);
-
-            // Remove flying element
-            document.body.removeChild(flyingElement);
-
-            // Show success message
-            showCartSuccess(productName);
-          }, 800);
+          $.ajax({
+            type: 'POST',
+            url: '/cart/add',
+            data: JSON.stringify({ perfumeId: productId, quantity: quantity }),
+            contentType: 'application/json',
+            success: function(response) {
+              $('#cart-count').text(response.cartItemCount);
+              animateAddToCart();
+            },
+            error: function(xhr) {
+              if (xhr.status === 400 || xhr.status === 409) {
+                $('#alreadyInCartModal').removeClass('hidden');
+              } else {
+                alert('장바구니 추가 실패: ' + xhr.responseText);
+              }
+            }
+          });
         });
       });
 
-      // Show cart success message
-      function showCartSuccess(productName) {
-        const successMessage = document.createElement('div');
-        successMessage.innerHTML = `
-          <div class="fixed top-20 right-4 bg-green-500 text-white px-4 py-2 rounded-md shadow-lg z-50 transform translate-x-full transition-transform duration-300">
-            <i class="fas fa-check mr-2"></i>
-            ${productName}이(가) 장바구니에 추가되었습니다!
-          </div>
-        `;
-        document.body.appendChild(successMessage);
+      // 카트에 추가하는 애니메이션
+      function animateAddToCart() {
+        // 메인 이미지에서 애니메이션용 이미지 복제
+        const $mainImage = $('#mainImage');
+        const $cartIcon = $('#cart-count').parent(); // 장바구니 아이콘 <a> 태그 선택
 
-        // Slide in
-        setTimeout(() => {
-          successMessage.querySelector('div').style.transform = 'translateX(0)';
-        }, 100);
+        if ($mainImage.length === 0 || $cartIcon.length === 0) {
+          console.warn('필요한 요소가 존재하지 않습니다.');
+          return;
+        }
 
-        // Slide out and remove
+        // 이미지 위치 및 크기 정보
+        const imgOffset = $mainImage.offset();
+        const imgWidth = $mainImage.width();
+        const imgHeight = $mainImage.height();
+
+        // 카트 아이콘 위치
+        const cartOffset = $cartIcon.offset();
+
+        // 복제 이미지 생성
+        const $flyImg = $mainImage.clone()
+                .css({
+                  position: 'absolute',
+                  top: imgOffset.top,
+                  left: imgOffset.left,
+                  width: imgWidth,
+                  height: imgHeight,
+                  borderRadius: '10px',
+                  zIndex: 1000,
+                  pointerEvents: 'none',
+                  opacity: 0.8,
+                  transition: 'all 0.8s ease-in-out',
+                })
+                .appendTo('body');
+
+        // 애니메이션 시작 (이미지 크기 줄이고 카트 위치로 이동)
         setTimeout(() => {
-          successMessage.querySelector('div').style.transform =
-            'translateX(full)';
-          setTimeout(() => {
-            document.body.removeChild(successMessage);
-          }, 300);
-        }, 3000);
+          $flyImg.css({
+            top: cartOffset.top + 10,    // 약간 여유를 줌
+            left: cartOffset.left + 10,
+            width: 30,
+            height: 30,
+            opacity: 0,
+          });
+        }, 10);
+
+        // 애니메이션 종료 후 제거
+        $flyImg.on('transitionend', () => {
+          $flyImg.remove();
+        });
       }
+
     </script>
   </body>
 </html>
