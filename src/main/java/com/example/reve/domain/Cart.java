@@ -29,7 +29,7 @@ public class Cart extends BaseEntity {
   private User user;
 
   // 장바구니와 향수 관계 (N : 1)
-  @ManyToOne(fetch = FetchType.LAZY)
+  @ManyToOne(fetch = FetchType.EAGER)
   @JoinColumn(name = "perfume_id", nullable = false)
   private Perfume perfume;
 }
