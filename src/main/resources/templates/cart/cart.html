@@ -347,8 +347,11 @@
       });
     });
 
+    // 할인된 가격
+    const totalPriceAfterDiscount = totalOriginalPrice - totalDiscount;
+
     // 배송비 계산
-    const deliveryFee = totalOriginalPrice >= 50000 ? 0 : 3000;
+    const deliveryFee = totalPriceAfterDiscount >= 50000 ? 0 : 3000;
 
     // 최종 결제 금액
     const totalPayment = totalOriginalPrice - totalDiscount + deliveryFee;
