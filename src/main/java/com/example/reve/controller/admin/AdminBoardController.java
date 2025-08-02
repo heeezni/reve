@@ -22,16 +22,14 @@ import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
-import com.example.reve.domain.Notice;
 import com.example.reve.dto.NoticeReqDTO;
+import com.example.reve.dto.NoticeResDTO;
 import com.example.reve.dto.QnaResDTO;
 import com.example.reve.service.NoticeService;
 import com.example.reve.service.QnaService;
 
 import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
 
-@Slf4j
 @Controller
 @RequestMapping("/admin/board")
 @RequiredArgsConstructor
@@ -49,7 +47,7 @@ public class AdminBoardController {
   @GetMapping("/notice/edit/{noticeId}")
   public String noticeEditForm(@PathVariable Long noticeId, Model model, Principal principal) {
     try {
-      Notice notice = noticeService.getNoticeById(noticeId);
+      NoticeResDTO notice = noticeService.getNoticeById(noticeId);
       model.addAttribute("notice", notice);
       model.addAttribute("isAdmin", isAdmin(principal)); // isAdmin 추가
       return "admin/board/notice/edit";
@@ -76,7 +74,6 @@ public class AdminBoardController {
       redirectAttributes.addFlashAttribute("errorMessage", e.getMessage());
       return "redirect:/admin/board/notice/register";
     } catch (Exception e) {
-      log.error("공지사항 등록 중 오류 발생: {}", e.getMessage());
       redirectAttributes.addFlashAttribute("errorMessage", "공지사항 등록에 실패했습니다.");
       return "redirect:/admin/board/notice/register";
     }
@@ -93,12 +90,11 @@ public class AdminBoardController {
       return ResponseEntity.badRequest().body(bindingResult.getAllErrors());
     }
     try {
-      Notice updatedNotice = noticeService.updateNotice(noticeId, noticeReqDTO, principal);
+      NoticeResDTO updatedNotice = noticeService.updateNotice(noticeId, noticeReqDTO, principal);
       return ResponseEntity.ok(Map.of("noticeId", updatedNotice.getNoticeId()));
     } catch (IOException | AccessDeniedException e) {
       return ResponseEntity.status(403).body(Map.of("error", e.getMessage()));
     } catch (Exception e) {
-      log.error("공지사항 수정 중 오류 발생: {}", e.getMessage());
       return ResponseEntity.status(500).body(Map.of("error", "공지사항 수정에 실패했습니다."));
     }
   }

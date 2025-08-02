@@ -5,6 +5,7 @@ import java.security.Principal;
 import java.util.List;
 import java.util.NoSuchElementException;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -17,6 +18,7 @@ import com.example.reve.domain.Notice;
 import com.example.reve.domain.Role;
 import com.example.reve.domain.User;
 import com.example.reve.dto.NoticeReqDTO;
+import com.example.reve.dto.NoticeResDTO;
 import com.example.reve.repository.NoticeRepository;
 import com.example.reve.repository.UserRepository;
 
@@ -106,53 +108,63 @@ public class NoticeService {
 
   // 모든 공지사항을 페이징하여 가져오는 메서드
   @Transactional(readOnly = true)
-  public Page<Notice> getAllNotices(Pageable pageable, String keyword, String category) {
+  public Page<NoticeResDTO> getAllNotices(Pageable pageable, String keyword, String category) {
+    Page<Notice> noticePage;
     if (keyword != null && !keyword.isEmpty()) {
-      return noticeRepository.findByTitleContaining(keyword, pageable);
+      noticePage = noticeRepository.findByTitleContaining(keyword, pageable);
     } else if (category != null && !category.isEmpty()) {
-      return noticeRepository.findByCategory(category, pageable);
+      noticePage = noticeRepository.findByCategory(category, pageable);
+    } else {
+      noticePage = noticeRepository.findAll(pageable);
     }
-    return noticeRepository.findAll(pageable);
+    return noticePage.map(NoticeResDTO::new);
   }
 
   // 특정 ID의 공지사항을 가져오는 메서드
   @Transactional
-  public Notice getNoticeById(Long noticeId) {
+  public NoticeResDTO getNoticeById(Long noticeId) {
     Notice notice =
         noticeRepository
             .findById(noticeId)
             .orElseThrow(() -> new NoSuchElementException("공지사항을 찾을 수 없습니다: " + noticeId));
     notice.setHit(notice.getHit() + 1); // 새로고침마다 조회수+1
-    return noticeRepository.save(notice);
+    Notice updatedNotice = noticeRepository.save(notice);
+    return new NoticeResDTO(updatedNotice);
   }
 
   // 이전 공지사항 가져오기 (중요도, 생성일, ID 고려)
   @Transactional(readOnly = true)
-  public Optional<Notice> getPrevNotice(Long currentNoticeId) {
+  public Optional<NoticeResDTO> getPrevNotice(Long currentNoticeId) {
     Notice currentNotice =
         noticeRepository
             .findById(currentNoticeId)
             .orElseThrow(() -> new NoSuchElementException("공지사항을 찾을 수 없습니다: " + currentNoticeId));
-    return noticeRepository.findPrevNoticeByImportantAndCreatedAt(
-        currentNoticeId, currentNotice.isImportant(), currentNotice.getCreatedAt());
+    return noticeRepository
+        .findPrevNoticeByImportantAndCreatedAt(
+            currentNoticeId, currentNotice.isImportant(), currentNotice.getCreatedAt())
+        .map(NoticeResDTO::new);
   }
 
   // 다음 공지사항 가져오기 (중요도, 생성일, ID 고려)
   @Transactional(readOnly = true)
-  public Optional<Notice> getNextNotice(Long currentNoticeId) {
+  public Optional<NoticeResDTO> getNextNotice(Long currentNoticeId) {
     Notice currentNotice =
         noticeRepository
             .findById(currentNoticeId)
             .orElseThrow(() -> new NoSuchElementException("공지사항을 찾을 수 없습니다: " + currentNoticeId));
-    return noticeRepository.findNextNoticeByImportantAndCreatedAt(
-        currentNoticeId, currentNotice.isImportant(), currentNotice.getCreatedAt());
+    return noticeRepository
+        .findNextNoticeByImportantAndCreatedAt(
+            currentNoticeId, currentNotice.isImportant(), currentNotice.getCreatedAt())
+        .map(NoticeResDTO::new);
   }
 
   // 관련 공지사항 가져오기 (현재 공지사항 제외, 같은 카테고리 내에서, 최신순)
   @Transactional(readOnly = true)
-  public List<Notice> getRelatedNotices(Long currentNoticeId, String category, int limit) {
+  public List<NoticeResDTO> getRelatedNotices(Long currentNoticeId, String category, int limit) {
     Pageable pageable = PageRequest.of(0, limit);
-    return noticeRepository.findRelatedNotices(category, currentNoticeId, pageable);
+    return noticeRepository.findRelatedNotices(category, currentNoticeId, pageable).stream()
+        .map(NoticeResDTO::new)
+        .collect(Collectors.toList());
   }
 
   @Transactional
@@ -183,7 +195,7 @@ public class NoticeService {
   }
 
   @Transactional
-  public Notice updateNotice(Long noticeId, NoticeReqDTO noticeReqDTO, Principal principal)
+  public NoticeResDTO updateNotice(Long noticeId, NoticeReqDTO noticeReqDTO, Principal principal)
       throws IOException, AccessDeniedException {
     Notice notice =
         noticeRepository
@@ -230,6 +242,7 @@ public class NoticeService {
       }
     }
 
-    return noticeRepository.save(notice);
+    Notice updatedNotice = noticeRepository.save(notice);
+    return new NoticeResDTO(updatedNotice);
   }
 }
