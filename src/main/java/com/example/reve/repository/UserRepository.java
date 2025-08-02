@@ -17,7 +17,7 @@ public interface UserRepository extends JpaRepository<User, Long> {
   boolean existsByLoginId(String loginId);
 
   @Query(
-      "SELECT new com.example.reve.dto.MypageDTO(u.email, u.createdAt) FROM User u WHERE u.loginId = :loginId")
+      "SELECT new com.example.reve.dto.MypageDTO(u.email, u.createdAt,u.profileUrl) FROM User u WHERE u.loginId = :loginId")
   MypageDTO findUserInfoByLoginId(String loginId);
 
   @Query(
