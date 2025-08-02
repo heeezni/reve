@@ -118,6 +118,10 @@
         content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0"
       />
       <meta http-equiv="X-UA-Compatible" content="ie=edge" />
+      <!-- CSRF Meta Tags -->
+      <!--  Spring Security는 기본적으로 POST, PUT, DELETE와 같은 상태 변경 요청에 대해 CSRF 토큰을 요구 -->
+      <meta th:if="${_csrf} != null" name="_csrf" th:content="${_csrf.token}"/>
+      <meta th:if="${_csrf} != null" name="_csrf_header" th:content="${_csrf.headerName}"/>
       <title th:text="${title} ?: 'Rêve'">Rêve</title>
       <!-- Tailwind CSS CDN -->
       <script src="https://cdn.tailwindcss.com"></script>

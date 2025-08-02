@@ -304,16 +304,16 @@
       console.log('form.html script 실행됨');
 
       // Character count for textarea
-      const textarea = $('#qna-content'); // jQuery 선택자 사용
-      const charCount = $('#charCount'); // jQuery 선택자 사용
+      const textarea = $('#qna-content');
+      const charCount = $('#charCount');
 
-      textarea.on('input', function () { // .on() 메소드 사용
-        const length = $(this).val().length; // .val() 메소드 사용
-        charCount.text(length.toString()); // .text() 메소드 사용
+      textarea.on('input', function () {
+        const length = $(this).val().length;
+        charCount.text(length.toString());
         if (length > 1900) {
-          charCount.addClass('text-red-500'); // .addClass() 메소드 사용
+          charCount.addClass('text-red-500');
         } else {
-          charCount.removeClass('text-red-500'); // .removeClass() 메소드 사용
+          charCount.removeClass('text-red-500');
         }
       });
 
@@ -353,7 +353,7 @@
           selectedFiles = selectedFiles.slice(0, MAX_FILES);
         }
 
-        selectedFiles.forEach((file, index) => {
+        selectedFiles.forEach((file) => {
           let isValid = true;
           let errorMessage = '';
 
@@ -382,7 +382,7 @@
             if (file.type.startsWith('image/')) {
               const reader = new FileReader();
               reader.onload = function (e) {
-                const img = $('<img>');
+                const img = $('<img alt="미리보기" src="" />');
                 img.attr('src', e.target.result);
                 img.addClass('w-16 h-16 object-cover rounded-md');
                 fileInfoContainer.prepend(img);
@@ -424,19 +424,6 @@
         fileInput[0].files = dt.files;
         fileInput.trigger('change'); // 파일 목록을 다시 렌더링하기 위해 change 이벤트 트리거
       }
-
-      // 비밀글 선택 시 비밀번호 필드 표시/숨김
-      // const passwordSection = $('#password-section'); // 주석 처리 또는 삭제
-      // function updatePasswordSection() { // 주석 처리 또는 삭제
-      //   const isSecretSelected = $('input[name="isSecret"]:checked').val() === 'true'; // 주석 처리 또는 삭제
-      //   if (isSecretSelected) { // 주석 처리 또는 삭제
-      //     passwordSection.show(); // 주석 처리 또는 삭제
-      //   } else { // 주석 처리 또는 삭제
-      //     passwordSection.hide(); // 주석 처리 또는 삭제
-      //     $('#qna-password').val(''); // 비밀번호 필드 숨길 때 값 초기화 // 주석 처리 또는 삭제
-      //   } // 주석 처리 또는 삭제
-      // } // 주석 처리 또는 삭제
-      // $('input[name="isSecret"]').on('change', updatePasswordSection); // 주석 처리 또는 삭제
 
       // 초기 로드 시 비밀번호 섹션 상태 업데이트
       $(document).ready(function() {
@@ -500,7 +487,7 @@
             success: function (data) {
               console.log('성공:', data);
               alert('문의가 성공적으로 등록되었습니다.');
-              location.href = '/board/qna/list';
+              location.href = '/board/qna/detail/' + data.qnaId;
             },
             error: function (xhr, status, error) {
               console.error('Error:', xhr.responseText || error);
