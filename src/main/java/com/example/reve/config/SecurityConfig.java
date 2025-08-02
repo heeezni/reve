@@ -50,7 +50,7 @@ public class SecurityConfig {
         .csrf(AbstractHttpConfigurer::disable)
         .formLogin(
             form ->
-                form.loginPage("/member/login?error=true") // 로그인 페이지 URL
+                form.loginPage("/member/login") // 로그인 페이지 URL
                     .loginProcessingUrl("/member/login") // 로그인 처리 URL
                     .usernameParameter("loginId") // 사용자 이름 파라미터 (기본값 username)
                     .passwordParameter("password") // 비밀번호 파라미터 (기본값 password)

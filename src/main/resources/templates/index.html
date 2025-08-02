@@ -162,17 +162,19 @@
     <div th:replace="~{fragments/modal :: loginModal}"></div>
 
     <script src="/js/script.js"></script>
-    <script>
-      const urlParams = new URLSearchParams(window.location.search);
-      const error = urlParams.get("error");
-      if (error === "true") {
-        alert("아이디 또는 비밀번호가 틀렸습니다");
-        // 모달 자동 열기
+    <script th:inline="javascript">
+      /*<![CDATA[*/
+      const loginError = /*[[${loginError}]]*/ false;
+      if (loginError) {
+        alert("비밀번호 또는 아이디가 다시 입력해 주세요");
         const modal = document.getElementById("loginModal");
         if (modal) {
           modal.style.display = "block";
         }
       }
+      /*]]>*/
     </script>
+
+
   </body>
 </html>

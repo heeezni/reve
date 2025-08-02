@@ -2,6 +2,7 @@ package com.example.reve.controller.user;
 
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
+import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 
 import com.example.reve.dto.CreateUserDTO;
@@ -20,8 +21,11 @@ public class MemberController {
   private final CouponService couponService;
 
   @GetMapping("/login")
-  public String login() {
-    return "index";
+  public String login(@RequestParam(value = "error", required = false) String error, Model model) {
+    if ("true".equals(error)) {
+      model.addAttribute("loginError", true); // 모델에 플래그 전달
+    }
+    return "member/login";
   }
 
   @GetMapping("/signup")
