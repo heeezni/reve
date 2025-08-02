@@ -137,13 +137,15 @@
                 </div>
 
                 <!-- 찜 버튼-->
+              <form th:action="@{/wishlist/list}" th:method="post">
                 <div class="absolute top-4 right-4 space-y-2 opacity-0 group-hover:opacity-100 transition-opacity duration-300">
                   <input type="hidden" name="perfumeId" th:value="${perfume.perfumeId}" />
                   <input type="hidden" id="isLoggedIn" th:value="${isLoggedIn}" />
-                  <button type="button" class="w-8 h-8 bg-white rounded-full flex items-center justify-center shadow-md hover:bg-gray-50 transition-colors">
-                    <i class="far fa-heart text-gray-600"></i>
+                  <button type="submit" class="w-8 h-8 bg-white rounded-full flex items-center justify-center shadow-md hover:bg-gray-50 transition-colors">
+                    <i class="text-lg" th:class="${isWished} ? 'fas fa-heart text-red-500' : 'far fa-heart'"></i>
                   </button>
                 </div>
+              </form>
               </div>
 
               <div class="p-4">

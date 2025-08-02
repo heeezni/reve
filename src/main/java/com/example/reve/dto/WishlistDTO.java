@@ -8,4 +8,5 @@ import lombok.Data;
 public class WishlistDTO {
   // 상품 아이디
   private Perfume perfume;
+  private boolean wished;
 }
