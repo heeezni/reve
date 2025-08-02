@@ -15,6 +15,7 @@ import com.example.reve.domain.WishList;
 import com.example.reve.dto.WishListShowDTO;
 import com.example.reve.repository.PerfumeRepository;
 import com.example.reve.repository.ReviewRepository;
+import com.example.reve.repository.UserRepository;
 import com.example.reve.repository.WishListRepository;
 
 import lombok.RequiredArgsConstructor;
@@ -29,6 +30,7 @@ public class WishListService {
   private final WishListRepository wishListRepository;
   private final PerfumeRepository perfumeRepository;
   private final ReviewRepository reviewRepository;
+  private final UserRepository userRepository;
 
   // 찜목록에 추가하거나 삭제하는 로직임.
   @Transactional
@@ -64,7 +66,9 @@ public class WishListService {
   }
 
   // 위시리스트 목록 보기
-  public List<WishListShowDTO> getWishList(Long userId) {
+  public List<WishListShowDTO> getWishList(String loginId) {
+    User user = userRepository.findByLoginId(loginId).orElseThrow();
+    Long userId = user.getUserId();
     List<WishListShowDTO> getWishList = new ArrayList<>();
     // 특정 회원이 가지고 있는 위시리스트
     List<WishList> wishList = wishListRepository.findByUser_UserId(userId);
@@ -77,12 +81,14 @@ public class WishListService {
       double ratingAvg = starAvg(perfume);
 
       WishListShowDTO wishListShowDTO = new WishListShowDTO();
+      wishListShowDTO.setPerfumeId(perfumeId);
       wishListShowDTO.setHoverImageUrl(perfume.getHoverImageUrl());
       wishListShowDTO.setPerfumeName(perfume.getPerfumeName());
       wishListShowDTO.setDiscount(perfume.getDiscount());
       wishListShowDTO.setPrice(perfume.getPrice());
       wishListShowDTO.setScent(perfume.getScent());
       wishListShowDTO.setDesciptionTitle(perfume.getDescriptionTitle());
+      wishListShowDTO.setVolume(perfume.getVolume());
       wishListShowDTO.setRatingAvg(ratingAvg);
       wishListShowDTO.setCountReview(countReview);
       getWishList.add(wishListShowDTO);
