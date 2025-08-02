@@ -100,15 +100,15 @@
                 <i class="far fa-heart text-lg"></i>
               </a>
               <a
-                href="/cart"
-                class="text-gray-800 hover:text-gray-600 transition-colors relative"
+                      href="/cart"
+                      class="text-gray-800 hover:text-gray-600 transition-colors relative"
               >
                 <i class="fas fa-shopping-cart text-lg"></i>
                 <span
-                  id="cart-count"
-                  class="absolute -top-2 -right-2 bg-red-500 text-white text-xs rounded-full w-5 h-5 flex items-center justify-center"
-                  >0</span
-                >
+                        id="cart-count"
+                        class="absolute -top-2 -right-2 bg-red-500 text-white text-xs rounded-full w-5 h-5 flex items-center justify-center"
+                        th:text="${cartCount} ?: 0"
+                >0</span>
               </a>
             </div>
           </div>
