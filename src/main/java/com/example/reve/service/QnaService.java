@@ -38,18 +38,13 @@ public class QnaService {
 
   @Transactional
   public QnaResDTO createQna(QnaReqDTO reqDto, Principal principal) throws IOException {
-
-    // 파일 업로드 실패 시 롤백을 위해 임시 디렉토리 이름 생성
-    String tempDirectoryName = UUID.randomUUID().toString();
-
+    Qna savedQna = null; // 파일 업로드 전에 저장된 Qna 엔티티를 보관하기 위한 용도
     try {
-      // 1. DTO에서 받은 userId로 진짜 유저가 DB에 있는지 찾기
       User user =
           userRepository
               .findByLoginId(principal.getName())
               .orElseThrow(() -> new IllegalArgumentException("해당 유저를 찾을 수 없습니다."));
 
-      // 3. perfumeId로 진짜 상품이 DB에 있는지 확인
       Perfume perfume =
           perfumeRepository
               .findById(reqDto.getPerfumeId())
@@ -58,59 +53,50 @@ public class QnaService {
                       new IllegalArgumentException(
                           "해당 상품을 찾을 수 없습니다. ID: " + reqDto.getPerfumeId()));
 
-      // 5. 유저와 상품 정보가 있으면, Qna 게시글 생성
       Qna qna = new Qna();
       qna.setTitle(reqDto.getTitle());
       qna.setContent(reqDto.getContent());
       qna.setCategory(reqDto.getCategory());
       qna.setUser(user);
       qna.setPerfume(perfume);
-
-      // isSecret 값은 reqDto에서 받은 대로 사용
       qna.setIsSecret(reqDto.getIsSecret());
 
-      String savedAttachmentUrls = null;
-      boolean hasAttachment =
-          reqDto.getAttachmentFiles() != null && !reqDto.getAttachmentFiles().isEmpty();
-      if (hasAttachment) {
-        savedAttachmentUrls =
-            fileUploadService.saveFiles(reqDto.getAttachmentFiles(), tempDirectoryName);
-        qna.setAttachment(savedAttachmentUrls);
+      // 1. Qna 엔티티를 먼저 저장하여 ID 얻기
+      savedQna = qnaRepository.save(qna);
+
+      // 2. 첨부파일이 있다면, Qna ID를 사용하여 파일을 저장
+      if (reqDto.getAttachmentFiles() != null && !reqDto.getAttachmentFiles().isEmpty()) {
+        List<String> uploadedFilePaths =
+            fileUploadService.saveFiles(
+                reqDto.getAttachmentFiles(), "qna", String.valueOf(savedQna.getQnaId()));
+        savedQna.setAttachment(String.join(",", uploadedFilePaths));
+        qnaRepository.save(savedQna); // 파일 경로 업데이트 후 다시 저장
       }
 
-      // 7. 만들어진 Qna 게시글을 DB에 저장 (PK를 얻기 위함)
-      Qna savedQna = qnaRepository.save(qna);
-
-      // 8. DB 저장 성공 후, 임시 디렉토리 이름을 실제 Q&A ID로 변경
-      String newDirectoryName = "qna_" + savedQna.getQnaId();
-      if (savedAttachmentUrls != null) { // 첨부파일이 업로드된 경우에만 디렉토리 이름 변경
-        fileUploadService.renameDirectory(tempDirectoryName, newDirectoryName);
-        // Qna 엔티티의 attachment 필드에 저장된 경로를 실제 경로로 업데이트
-        String updatedAttachmentUrls =
-            savedAttachmentUrls.replace(tempDirectoryName, newDirectoryName);
-        savedQna.setAttachment(updatedAttachmentUrls);
-        qnaRepository.save(savedQna); // 업데이트된 Qna 엔티티 다시 저장
-      }
-
-      // 9. 저장된 최종 결과를 바탕으로 클라이언트에게 보여줄 응답(DTO)을 만들어 반환
       return new QnaResDTO(savedQna);
-    } catch (IOException e) { // RuntimeException 대신 IOException을 직접 처리
-      // 파일 저장/이름 변경 중 오류 발생 시 임시 디렉토리 삭제
-      try {
-        fileUploadService.deleteDirectory(tempDirectoryName);
-      } catch (IOException deleteEx) {
-        System.err.println("임시 디렉토리 삭제 중 오류 발생: " + deleteEx.getMessage());
+    } catch (IOException e) {
+      // 파일 업로드 중 오류 발생 시, 이미 저장된 Qna 엔티티와 파일 디렉토리 정리
+      if (savedQna != null && savedQna.getQnaId() != null) {
+        try {
+          fileUploadService.deleteDirectory("qna", String.valueOf(savedQna.getQnaId()));
+          qnaRepository.delete(savedQna); // Qna 엔티티도 롤백 (트랜잭션이 이미 롤백될 수도 있지만 명시적으로)
+        } catch (IOException deleteEx) {
+          log.error("Q&A 생성 실패 후 디렉토리 삭제 중 오류 발생: {}", deleteEx.getMessage());
+        }
       }
-      System.err.println("이미지 파일 처리 중 오류 발생: " + e.getMessage());
+      log.error("Q&A 생성 중 파일 처리 오류 발생: {}", e.getMessage());
       throw e; // IOException을 그대로 던짐
     } catch (Exception e) {
-      // 다른 일반적인 오류 발생 시 임시 디렉토리 삭제
-      try {
-        fileUploadService.deleteDirectory(tempDirectoryName);
-      } catch (IOException deleteEx) {
-        System.err.println("임시 디렉토리 삭제 중 오류 발생: " + deleteEx.getMessage());
+      // 다른 일반적인 오류 발생 시, 이미 저장된 Qna 엔티티와 파일 디렉토리 정리
+      if (savedQna != null && savedQna.getQnaId() != null) {
+        try {
+          fileUploadService.deleteDirectory("qna", String.valueOf(savedQna.getQnaId()));
+          qnaRepository.delete(savedQna); // Qna 엔티티도 롤백
+        } catch (IOException deleteEx) {
+          log.error("Q&A 생성 실패 후 디렉토리 삭제 중 오류 발생: {}", deleteEx.getMessage());
+        }
       }
-      System.err.println("Q&A 생성 중 오류 발생: " + e.getMessage());
+      log.error("Q&A 생성 중 오류 발생: {}", e.getMessage());
       throw e; // 기존 예외 다시 던지기
     }
   }
@@ -163,16 +149,20 @@ public class QnaService {
 
     // 3. 새로 추가된 파일 처리
     if (reqDto.getAttachmentFiles() != null && !reqDto.getAttachmentFiles().isEmpty()) {
-      String newAttachmentUrls =
-          fileUploadService.saveFiles(reqDto.getAttachmentFiles(), "qna_" + qnaId);
-      if (newAttachmentUrls != null && !newAttachmentUrls.isEmpty()) {
-        existingAttachments.addAll(Arrays.asList(newAttachmentUrls.split(",")));
+      // 변경된 FileUploadService의 saveFiles 메소드를 사용하여 파일 저장
+      List<String> newUploadedFilePaths =
+          fileUploadService.saveFiles(reqDto.getAttachmentFiles(), "qna", String.valueOf(qnaId));
+      // 새로 업로드된 파일 경로들을 기존 목록에 추가
+      if (newUploadedFilePaths != null && !newUploadedFilePaths.isEmpty()) {
+        existingAttachments.addAll(newUploadedFilePaths);
       }
     }
 
-    // 최종 파일 목록을 문자열로 변환. 목록이 비어있으면 null 저장
-    String finalAttachments = String.join(",", existingAttachments);
-    qna.setAttachment(finalAttachments.isEmpty() ? null : finalAttachments);
+    // 최종 파일 목록을 콤마로 구분된 문자열로 변환하여 Qna 엔티티에 저장
+    // 목록이 비어있으면 null로 설정
+    String finalAttachments =
+        existingAttachments.isEmpty() ? null : String.join(",", existingAttachments);
+    qna.setAttachment(finalAttachments);
 
     Qna updatedQna = qnaRepository.save(qna);
     new QnaResDTO(updatedQna);
@@ -282,8 +272,8 @@ public class QnaService {
 
     // 첨부 파일 디렉토리 삭제
     if (qna.getAttachment() != null && !qna.getAttachment().isEmpty()) {
-      String directoryName = "qna_" + qna.getQnaId();
-      fileUploadService.deleteDirectory(directoryName);
+      // 변경된 FileUploadService의 deleteDirectory 메소드를 사용하여 디렉토리 삭제
+      fileUploadService.deleteDirectory("qna", String.valueOf(qna.getQnaId()));
     }
 
     qnaRepository.delete(qna);
