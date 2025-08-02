@@ -57,6 +57,18 @@
               <option value="배송">배송</option>
             </select>
           </div>
+
+          <!-- Important Checkbox -->
+          <div>
+            <label class="flex items-center">
+              <input
+                      type="checkbox"
+                      th:field="*{important}"
+                      class="w-4 h-4 text-purple-600 border-gray-300 rounded focus:ring-purple-500"
+              />
+              <span class="ml-2 text-sm text-gray-700">중요 공지 (상단에 고정)</span>
+            </label>
+          </div>
           
           <!-- Title -->
           <div>
@@ -167,18 +179,6 @@
             </div>
             <!-- New File List -->
             <div id="newFileList" class="mt-4 space-y-2"></div>
-          </div>
-
-          <!-- Important Checkbox -->
-          <div>
-            <label class="flex items-center">
-              <input
-                type="checkbox"
-                th:field="*{important}"
-                class="w-4 h-4 text-purple-600 border-gray-300 rounded focus:ring-purple-500"
-              />
-              <span class="ml-2 text-sm text-gray-700">중요 공지 (상단에 고정)</span>
-            </label>
           </div>
 
           <!-- Notice -->

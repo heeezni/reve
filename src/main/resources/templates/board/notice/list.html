@@ -107,9 +107,9 @@
                   <div class="col-span-1 text-center">
                     <span
                       th:if="${notice.important}"
-                      class="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-red-100 text-red-800"
+                      class="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-yellow-100 text-yellow-800"
                     >
-                      공지
+                      <i class="fas fa-star mr-1"></i> 중요
                     </span>
                     <span th:unless="${notice.important}" th:text="${notices.totalElements - (notices.number * notices.size) - iStat.index}" class="text-sm text-gray-600"></span>
                   </div>

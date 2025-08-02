@@ -55,12 +55,25 @@
               <option value="배송">배송</option>
             </select>
           </div>
-          
+
+          <!-- Important Notice Checkbox -->
+          <div class="flex items-center mt-4">
+            <input
+              type="checkbox"
+              id="notice-important"
+              name="important"
+              class="h-4 w-4 text-purple-600 focus:ring-purple-500 border-gray-300 rounded"
+            />
+            <label for="notice-important" class="ml-2 block text-sm text-gray-900">
+              중요 공지 (상단 고정)
+            </label>
+          </div>
+
 
           <!-- Title -->
           <div>
             <label
-                    for
+                    for="notice-title"
                     class="block text-sm font-medium text-gray-700 mb-3"
             >
               제목 <span class="text-red-500">*</span>
@@ -86,7 +99,7 @@
           <!-- Content -->
           <div>
             <label
-                    for
+                    for="notice-content"
                     class="block text-sm font-medium text-gray-700 mb-3"
             >
               공지 내용 <span class="text-red-500">*</span>
@@ -287,7 +300,7 @@
       selectedFiles = selectedFiles.slice(0, MAX_FILES);
     }
 
-    selectedFiles.forEach((file, index) => {
+    selectedFiles.forEach((file) => {
       let isValid = true;
       let errorMessage = '';
 
@@ -316,7 +329,7 @@
         if (file.type.startsWith('image/')) {
           const reader = new FileReader();
           reader.onload = function (e) {
-            const img = $('<img>');
+            const img = $('<img alt="미리보기" src="">');
             img.attr('src', e.target.result);
             img.addClass('w-16 h-16 object-cover rounded-md');
             fileInfoContainer.prepend(img);
@@ -389,6 +402,7 @@
       const title = $('#notice-title').val();
       const content = $('#notice-content').val();
       const category = $('#notice-category').val();
+      const important = $('#notice-important').is(':checked'); // 체크박스 값 가져오기
 
       // 2. 유효성 검사
       if (!title.trim()) {
@@ -405,6 +419,7 @@
       formData.append('title', title);
       formData.append('content', content);
       formData.append('category', category);
+      formData.append('important', important); // important 값 추가
 
       // 파일 추가
       const files = fileInput[0].files;
