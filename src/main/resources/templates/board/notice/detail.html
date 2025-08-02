@@ -75,12 +75,7 @@
                   <span th:if="${notice.attachmentFiles != null and !notice.attachmentFiles.isEmpty()}" th:text="|첨부파일: ${notice.attachmentFiles.size()}개|"></span>
                 </div>
                 <div class="flex items-center space-x-4">
-                  <button
-                    class="flex items-center space-x-1 text-gray-500 hover:text-gray-700"
-                  >
-                    <i class="far fa-heart"></i>
-                    <span>스크랩</span>
-                  </button>
+                  
                   <button
                     class="flex items-center space-x-1 text-gray-500 hover:text-gray-700"
                   >
@@ -223,14 +218,16 @@
     <!-- Login Modal Fragment -->
     <div th:replace="~{fragments/modal :: loginModal}"></div>
 
+    <div id="noticeData" style="display:none;" th:attr="data-title=${notice.title}"></div>
+    <div id="noticeContentHidden" style="display:none;" th:utext="${notice.content}"></div>
     <script src="/js/script.js"></script>
-    <script th:inline="javascript">
+    <script>
       function deleteNotice(noticeId) {
         if (confirm('정말로 이 공지사항을 삭제하시겠습니까?')) {
           $.ajax({
             url: '/admin/board/notice/' + noticeId,
             type: 'DELETE',
-            success: function(result) {
+            success: function() {
               alert('공지사항이 삭제되었습니다.');
               window.location.href = '/board/notice/list';
             },
@@ -245,10 +242,17 @@
       document
         .querySelector('button:has(.fa-share)')
         .addEventListener('click', function () {
+          const noticeDataElement = document.getElementById('noticeData');
+          const noticeTitle = noticeDataElement.dataset.title;
+
+          const tempDiv = document.createElement('div');
+          tempDiv.innerHTML = document.getElementById('noticeContentHidden').innerHTML;
+          const plainTextContent = tempDiv.textContent || tempDiv.innerText || '';
+
           if (navigator.share) {
             navigator.share({
-              title: '[이벤트] 봄맞이 신상품 출시 기념 할인 이벤트 안내',
-              text: 'Rêve 봄맞이 특별 이벤트를 확인해보세요!',
+              title: noticeTitle,
+              text: plainTextContent.substring(0, Math.min(plainTextContent.length, 100)) + '...',
               url: window.location.href,
             });
           } else {
@@ -259,38 +263,6 @@
             });
           }
         });
-
-      // Scrap functionality
-      document
-        .querySelector('button:has(.fa-heart)')
-        .addEventListener('click', function () {
-          const icon = this.querySelector('i');
-          if (icon.classList.contains('far')) {
-            icon.classList.remove('far');
-            icon.classList.add('fas');
-            icon.style.color = '#ef4444';
-            this.querySelector('span').textContent = '스크랩됨';
-          } else {
-            icon.classList.remove('fas');
-            icon.classList.add('far');
-            icon.style.color = '';
-            this.querySelector('span').textContent = '스크랩';
-          }
-        });
-
-      // File download simulation
-      document.querySelectorAll('a[href="#"]').forEach((link) => {
-        if (
-          link.querySelector('.fa-file-pdf') ||
-          link.querySelector('.fa-file-image')
-        ) {
-          link.addEventListener('click', function (e) {
-            e.preventDefault();
-            const fileName = this.querySelector('span').textContent;
-            alert(`${fileName} 다운로드를 시작합니다.`);
-          });
-        }
-      });
     </script>
   </body>
 </html>
