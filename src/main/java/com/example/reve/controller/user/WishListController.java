@@ -38,6 +38,9 @@ public class WishListController {
   // 상품 목록에 있는 버튼
   @PostMapping("/wishlist/list")
   public String listWish(@RequestParam Long perfumeId, Principal principal) {
+    if (principal == null) {
+      return "redirect:/login";
+    }
     String loginId = principal.getName();
     User user =
         userRepository

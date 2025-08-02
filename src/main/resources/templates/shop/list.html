@@ -137,11 +137,11 @@
                 </div>
 
                 <!-- 찜 버튼-->
-              <form th:action="@{/wishlist/list}" th:method="post">
+              <form th:action="@{/wishlist/list}" th:method="post" class="wishlist-form">
                 <div class="absolute top-4 right-4 space-y-2 opacity-0 group-hover:opacity-100 transition-opacity duration-300">
                   <input type="hidden" name="perfumeId" th:value="${perfume.perfumeId}" />
                   <input type="hidden" id="isLoggedIn" th:value="${isLoggedIn}" />
-                  <button type="submit" class="w-8 h-8 bg-white rounded-full flex items-center justify-center shadow-md hover:bg-gray-50 transition-colors">
+                  <button type="submit" id="btWishlist" class="w-8 h-8 bg-white rounded-full flex items-center justify-center shadow-md hover:bg-gray-50 transition-colors">
                     <i class="text-lg" th:class="${isWished} ? 'fas fa-heart text-red-500' : 'far fa-heart'"></i>
                   </button>
                 </div>
@@ -539,5 +539,16 @@
         }, 3000);
       }
     </script>
+  <script>
+    document.querySelectorAll('.wishlist-form').forEach(form => {
+      form.addEventListener('submit', function (event) {
+        const isLoggedIn = this.querySelector('input[name="isLoggedIn"]').value === 'true';
+        if (!isLoggedIn) {
+          event.preventDefault(); // ❌ form 전송 막고
+          window.location.href = '/login'; // 🔁 로그인 페이지로 이동
+        }
+      });
+    });
+  </script>
   </body>
 </html>
