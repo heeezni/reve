@@ -1,10 +1,53 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
 <head>
     <meta charset="UTF-8">
-    <title>Title</title>
+    <title>상품 목록</title>
+    <style>
+        body { font-family: Arial, sans-serif; margin: 20px; }
+        table { width: 100%; border-collapse: collapse; margin-top: 20px; }
+        th, td { border: 1px solid #ddd; padding: 8px; text-align: left; }
+        th { background-color: #f2f2f2; }
+        .actions a { margin-right: 5px; text-decoration: none; color: #007bff; }
+        .actions a:hover { text-decoration: underline; }
+        .add-button { margin-bottom: 20px; padding: 10px 15px; background-color: #28a745; color: white; border: none; border-radius: 5px; cursor: pointer; text-decoration: none; }
+        .add-button:hover { background-color: #218838; }
+    </style>
 </head>
 <body>
-상품 목록 페이지 (검색/필터/수정/삭제)
+    <h1>상품 목록</h1>
+
+    <a th:href="@{/admin/product/add}" class="add-button">새 상품 추가</a>
+    <a th:href="@{/admin/dashboard}" class="add-button" style="background-color: #6c757d;">대시보드로 돌아가기</a>
+
+    <table>
+        <thead>
+            <tr>
+                <th>ID</th>
+                <th>상품명</th>
+                <th>향</th>
+                <th>재고</th>
+                <th>가격</th>
+                <th>할인율</th>
+                <th>이미지</th>
+                <th>액션</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr th:each="perfume : ${perfumes}">
+                <td th:text="${perfume.perfumeId}"></td>
+                <td th:text="${perfume.perfumeName}"></td>
+                <td th:text="${perfume.scent}"></td>
+                <td th:text="${perfume.stock}"></td>
+                <td th:text="${perfume.price}"></td>
+                <td th:text="${perfume.discount}"></td>
+                <td><img th:src="${perfume.imageUrl}" alt="상품 이미지" style="width: 50px; height: 50px; object-fit: cover;"></td>
+                <td class="actions">
+                    <a th:href="@{/admin/product/edit(perfumeId=${perfume.perfumeId})}">수정</a>
+                    <a th:href="@{/admin/product/delete(perfumeId=${perfume.perfumeId})}" onclick="return confirm('정말로 삭제하시겠습니까?');">삭제</a>
+                </td>
+            </tr>
+        </tbody>
+    </table>
 </body>
 </html>

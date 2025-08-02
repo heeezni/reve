@@ -30,7 +30,8 @@ public class AdminController {
   }
 
   @GetMapping("/product/list")
-  public String productList() {
+  public String productList(Model model) {
+    model.addAttribute("perfumes", perfumeService.getAllPerfumes());
     return "admin/product/list";
   }
 
@@ -50,7 +51,8 @@ public class AdminController {
   }
 
   @GetMapping("/member/list")
-  public String memberList() {
+  public String memberList(Model model) {
+    model.addAttribute("users", userService.getAllUsers());
     return "admin/member/list";
   }
 }
