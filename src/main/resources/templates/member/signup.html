@@ -1,7 +1,6 @@
 <!DOCTYPE html>
 <html lang="ko"
       xmlns:th="http://www.thymeleaf.org"
-      xmlns:sec="http://www.thymeleaf.org/thymeleaf-extras-springsecurity4"
 >
   <head th:replace="~{fragments/header :: head(title='회원가입 | Rêve')}">
   </head>
@@ -38,7 +37,7 @@
 
                 <!-- Username -->
                 <div class="mb-4">
-                  <label class="block text-sm font-medium text-gray-700 mb-2">
+                  <label for="loginId" class="block text-sm font-medium text-gray-700 mb-2">
                     아이디 <span class="text-red-500">*</span>
                   </label>
 
@@ -133,6 +132,7 @@
                   </label>
                   <div class="flex items-center space-x-2 w-full">
                     <select name="firstNum"
+                            aria-label="휴대전화 앞자리"
                             class="w-1/4 border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-gray-800 focus:border-transparent">
                       <option>010</option>
                       <option>011</option>
@@ -144,6 +144,7 @@
                     <input
                       type="text"
                       name="middleNum"
+                      aria-label="휴대전화 중간자리"
                       id="middleNum"
                       required
                       maxlength="4"
@@ -154,6 +155,7 @@
                       type="text"
                       name="lastNum"
                       id="lastNum"
+                      aria-label="휴대전화 마지막자리"
                       required
                       maxlength="4"
                       class="w-1/3 border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-gray-800 focus:border-transparent"
