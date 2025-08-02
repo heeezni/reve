@@ -162,36 +162,24 @@ public class UserService implements UserDetailsService { // UserDetailsService �
     return userRepository.findUserUpdate(loginId);
   }
 
-  /**
-   * 비밀번호 변경 서비스 -기존 비밀번호 확인 후 새 비밀번호 암호화 후 저장
-   *
-   * @param newPasswordDTO (로그인 아이디, 기존 비밀번호, 변경 비밀번호)
-   */
-  public boolean checkPassword(NewPasswordDTO newPasswordDTO, String loginId) {
-    // 로그인 아이디가 같은 회원 정보 가져오기
-    User user = userRepository.findByLoginId(loginId).orElseThrow();
-    // 기존 비밀번호가 일치한지 확인하기
-    if (passwordEncoder.matches(newPasswordDTO.getPassword(), user.getPassword())) {
-      return true;
-    } else {
-      log.error("비밀번호가 일치하지 않음");
-      return false;
-    }
-  }
-
   public boolean updatePassword(NewPasswordDTO newPasswordDTO, String loginId) {
     User user = userRepository.findByLoginId(loginId).orElseThrow();
-    // 새 비밀번호와 기존 비밀번호가 일치한지 비교
-    if (!newPasswordDTO.getPassword().equals(newPasswordDTO.getNewPassword())) {
-      // 새 비밀번호 암호화
-      String encodedNewPassword = passwordEncoder.encode(newPasswordDTO.getNewPassword());
-      user.setPassword(encodedNewPassword);
-      // 저장
-      userRepository.save(user);
-      return true;
-    } else {
-      throw new BadCredentialsException("비밀번호의 변경사함이 없음");
+    // 비밀번호 일치 비교
+    if (!passwordEncoder.matches(newPasswordDTO.getPassword(), user.getPassword())) {
+      log.error("비밀번호 불일치");
+      return false;
     }
+    // 새 비밀번호가 기존과 같은지 확인
+    if (passwordEncoder.matches(newPasswordDTO.getNewPassword(), user.getPassword())) {
+      log.error("현재 비밀번호와 새 비밀번호가 일치");
+      return false;
+    }
+    // 새 비밀번호 암호화 및 저장
+    String encodedNewPassword = passwordEncoder.encode(newPasswordDTO.getNewPassword());
+    user.setPassword(encodedNewPassword);
+    userRepository.save(user);
+    log.info("비밀번호 성공");
+    return true;
   }
 
   public MypageDTO selectMypage(String loginId) {
