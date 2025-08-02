@@ -19,130 +19,97 @@
           <!-- Wishlist Content -->
           <div class="bg-white rounded-lg shadow-sm">
             <!-- Wishlist Header -->
+            <!-- Wishlist Header -->
             <div class="p-6 border-b border-gray-200">
               <div class="flex items-center justify-between">
                 <div class="flex items-center space-x-4">
                   <h2 class="text-lg font-semibold text-gray-800">관심 상품</h2>
-                  <span class="text-sm text-gray-500" th:text="'총'+ ${wishlist.size()}+'개 상품'"></span>
+                  <!-- 총 상품 개수 표시 -->
+                  <span class="text-sm text-gray-500" th:text="'총 ' + ${wishlist.size()} + '개 상품'"></span>
                 </div>
                 <div class="flex items-center space-x-3">
-                  <button
-                    id="selectAll"
-                    class="text-sm text-gray-600 hover:text-gray-800"
-                  >
-                    전체 선택
-                  </button>
-                  <button
-                    id="removeSelected"
-                    class="text-sm text-red-600 hover:text-red-700"
-                  >
-                    선택 삭제
-                  </button>
+                  <button id="selectAll" class="text-sm text-gray-600 hover:text-gray-800">전체 선택</button>
+                  <button id="removeSelected" class="text-sm text-red-600 hover:text-red-700">선택 삭제</button>
                 </div>
               </div>
             </div>
 
             <!-- Wishlist Items -->
-            <div :if="${wishlist>1}" th:each="getWishList : ${wishlist}">
-            <input th:text="${getWishList.perfumeId}" type="hidden"/>
-            <div class="p-6">
+            <div class="p-6" th:if="${wishlist.size() > 0}">
               <div class="space-y-6">
-                <div class="wishlist-item flex items-start space-x-4 p-4 border border-gray-200 rounded-lg hover:shadow-md transition-shadow">
-                  <div class="flex items-start space-x-4">
-                    <label>
-                      <input
-                        type="checkbox"
-                        class="wishlist-checkbox mt-2 w-4 h-4 text-gray-800 border-gray-300 rounded focus:ring-gray-800"
-                      />
-                    </label>
-                    <div class="relative overflow-hidden rounded-lg">
-                      <img
-                        th:src="${getWishList.hoverImageUrl}"
-                        alt="디어 무드 멀티 퍼퓸 70ml"
-                        class="w-24 h-24 object-cover"
-                      />
-                      <div class="absolute top-1 left-1">
-                        <span
-                          class="inline-flex items-center px-1 py-0.5 rounded text-xs font-medium bg-red-500 text-white"
-                          th:text="${(getWishList.discount * 100) / getWishList.price}+'% 할인'">
-                        </span>
+                <div th:each="getWishList : ${wishlist}">
+                  <input th:value="${getWishList.perfumeId}" type="hidden"/>
+                  <div class="wishlist-item flex items-start space-x-4 p-4 border border-gray-200 rounded-lg hover:shadow-md transition-shadow">
+                    <div class="flex items-start space-x-4">
+                      <label>
+                        <input type="checkbox" class="wishlist-checkbox mt-2 w-4 h-4 text-gray-800 border-gray-300 rounded focus:ring-gray-800"/>
+                      </label>
+                      <div class="relative overflow-hidden rounded-lg">
+                        <img th:src="${getWishList.hoverImageUrl}" alt="상품 이미지" class="w-24 h-24 object-cover"/>
+                        <div class="absolute top-1 left-1">
+              <span class="inline-flex items-center px-1 py-0.5 rounded text-xs font-medium bg-red-500 text-white"
+                    th:text="${(getWishList.discount * 100) / getWishList.price} + '% 할인'">
+              </span>
+                        </div>
                       </div>
                     </div>
-                  </div>
 
-                  <div class="flex-1 min-w-0">
-                    <div class="flex items-start justify-between">
-                      <div class="flex-1">
-                        <div class="flex items-center space-x-2 mb-2">
-                          <span
-                            class="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-blue-100 text-blue-800"
-                            th:text="${getWishList.scent}"
-                          >
-                          </span>
-                        </div>
-                        <h3 class="text-lg font-medium text-gray-800 mb-1">
-                          <a th:href="'/shop/detail?id='+${getWishList.getPerfumeId()}" class="hover:text-gray-600" th:text="${getWishList.perfumeName}+' '+${getWishList.volume}+'ml'"></a>
-                        </h3>
-                        <p class="text-sm text-gray-600 mb-3" th:text="${getWishList.desciptionTitle}">
-                        </p>
+                    <div class="flex-1 min-w-0">
+                      <div class="flex items-start justify-between">
+                        <div class="flex-1">
+                          <div class="flex items-center space-x-2 mb-2">
+                <span class="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-blue-100 text-blue-800"
+                      th:text="${getWishList.scent}"></span>
+                          </div>
+                          <h3 class="text-lg font-medium text-gray-800 mb-1">
+                            <a th:href="'/shop/detail?id=' + ${getWishList.perfumeId}" class="hover:text-gray-600"
+                               th:text="${getWishList.perfumeName} + ' ' + ${getWishList.volume} + 'ml'"></a>
+                          </h3>
+                          <p class="text-sm text-gray-600 mb-3" th:text="${getWishList.desciptionTitle}"></p>
 
-                        <div class="flex items-center space-x-3 mb-3">
+                          <div class="flex items-center space-x-3 mb-3">
+                            <div class="flex items-center space-x-2">
+                              <span class="text-xl font-bold text-gray-800" th:text="${getWishList.discount}"></span>
+                              <span class="text-sm text-gray-400 line-through" th:text="${getWishList.price}"></span>
+                            </div>
+                            <div class="flex items-center space-x-1">
+                              <i class="fas fa-star text-yellow-400 text-sm"></i>
+                              <span class="text-sm text-gray-600" th:text="${getWishList.ratingAvg}"></span>
+                              <span class="text-sm text-gray-500" th:text="'(' + ${getWishList.countReview} + ')'"></span>
+                            </div>
+                          </div>
+
                           <div class="flex items-center space-x-2">
-                            <span class="text-xl font-bold text-gray-800" th:text="${getWishList.discount}"></span>
-                            <span class="text-sm text-gray-400 line-through" th:text="${getWishList.price}"></span>
-                          </div>
-                          <div class="flex items-center space-x-1">
-                            <i class="fas fa-star text-yellow-400 text-sm"></i>
-                            <span class="text-sm text-gray-600"  th:text="${getWishList.ratingAvg}"></span>
-                            <span class="text-sm text-gray-500" th:text="'('+${getWishList.countReview}+')'"></span>
+                            <button class="bg-gray-800 text-white px-4 py-2 rounded-md hover:bg-gray-700 transition-colors text-sm font-medium">
+                              장바구니 담기
+                            </button>
+                            <button class="border border-gray-300 text-gray-700 px-4 py-2 rounded-md hover:bg-gray-50 transition-colors text-sm font-medium">
+                              바로구매
+                            </button>
                           </div>
                         </div>
+                        <button class="remove-wishlist text-gray-400 hover:text-red-500 transition-colors ml-4">
+                          <i class="fas fa-times text-lg"></i>
+                        </button>
                       </div>
-                    </div>
-                        <div class="flex items-center space-x-2">
-                          <button
-                            class="bg-gray-800 text-white px-4 py-2 rounded-md hover:bg-gray-700 transition-colors text-sm font-medium"
-                          >
-                            장바구니 담기
-                          </button>
-                          <button
-                            class="border border-gray-300 text-gray-700 px-4 py-2 rounded-md hover:bg-gray-50 transition-colors text-sm font-medium"
-                          >
-                            바로구매
-                          </button>
-                        </div>
-                      </div>
-
-                      <button
-                        class="remove-wishlist text-gray-400 hover:text-red-500 transition-colors ml-4"
-                      >
-                        <i class="fas fa-times text-lg"></i>
-                      </button>
                     </div>
                   </div>
-                </div>
+                </div> <!-- th:each 닫힘 -->
+              </div>
             </div>
-            <!-- Empty State (Hidden by default) -->
-            <div id="emptyWishlist" class="hidden p-12 text-center">
-              <div
-                class="w-24 h-24 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-4"
-              >
+
+            <!-- Empty State -->
+            <div id="emptyWishlist" th:if="${wishlist.size() == 0}" class="p-12 text-center">
+              <div class="w-24 h-24 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-4">
                 <i class="far fa-heart text-3xl text-gray-400"></i>
               </div>
-              <h3 class="text-lg font-medium text-gray-800 mb-2">
-                위시리스트가 비어있습니다
-              </h3>
-              <p class="text-gray-600 mb-6">
-                관심 있는 상품을 위시리스트에 추가해보세요
-              </p>
-              <a
-                href="/shop/list"
-                class="inline-flex items-center px-6 py-3 bg-gray-800 text-white rounded-md hover:bg-gray-700 transition-colors font-medium"
-              >
-                <i class="fas fa-shopping-bag mr-2"></i>
-                쇼핑하러 가기
+              <h3 class="text-lg font-medium text-gray-800 mb-2">위시리스트가 비어있습니다</h3>
+              <p class="text-gray-600 mb-6">관심 있는 상품을 위시리스트에 추가해보세요</p>
+              <a href="/shop/list" class="inline-flex items-center px-6 py-3 bg-gray-800 text-white rounded-md hover:bg-gray-700 transition-colors font-medium">
+                <i class="fas fa-shopping-bag mr-2"></i>쇼핑하러 가기
               </a>
             </div>
+
           </div>
 
           <!-- Quick Actions -->
