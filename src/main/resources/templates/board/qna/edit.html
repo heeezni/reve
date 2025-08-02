@@ -45,12 +45,20 @@
                     <div>
                         <label for="qna-title" class="block text-sm font-medium text-gray-700 mb-3">제목 <span class="text-red-500">*</span></label>
                         <input type="text" id="qna-title" name="title" th:value="${qna.title}" class="w-full border border-gray-300 rounded-md px-4 py-3 focus:outline-none focus:ring-2 focus:ring-gray-800 focus:border-transparent" maxlength="100"/>
+                        <div class="flex justify-between items-center mt-1">
+                            <p class="text-sm text-gray-500">최대 100자까지 입력 가능합니다</p>
+                            <p class="text-sm text-gray-500"><span id="titleCharCount" th:text="${#strings.length(qna.title)}">0</span>/100</p>
+                        </div>
                     </div>
 
                     <!-- Content -->
                     <div>
                         <label for="qna-content" class="block text-sm font-medium text-gray-700 mb-3">문의 내용 <span class="text-red-500">*</span></label>
                         <textarea id="qna-content" name="content" rows="10" class="w-full border border-gray-300 rounded-md px-4 py-3 focus:outline-none focus:ring-2 focus:ring-gray-800 focus:border-transparent resize-none" maxlength="2000" th:text="${qna.content}"></textarea>
+                        <div class="flex justify-between items-center mt-1">
+                            <p class="text-sm text-gray-500">최대 2,000자까지 입력 가능합니다</p>
+                            <p class="text-sm text-gray-500"><span id="charCount" th:text="${#strings.length(qna.content)}">0</span>/2,000</p>
+                        </div>
                     </div>
 
                     <!-- File Upload -->
@@ -109,6 +117,37 @@
         const fileListContainer = document.getElementById('fileList');
         const deletedFilesContainer = document.getElementById('deleted-files-container');
         const dataTransfer = new DataTransfer();
+
+        // 제목과 내용 입력 필드 및 글자 수 표시 span 요소 가져오기
+        const qnaTitleInput = document.getElementById('qna-title');
+        const titleCharCountSpan = document.querySelector('#qna-form #qna-title + div p:last-child span');
+        const qnaContentTextarea = document.getElementById('qna-content');
+        const contentCharCountSpan = document.querySelector('#qna-form #qna-content + div p:last-child span');
+
+        // input 이벤트 리스너 추가
+        if (qnaTitleInput && titleCharCountSpan) {
+            qnaTitleInput.addEventListener('input', function() {
+                const length = this.value.length;
+                titleCharCountSpan.textContent = length.toString();
+                if (length > 90) {
+                    titleCharCountSpan.classList.add('text-red-500');
+                } else {
+                    titleCharCountSpan.classList.remove('text-red-500');
+                }
+            });
+        }
+
+        if (qnaContentTextarea && contentCharCountSpan) {
+            qnaContentTextarea.addEventListener('input', function() {
+                const length = this.value.length;
+                contentCharCountSpan.textContent = length.toString();
+                if (length > 1900) {
+                    contentCharCountSpan.classList.add('text-red-500');
+                } else {
+                    contentCharCountSpan.classList.remove('text-red-500');
+                }
+            });
+        }
 
         // 기존 파일 목록 초기화
         const existingFiles = [];

@@ -304,16 +304,16 @@
       console.log('form.html script 실행됨');
 
       // Character count for textarea
-      const textarea = $('#qna-content'); // jQuery 선택자 사용
-      const charCount = $('#charCount'); // jQuery 선택자 사용
+      const textarea = $('#qna-content');
+      const charCount = $('#charCount');
 
-      textarea.on('input', function () { // .on() 메소드 사용
-        const length = $(this).val().length; // .val() 메소드 사용
-        charCount.text(length.toString()); // .text() 메소드 사용
+      textarea.on('input', function () {
+        const length = $(this).val().length;
+        charCount.text(length.toString());
         if (length > 1900) {
-          charCount.addClass('text-red-500'); // .addClass() 메소드 사용
+          charCount.addClass('text-red-500');
         } else {
-          charCount.removeClass('text-red-500'); // .removeClass() 메소드 사용
+          charCount.removeClass('text-red-500');
         }
       });
 

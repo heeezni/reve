@@ -31,10 +31,9 @@
             <p th:unless="${qna.isSecret}">이 게시글은 로그인한 사용자만 열람할 수 있습니다. <a th:href="@{/member/login}" class="font-bold underline">로그인</a> 해주세요.</p>
           </div>
 
-          
-
           <!-- Question Section -->
-          <div th:unless="${qna.isSecret and !isAuthor and !isAdmin}" class="bg-white rounded-lg shadow-sm p-8 mb-6">
+          <div th:unless="${(qna.isSecret ?: false) and !(isAuthor ?: false) and !(isAdmin ?: false)}"
+            class="bg-white rounded-lg shadow-sm p-8 mb-6">
             <div class="border-b border-gray-200 pb-6 mb-6">
               <!-- Category and Status -->
               <div class="flex items-center space-x-3 mb-4">
@@ -102,15 +101,8 @@
                 class="flex items-center justify-between text-sm text-gray-600"
               >
                 <div class="flex items-center space-x-6">
-                  <span
-                    >작성자: <span th:text="${qna.userName}"></span
-                  ></span>
-                  <span
-                    >작성일:
-                    <span
-                      th:text="${#temporals.format(qna.createdAt, 'yyyy.MM.dd')}"
-                    ></span
-                  ></span>
+                  <span>작성자: <span th:text="${qna.userName}"></span></span>
+                  <span>작성일: <span th:text="${#temporals.format(qna.createdAt, 'yyyy.MM.dd')}"></span></span>
                 </div>
               </div>
             </div>
@@ -195,9 +187,7 @@
                 <div class="flex items-center space-x-4">
                   <div class="flex items-center space-x-2">
                     <i class="fas fa-user-tie text-gray-600"></i>
-                    <span class="text-sm font-medium text-gray-800"
-                      >Rêve 고객센터</span
-                    >
+                    <span class="text-sm font-medium text-gray-800">Rêve 고객센터</span>
                   </div>
                   <span class="text-sm text-gray-500"
                     th:text="${#temporals.format(qna.updatedAt, 'yyyy.MM.dd')}"
@@ -358,18 +348,6 @@
           });
         }
       }
-
-      // File download simulation (for non-image attachments)
-      document.querySelectorAll('a[href^="/uploads/"]').forEach((link) => {
-        // th:href 속성이 /uploads/로 시작하는 링크에만 이벤트 리스너 추가
-        link.addEventListener('click', function () {
-          const url = this.getAttribute('href');
-          const fileName = url.substring(url.lastIndexOf('/') + 1);
-          // 실제 다운로드 로직 대신 시뮬레이션 메시지 표시
-          alert(`${fileName} 다운로드를 시작합니다.`);
-          // 실제 다운로드를 원하면 e.preventDefault()를 제거하고 서버에서 파일 스트리밍 로직 구현 필요
-        });
-      });
 
       function editAnswer() {
         const answerDisplay = document.querySelector('.bg-green-50.border-l-4');

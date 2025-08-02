@@ -458,6 +458,27 @@
       });
     }
   }
+
+  // 초기 로드 시 글자 수 업데이트
+  $(document).ready(function() {
+    // 제목 글자 수 업데이트
+    const initialTitleLength = titleInput.val().length;
+    titleCharCount.text(initialTitleLength.toString());
+    if (initialTitleLength > 90) {
+      titleCharCount.addClass('text-red-500');
+    } else {
+      titleCharCount.removeClass('text-red-500');
+    }
+
+    // 내용 글자 수 업데이트
+    const initialContentLength = textarea.val().length;
+    charCount.text(initialContentLength.toString());
+    if (initialContentLength > 1900) {
+      charCount.addClass('text-red-500');
+    } else {
+      charCount.removeClass('text-red-500');
+    }
+  });
 </script>
 </body>
 </html>
