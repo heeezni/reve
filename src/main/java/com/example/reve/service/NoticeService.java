@@ -9,7 +9,6 @@ import java.util.Optional;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
-import org.springframework.data.domain.Sort;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -108,17 +107,12 @@ public class NoticeService {
   // 모든 공지사항을 페이징하여 가져오는 메서드
   @Transactional(readOnly = true)
   public Page<Notice> getAllNotices(Pageable pageable, String keyword, String category) {
-    Sort sort =
-        Sort.by(Sort.Direction.DESC, "important").and(Sort.by(Sort.Direction.DESC, "createdAt"));
-    Pageable sortedPageable =
-        PageRequest.of(pageable.getPageNumber(), pageable.getPageSize(), sort);
-
     if (keyword != null && !keyword.isEmpty()) {
-      return noticeRepository.findByTitleContaining(keyword, sortedPageable);
+      return noticeRepository.findByTitleContaining(keyword, pageable);
     } else if (category != null && !category.isEmpty()) {
-      return noticeRepository.findByCategory(category, sortedPageable);
+      return noticeRepository.findByCategory(category, pageable);
     }
-    return noticeRepository.findAll(sortedPageable);
+    return noticeRepository.findAll(pageable);
   }
 
   // 특정 ID의 공지사항을 가져오는 메서드

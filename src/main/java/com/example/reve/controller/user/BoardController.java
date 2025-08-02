@@ -32,9 +32,7 @@ import com.example.reve.service.PerfumeService;
 import com.example.reve.service.QnaService;
 
 import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
 
-@Slf4j
 @Controller
 @RequestMapping("/board")
 @RequiredArgsConstructor
@@ -81,21 +79,22 @@ public class BoardController {
           Pageable pageable,
       @RequestParam(required = false) String keyword,
       @RequestParam(required = false) String category,
-      @RequestParam(required = false) String sortParam, // sort 파라미터 이름 변경
+      @RequestParam(required = false) String sort,
       Principal principal) {
     model.addAttribute("isAdmin", isAdmin(principal));
 
     // sort 파라미터 파싱
-    String sort =
-        (sortParam != null && !sortParam.isEmpty()) ? sortParam : "createdAt,desc"; // 기본값 설정
+    String sortValue = (sort != null && !sort.isEmpty()) ? sort : "createdAt,desc";
     Sort sortObj;
-    if (sort.equals("hit,desc")) {
-      sortObj = Sort.by(Sort.Direction.DESC, "important").and(Sort.by(Sort.Direction.DESC, "hit"));
-    } else if (sort.equals("title,asc")) {
-      sortObj = Sort.by(Sort.Direction.DESC, "important").and(Sort.by(Sort.Direction.ASC, "title"));
-    } else { // "createdAt,desc"이거나 다른 값일 경우
-      sortObj =
-          Sort.by(Sort.Direction.DESC, "important").and(Sort.by(Sort.Direction.DESC, "createdAt"));
+
+    Sort importantSort = Sort.by(Sort.Direction.DESC, "important");
+
+    if (sortValue.equals("hit,desc")) {
+      sortObj = importantSort.and(Sort.by(Sort.Direction.DESC, "hit"));
+    } else if (sortValue.equals("createdAt,asc")) {
+      sortObj = importantSort.and(Sort.by(Sort.Direction.ASC, "createdAt"));
+    } else { // 기본값: createdAt,desc (최신순)
+      sortObj = importantSort.and(Sort.by(Sort.Direction.DESC, "createdAt"));
     }
 
     Pageable sortedPageable =
@@ -201,7 +200,6 @@ public class BoardController {
   @GetMapping("/qna/detail/{qnaId}")
   public String qnaDetail(@PathVariable Long qnaId, Model model, Principal principal)
       throws AccessDeniedException {
-    log.info("qnaDetail: Accessing Q&A with ID: {}", qnaId); // Q&A ID 로깅
     // try-catch 블록 제거
     QnaResDTO qna = qnaService.getQnaById(qnaId, principal);
     model.addAttribute("qna", qna);
@@ -210,40 +208,20 @@ public class BoardController {
     boolean isAuthor = false;
     boolean isAdmin = false;
 
-    log.info("qnaDetail: Principal is null: {}", (principal == null)); // Principal null 여부
     if (principal != null) {
       String loggedInUsername = principal.getName();
-      log.info("qnaDetail: Logged-in username: {}", loggedInUsername); // 로그인한 사용자 이름
       User loggedInUser = userRepository.findByLoginId(loggedInUsername).orElse(null);
-      log.info(
-          "qnaDetail: Found loggedInUser: {}",
-          (loggedInUser != null ? loggedInUser.getLoginId() : "null")); // 조회된 사용자 ID
 
-      if (loggedInUser != null) {
-        // 작성자 확인
-        log.info("qnaDetail: Qna userName: {}", qna.getUserName()); // Q&A 작성자 이름
-        if (qna.getUserName() != null && qna.getUserName().equals(loggedInUser.getName())) {
-          isAuthor = true;
-          log.info("qnaDetail: User is author."); // 작성자 일치
-        } else {
-          log.info(
-              "qnaDetail: User is NOT author. Qna userName: {}, LoggedInUser name: {}",
-              qna.getUserName(),
-              loggedInUser.getName()); // 작성자 불일치
-        }
-        // 관리자 확인
-        if (loggedInUser.getRole().equals(Role.ADMIN)) {
-          isAdmin = true;
-          log.info("qnaDetail: User is admin."); // 관리자 일치
-        } else {
-          log.info(
-              "qnaDetail: User is NOT admin. User role: {}", loggedInUser.getRole()); // 관리자 불일치
-        }
+      // 관리자 확인
+      if (loggedInUser == null) {
+        throw new IllegalStateException("로그인된 사용자 정보가 없습니다.");
+      }
+      if (loggedInUser.getRole().equals(Role.ADMIN)) {
+        isAdmin = true;
       }
     }
     model.addAttribute("isAuthor", isAuthor);
     model.addAttribute("isAdmin", isAdmin);
-    log.info("qnaDetail: isAuthor: {}, isAdmin: {}", isAuthor, isAdmin); // 최종 isAuthor, isAdmin 값
 
     return "board/qna/detail";
   }

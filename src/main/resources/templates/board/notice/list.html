@@ -24,7 +24,7 @@
               <div
                 class="flex flex-col md:flex-row md:items-center md:justify-between space-y-4 md:space-y-0"
               >
-                <!-- Search Bar -->
+                <!-- 검색 바 -->
                 <div class="flex-1 max-w-md">
                   <div class="relative">
                     <label>
@@ -44,7 +44,7 @@
                   </div>
                 </div>
 
-                <!-- Filter Options and Admin Button -->
+                <!-- 필터 옵션 및 관리자 버튼 -->
                 <div class="flex flex-col md:flex-row md:items-center space-y-4 md:space-y-0 md:space-x-4">
                   <label>
                     <select
@@ -61,15 +61,17 @@
                   </label>
                   <label>
                     <select
+                      id="sortSelect"
                       name="sort"
-                      onchange="this.form.submit()"
+                      onchange="this.form.submit();"
                       class="border border-gray-300 rounded-md px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-gray-800 focus:border-transparent"
                     >
-                      <option value="createdAt,desc" th:selected="${#strings.contains(sort, 'createdAt,desc')}">최신순</option>
-                      <option value="hit,desc" th:selected="${#strings.contains(sort, 'hit,desc')}">조회순</option>
+                      <option value="createdAt,desc" th:selected="${sort == 'createdAt,desc'}">최신순</option>
+                      <option value="createdAt,asc" th:selected="${sort == 'createdAt,asc'}">오래된순</option>
+                      <option value="hit,desc" th:selected="${sort == 'hit,desc'}">조회순</option>
                     </select>
                   </label>
-                  <!-- Admin Button: Register Notice -->
+                  <!-- 관리자 버튼: 공지사항 등록 -->
                   <div th:if="${isAdmin}" class="md:ml-auto">
                     <a
                       href="/admin/board/notice/register"
