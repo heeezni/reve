@@ -131,11 +131,11 @@
             </div>
 
             <!-- Attachments -->
-            <div th:if="${qna.attachment}" class="mb-8">
+            <div th:if="${qna.attachmentFiles != null and !qna.attachmentFiles.isEmpty()}" class="mb-8">
               <h3 class="text-lg font-semibold text-gray-800 mb-4">첨부파일</h3>
               <div class="flex flex-wrap gap-3">
                 <div
-                  th:each="url : ${#strings.arraySplit(qna.attachment, ',')}"
+                  th:each="url : ${qna.attachmentFiles}"
                   class="relative w-24 h-24 border border-gray-300 rounded-md overflow-hidden flex items-center justify-center bg-gray-100"
                 >
                   <a th:href="@{${url}}" target="_blank" class="block w-full h-full">

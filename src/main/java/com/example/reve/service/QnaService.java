@@ -69,7 +69,7 @@ public class QnaService {
         List<String> uploadedFilePaths =
             fileUploadService.saveFiles(
                 reqDto.getAttachmentFiles(), "qna", String.valueOf(savedQna.getQnaId()));
-        savedQna.setAttachment(String.join(",", uploadedFilePaths));
+        savedQna.setAttachmentFiles(uploadedFilePaths); // Qna 엔티티의 attachmentFiles 필드에 저장
         qnaRepository.save(savedQna); // 파일 경로 업데이트 후 다시 저장
       }
 
@@ -133,11 +133,8 @@ public class QnaService {
                     new IllegalArgumentException("해당 상품을 찾을 수 없습니다. ID: " + reqDto.getPerfumeId()));
     qna.setPerfume(perfume);
 
-    // --- 파일 처리 로직 ---
-    List<String> existingAttachments = new ArrayList<>();
-    if (qna.getAttachment() != null && !qna.getAttachment().isEmpty()) {
-      existingAttachments.addAll(Arrays.asList(qna.getAttachment().split(",")));
-    }
+    // --- 파일 처리 로직 (기존 String에서 List<String>으로 변경) ---
+    List<String> existingAttachments = qna.getAttachmentFiles();
 
     // 2. 삭제 요청된 파일 처리
     if (reqDto.getDeletedAttachments() != null) {
@@ -149,20 +146,14 @@ public class QnaService {
 
     // 3. 새로 추가된 파일 처리
     if (reqDto.getAttachmentFiles() != null && !reqDto.getAttachmentFiles().isEmpty()) {
-      // 변경된 FileUploadService의 saveFiles 메소드를 사용하여 파일 저장
       List<String> newUploadedFilePaths =
           fileUploadService.saveFiles(reqDto.getAttachmentFiles(), "qna", String.valueOf(qnaId));
-      // 새로 업로드된 파일 경로들을 기존 목록에 추가
       if (newUploadedFilePaths != null && !newUploadedFilePaths.isEmpty()) {
         existingAttachments.addAll(newUploadedFilePaths);
       }
     }
 
-    // 최종 파일 목록을 콤마로 구분된 문자열로 변환하여 Qna 엔티티에 저장
-    // 목록이 비어있으면 null로 설정
-    String finalAttachments =
-        existingAttachments.isEmpty() ? null : String.join(",", existingAttachments);
-    qna.setAttachment(finalAttachments);
+    qna.setAttachmentFiles(existingAttachments); // Qna 엔티티의 attachmentFiles 필드 업데이트
 
     Qna updatedQna = qnaRepository.save(qna);
     new QnaResDTO(updatedQna);
@@ -270,8 +261,8 @@ public class QnaService {
 
     validateUserPermission(principal, qna);
 
-    // 첨부 파일 디렉토리 삭제
-    if (qna.getAttachment() != null && !qna.getAttachment().isEmpty()) {
+    // 첨부 파일 디렉토리 삭제 (attachmentFiles 필드 사용)
+    if (qna.getAttachmentFiles() != null && !qna.getAttachmentFiles().isEmpty()) {
       // 변경된 FileUploadService의 deleteDirectory 메소드를 사용하여 디렉토리 삭제
       fileUploadService.deleteDirectory("qna", String.valueOf(qna.getQnaId()));
     }

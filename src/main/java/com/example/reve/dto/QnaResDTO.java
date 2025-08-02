@@ -1,6 +1,7 @@
 package com.example.reve.dto;
 
 import java.time.LocalDateTime;
+import java.util.List;
 
 import com.example.reve.domain.Qna;
 
@@ -19,7 +20,7 @@ public class QnaResDTO {
   private Boolean isSecret;
   private Boolean isAnswered;
   private String category;
-  private String attachment;
+  private List<String> attachmentFiles;
   private String userName;
   private String perfumeName;
   private Long perfumeId; // 상품 ID
@@ -36,7 +37,7 @@ public class QnaResDTO {
     this.isSecret = qna.getIsSecret();
     this.isAnswered = qna.getAnswer() != null && !qna.getAnswer().trim().isEmpty();
     this.category = qna.getCategory();
-    this.attachment = qna.getAttachment();
+    this.attachmentFiles = qna.getAttachmentFiles(); // Qna 엔티티의 attachmentFiles 사용
     this.userName = (qna.getUser() != null) ? qna.getUser().getName() : "비회원";
     this.perfumeName = qna.getPerfume().getPerfumeName();
     this.perfumeId = qna.getPerfume().getPerfumeId();
