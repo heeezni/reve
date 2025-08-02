@@ -65,8 +65,9 @@ public class ShopController {
       if (user != null) {
         wishedIds = wishListService.findWishListIdsByUser(user);
       }
-      model.addAttribute("wishedIds", wishedIds);
     }
+    model.addAttribute("wishedIds", wishedIds != null ? wishedIds : new ArrayList<>());
+    model.addAttribute("isLoggedIn", principal != null);
 
     return "shop/list";
   }
