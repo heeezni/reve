@@ -122,11 +122,14 @@ public class NoticeService {
   }
 
   // 특정 ID의 공지사항을 가져오는 메서드
-  @Transactional(readOnly = true)
+  @Transactional
   public Notice getNoticeById(Long noticeId) {
-    return noticeRepository
-        .findById(noticeId)
-        .orElseThrow(() -> new NoSuchElementException("공지사항을 찾을 수 없습니다: " + noticeId));
+    Notice notice =
+        noticeRepository
+            .findById(noticeId)
+            .orElseThrow(() -> new NoSuchElementException("공지사항을 찾을 수 없습니다: " + noticeId));
+    notice.setHit(notice.getHit() + 1); // 새로고침마다 조회수+1
+    return noticeRepository.save(notice);
   }
 
   // 이전 공지사항 가져오기
