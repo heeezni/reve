@@ -5,9 +5,9 @@ import lombok.Data;
 @Data
 public class WishListShowDTO {
   // 상품 이미지
-  private String haverImageUrl;
+  private String hoverImageUrl;
   // 상품명
-  private String perfumName;
+  private String perfumeName;
   // 할인값
   private int discount;
   // 가격
@@ -17,7 +17,7 @@ public class WishListShowDTO {
   // 간략 설명
   private String desciptionTitle;
   // 별 평균
-  private String ratingAvg;
+  private double ratingAvg;
   // 리뷰 수
   private int countReview;
 }

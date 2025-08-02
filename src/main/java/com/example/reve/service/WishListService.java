@@ -1,17 +1,20 @@
 package com.example.reve.service;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
-import com.example.reve.dto.WishListShowDTO;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.example.reve.domain.Perfume;
+import com.example.reve.domain.Review;
 import com.example.reve.domain.User;
 import com.example.reve.domain.WishList;
+import com.example.reve.dto.WishListShowDTO;
 import com.example.reve.repository.PerfumeRepository;
+import com.example.reve.repository.ReviewRepository;
 import com.example.reve.repository.WishListRepository;
 
 import lombok.RequiredArgsConstructor;
@@ -25,6 +28,7 @@ public class WishListService {
 
   private final WishListRepository wishListRepository;
   private final PerfumeRepository perfumeRepository;
+  private final ReviewRepository reviewRepository;
 
   // 찜목록에 추가하거나 삭제하는 로직임.
   @Transactional
@@ -58,8 +62,45 @@ public class WishListService {
         .map(wish -> wish.getPerfume().getPerfumeId())
         .collect(Collectors.toList());
   }
-  //위시리스트 목록 보기
+
+  // 위시리스트 목록 보기
   public List<WishListShowDTO> getWishList(Long userId) {
-    return null;
+    List<WishListShowDTO> getWishList = new ArrayList<>();
+    // 특정 회원이 가지고 있는 위시리스트
+    List<WishList> wishList = wishListRepository.findByUser_UserId(userId);
+
+    for (WishList wish : wishList) {
+      Long perfumeId = wish.getPerfume().getPerfumeId();
+      Perfume perfume = perfumeRepository.findByPerfumeId(perfumeId).orElse(null);
+      int countReview =
+          reviewRepository.findByPerfume_PerfumeIdOrderByCreatedAtDesc(perfumeId).size();
+      double ratingAvg = starAvg(perfume);
+
+      WishListShowDTO wishListShowDTO = new WishListShowDTO();
+      wishListShowDTO.setHoverImageUrl(perfume.getHoverImageUrl());
+      wishListShowDTO.setPerfumeName(perfume.getPerfumeName());
+      wishListShowDTO.setDiscount(perfume.getDiscount());
+      wishListShowDTO.setPrice(perfume.getPrice());
+      wishListShowDTO.setScent(perfume.getScent());
+      wishListShowDTO.setDesciptionTitle(perfume.getDescriptionTitle());
+      wishListShowDTO.setRatingAvg(ratingAvg);
+      wishListShowDTO.setCountReview(countReview);
+      getWishList.add(wishListShowDTO);
+    }
+    return getWishList;
+  }
+
+  // 별 평균
+  public double starAvg(Perfume perfume) {
+    // 리뷰에 관한 로직임.
+    List<Review> reviewList = perfume.getReviewList();
+    int count = reviewList.size();
+    double avgRating = 0.0;
+
+    if (count > 0) {
+      double sum = reviewList.stream().mapToDouble(Review::getRating).sum();
+      avgRating = Math.round((sum / count) * 10) / 10.0; // 소수점 1자리 반올림
+    }
+    return avgRating;
   }
 }
