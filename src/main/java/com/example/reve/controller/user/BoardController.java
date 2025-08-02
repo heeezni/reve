@@ -21,7 +21,6 @@ import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
 import org.springframework.validation.FieldError;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import com.example.reve.domain.Role;
 import com.example.reve.domain.User;
@@ -82,11 +81,13 @@ public class BoardController {
           Pageable pageable,
       @RequestParam(required = false) String keyword,
       @RequestParam(required = false) String category,
-      @RequestParam(required = false, defaultValue = "createdAt,desc") String sort, // sort 파라미터 추가
+      @RequestParam(required = false) String sortParam, // sort 파라미터 이름 변경
       Principal principal) {
     model.addAttribute("isAdmin", isAdmin(principal));
 
     // sort 파라미터 파싱
+    String sort =
+        (sortParam != null && !sortParam.isEmpty()) ? sortParam : "createdAt,desc"; // 기본값 설정
     Sort sortObj;
     if (sort.equals("hit,desc")) {
       sortObj = Sort.by(Sort.Direction.DESC, "important").and(Sort.by(Sort.Direction.DESC, "hit"));
@@ -157,7 +158,7 @@ public class BoardController {
           Pageable pageable,
       @RequestParam(required = false) String keyword,
       @RequestParam(required = false) String category,
-      @RequestParam(required = false, defaultValue = "") String filterAndSort) {
+      @RequestParam(required = false) String filterAndSortParam) {
 
     // keyword에 trim() 적용
     if (keyword != null) {
@@ -165,14 +166,25 @@ public class BoardController {
     }
 
     String status = null; // QnaService에 전달할 status 값
+    String filterAndSort =
+        (filterAndSortParam != null && !filterAndSortParam.isEmpty())
+            ? filterAndSortParam
+            : ""; // 기본값 설정
     Sort sort = Sort.by(Sort.Direction.DESC, "createdAt"); // 기본 정렬: 최신순
 
-    if ("oldest".equals(filterAndSort)) {
-      sort = Sort.by(Sort.Direction.ASC, "createdAt");
-    } else if ("pending".equals(filterAndSort)) {
-      status = "pending";
-    } else if ("completed".equals(filterAndSort)) {
-      status = "completed";
+    switch (filterAndSort) {
+      case "oldest":
+        sort = Sort.by(Sort.Direction.ASC, "createdAt");
+        break;
+      case "pending":
+        status = "pending";
+        break;
+      case "completed":
+        status = "completed";
+        break;
+      default:
+        // 기본 정렬: 최신순 (이미 위에서 설정됨)
+        break;
     }
 
     Pageable pageableWithSort =
@@ -271,19 +283,14 @@ public class BoardController {
       @PathVariable Long qnaId,
       @Valid @ModelAttribute QnaReqDTO reqDto,
       BindingResult bindingResult,
-      Principal principal,
-      RedirectAttributes redirectAttributes) {
+      Principal principal) {
     if (bindingResult.hasErrors()) {
-      redirectAttributes.addFlashAttribute(
-          "org.springframework.validation.BindingResult.qnaReqDTO", bindingResult);
-      redirectAttributes.addFlashAttribute("qnaReqDTO", reqDto);
       return "redirect:/board/qna/edit/" + qnaId;
     }
     try {
       qnaService.updateQna(qnaId, reqDto, principal);
-      return "redirect:/board/qna/detail/" + qnaId;
+      return "redirect:/board/qna/detail/" + qnaId + "?success=true"; // 성공 시 리다이렉트
     } catch (IOException e) {
-      redirectAttributes.addFlashAttribute("errorMessage", e.getMessage());
       return "redirect:/board/qna/edit/" + qnaId;
     }
   }

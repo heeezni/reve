@@ -31,6 +31,8 @@
             <p th:unless="${qna.isSecret}">이 게시글은 로그인한 사용자만 열람할 수 있습니다. <a th:href="@{/member/login}" class="font-bold underline">로그인</a> 해주세요.</p>
           </div>
 
+          
+
           <!-- Question Section -->
           <div th:unless="${qna.isSecret and !isAuthor and !isAdmin}" class="bg-white rounded-lg shadow-sm p-8 mb-6">
             <div class="border-b border-gray-200 pb-6 mb-6">
@@ -346,7 +348,7 @@
           $.ajax({
             url: '/board/qna/' + qnaId,
             type: 'DELETE',
-            success: function(result) {
+            success: function () {
               alert('Q&A가 삭제되었습니다.');
               window.location.href = '/board/qna/list';
             },
@@ -360,7 +362,7 @@
       // File download simulation (for non-image attachments)
       document.querySelectorAll('a[href^="/uploads/"]').forEach((link) => {
         // th:href 속성이 /uploads/로 시작하는 링크에만 이벤트 리스너 추가
-        link.addEventListener('click', function (e) {
+        link.addEventListener('click', function () {
           const url = this.getAttribute('href');
           const fileName = url.substring(url.lastIndexOf('/') + 1);
           // 실제 다운로드 로직 대신 시뮬레이션 메시지 표시
@@ -391,6 +393,17 @@
           answerEditForm.style.display = 'none';
         }
       }
+
+      // 게시물 수정 성공 시 alert 메시지 표시
+      document.addEventListener('DOMContentLoaded', function() {
+        const urlParams = new URLSearchParams(window.location.search);
+        const success = urlParams.get('success');
+        if (success === 'true') {
+          alert('게시물이 성공적으로 수정되었습니다.');
+          // URL에서 success 파라미터 제거 (새로고침 시 메시지 중복 방지)
+          history.replaceState({}, document.title, window.location.pathname);
+        }
+      });
     </script>
   </body>
 </html>

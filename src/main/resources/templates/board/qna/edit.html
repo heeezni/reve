@@ -111,8 +111,7 @@
         const dataTransfer = new DataTransfer();
 
         // 기존 파일 목록 초기화
-        const existingFilesRaw = /*[[${qna.attachment}]]*/ null;
-        const existingFiles = (existingFilesRaw && existingFilesRaw.trim() !== '') ? existingFilesRaw.split(',') : [];
+        const existingFiles = [];
         
         if (existingFiles.length > 0) {
             existingFiles.forEach(url => {
@@ -135,7 +134,7 @@
         function createPreview(fileOrUrl, type) {
             const isNewUrl = typeof fileOrUrl === 'object';
             const fileId = isNewUrl ? fileOrUrl.name : fileOrUrl;
-            const fileName = isNewUrl ? fileOrUrl.name : fileOrUrl.substring(fileOrUrl.lastIndexOf('_') + 1);
+            const fileName = isNewUrl ? fileOrUrl.name : fileOrUrl.substring(fileOrUrl.lastIndexOf('/') + 1);
 
             const fileItem = document.createElement('div');
             fileItem.className = 'flex items-center justify-between p-3 bg-gray-50 rounded-md';
