@@ -1,6 +1,5 @@
 package com.example.reve.service;
 
-import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -110,10 +109,17 @@ public class FileUploadService {
   public void deleteDirectory(String domainType, String domainId) throws IOException {
     Path targetDirectoryPath = Paths.get(uploadDir, domainType, domainId);
     if (Files.exists(targetDirectoryPath)) {
-      Files.walk(targetDirectoryPath)
-          .sorted(Comparator.reverseOrder())
-          .map(Path::toFile)
-          .forEach(File::delete);
+      try (java.util.stream.Stream<Path> walk = Files.walk(targetDirectoryPath)) {
+        walk.sorted(Comparator.reverseOrder())
+            .forEach(
+                path -> {
+                  try {
+                    Files.delete(path);
+                  } catch (IOException e) {
+                    System.err.println("파일/디렉토리 삭제 실패: " + path + " - " + e.getMessage());
+                  }
+                });
+      }
     }
   }
 

@@ -320,7 +320,6 @@
   fileInput.on('change', function () {
     newFileList.empty(); // 기존 새 파일 목록 초기화
     let selectedFiles = Array.from(this.files);
-    const validFiles = [];
 
     // 파일 개수 제한 검사
     if (selectedFiles.length > MAX_FILES) {
@@ -355,7 +354,7 @@
         if (file.type.startsWith('image/')) {
           const reader = new FileReader();
           reader.onload = function (e) {
-            const img = $('<img>');
+            const img = $('<img src="" alt="첨부 이미지 미리보기">');
             img.attr('src', e.target.result);
             img.addClass('w-16 h-16 object-cover rounded-md');
             fileInfoContainer.prepend(img);
@@ -449,7 +448,7 @@
       $.ajax({
         url: '/admin/board/notice/' + noticeId,
         type: 'DELETE',
-        success: function(result) {
+        success: function() {
           alert('공지사항이 삭제되었습니다.');
           location.href = '/board/notice/list';
         },

@@ -110,7 +110,7 @@ public class AdminBoardController {
           Pageable pageable,
       @RequestParam(required = false) String keyword,
       @RequestParam(required = false) String category,
-      @RequestParam(required = false, defaultValue = "") String filterAndSort) {
+      @RequestParam(required = false) String filterAndSort) {
 
     // keyword에 trim() 적용
     if (keyword != null) {
