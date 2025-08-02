@@ -2,7 +2,11 @@ package com.example.reve.service;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
+import java.util.stream.Collectors;
 
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -47,6 +51,20 @@ public class CartService {
 
     // 장바구니에 담긴 서로 다른 향수 종류 수 반환 (리스트 크기)
     return cartRepository.findByUser_UserId(user.getUserId()).size();
+  }
+
+  public List<Perfume> getRecommendedPerfumes(List<Cart> cartList) {
+    Set<String> scentSet =
+        cartList.stream().map(cart -> cart.getPerfume().getScent()).collect(Collectors.toSet());
+
+    List<Long> excludeIds =
+        cartList.stream()
+            .map(cart -> cart.getPerfume().getPerfumeId())
+            .collect(Collectors.toList());
+
+    Pageable top3 = PageRequest.of(0, 3);
+
+    return perfumeRepository.findRecommendedPerfumes(scentSet, excludeIds, top3);
   }
 
   // 장바구니에 아이템 추가

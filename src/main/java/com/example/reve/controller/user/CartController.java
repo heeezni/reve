@@ -10,6 +10,7 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 
 import com.example.reve.domain.Cart;
+import com.example.reve.domain.Perfume;
 import com.example.reve.dto.CartAddRequestDTO;
 import com.example.reve.service.CartService;
 
@@ -35,6 +36,9 @@ public class CartController {
     int totalPrice =
         cartList.stream().mapToInt(item -> item.getQuantity() * item.getPerfume().getPrice()).sum();
     model.addAttribute("totalPrice", totalPrice);
+
+    List<Perfume> recommendedPerfumes = cartService.getRecommendedPerfumes(cartList);
+    model.addAttribute("recommendedPerfumes", recommendedPerfumes);
 
     return "cart/cart";
   }

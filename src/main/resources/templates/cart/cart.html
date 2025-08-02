@@ -196,7 +196,52 @@
       <div class="mt-12">
         <h2 class="text-2xl font-bold text-gray-800 mb-6">함께 구매하면 좋은 상품</h2>
         <div class="grid md:grid-cols-4 gap-6">
-          <!-- 관련 상품들은 예시니까 그대로 두겠습니다 -->
+          <div th:each="perfume : ${recommendedPerfumes}" class="bg-white rounded-lg shadow p-4 group">
+            <a th:href="@{/shop/detail(id=${perfume.perfumeId})}" class="block">
+              <!-- 이미지 영역 (hover 효과 적용됨) -->
+              <div class="relative w-full h-48 overflow-hidden rounded-md mb-2">
+                <!-- 기본 이미지 -->
+                <img th:src="@{${perfume.imageUrl}}" th:alt="${perfume.perfumeName}"
+                     class="absolute inset-0 w-full h-full object-cover transition-opacity duration-300 opacity-100 group-hover:opacity-0" />
+
+                <!-- 호버 이미지 -->
+                <img th:src="@{${perfume.hoverImageUrl}}" th:alt="${perfume.perfumeName} + ' (hover)'"
+                     class="absolute inset-0 w-full h-full object-cover transition-opacity duration-300 opacity-0 group-hover:opacity-100" />
+              </div>
+
+              <!-- 향수 이름 -->
+              <h3 class="text-lg font-semibold text-gray-800" th:text="${perfume.perfumeName}"></h3>
+
+              <!-- 향 설명 -->
+              <p
+                      th:text="${perfume.scent}"
+                      th:classappend="
+                        ${perfume.scent} == '플로럴' ? ' bg-pink-100 text-pink-800 px-2 py-0.5 rounded-full text-xs font-semibold inline-block' :
+                        (${perfume.scent} == '시트러스' ? ' bg-green-100 text-green-800 px-2 py-0.5 rounded-full text-xs font-semibold inline-block' :
+                        (${perfume.scent} == '우디' ? ' bg-purple-100 text-purple-800 px-2 py-0.5 rounded-full text-xs font-semibold inline-block' :
+                        (${perfume.scent} == '머스크' ? ' bg-yellow-100 text-yellow-800 px-2 py-0.5 rounded-full text-xs font-semibold inline-block' : ' bg-gray-100 text-gray-800 px-2 py-0.5 rounded-full text-xs font-semibold inline-block')))
+                      "
+              ></p>
+            </a>
+
+            <!-- 가격 정보 -->
+            <div class="mt-2 flex items-center space-x-2">
+              <!-- 할인율 -->
+              <span class="text-red-600 text-sm font-bold"
+                    th:text="${T(java.lang.Math).round((perfume.discount * 100.0) / perfume.price)} + '%할인'">
+              </span>
+
+              <!-- 할인된 가격 -->
+              <span class="text-black-500 font-bold text-lg"
+                    th:text="${#numbers.formatInteger(perfume.price - perfume.discount, 3, 'COMMA')} + '원'">
+              </span>
+
+              <!-- 원가 -->
+              <span class="text-gray-400 line-through text-sm"
+                    th:text="${#numbers.formatInteger(perfume.price, 3, 'COMMA')} + '원'">
+              </span>
+            </div>
+          </div>
         </div>
       </div>
     </div>
