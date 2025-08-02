@@ -1,6 +1,7 @@
 <!DOCTYPE html>
 <html lang="ko" xmlns:th="http://www.thymeleaf.org">
   <head th:replace="~{fragments/header :: head(title=${qna.title} + ' | Rêve')}">
+    <title>Loading...</title>
   </head>
   <body class="font-sans text-gray-800">
     <!-- Header Fragment -->
@@ -24,13 +25,14 @@
           </nav>
 
           <!-- Access Denied Message for Secret Posts -->
-          <div th:if="${qna.isSecret and !isAuthor and !isAdmin}" class="bg-red-100 border-l-4 border-red-500 text-red-700 p-4 mb-6" role="alert">
+          <div th:if="${accessDenied}" class="bg-red-100 border-l-4 border-red-500 text-red-700 p-4 mb-6" role="alert">
             <p class="font-bold">접근 권한 없음</p>
-            <p>이 게시글은 비밀글입니다. 작성자 또는 관리자만 열람할 수 있습니다.</p>
+            <p th:if="${qna.isSecret}">이 게시글은 비밀글입니다. 작성자 또는 관리자만 열람할 수 있습니다.</p>
+            <p th:unless="${qna.isSecret}">이 게시글은 로그인한 사용자만 열람할 수 있습니다. <a th:href="@{/member/login}" class="font-bold underline">로그인</a> 해주세요.</p>
           </div>
 
           <!-- Question Section -->
-          <div th:unless="${qna.isSecret and !isAuthor and !isAdmin}" class="bg-white rounded-lg shadow-sm p-8 mb-6">
+          <div th:if="${!accessDenied}" class="bg-white rounded-lg shadow-sm p-8 mb-6">
             <div class="border-b border-gray-200 pb-6 mb-6">
               <!-- Category and Status -->
               <div class="flex items-center space-x-3 mb-4">
@@ -72,7 +74,7 @@
                 <!-- Title -->
               </h1>
               <!-- Admin/Author Buttons -->
-              <div th:if="${(isAuthor != null && isAuthor) || (isAdmin != null && isAdmin)}" class="flex items-center justify-end space-x-2 mb-4">
+              <div th:if="${isAuthor or isAdmin}" class="flex items-center justify-end space-x-2 mb-4">
                 <a
                   th:href="@{/board/qna/edit/{qnaId}(qnaId=${qna.qnaId})}"
                   class="inline-flex items-center px-4 py-2 bg-blue-500 text-white rounded-md hover:bg-blue-600 transition-colors font-medium text-sm"
@@ -98,15 +100,8 @@
                 class="flex items-center justify-between text-sm text-gray-600"
               >
                 <div class="flex items-center space-x-6">
-                  <span
-                    >작성자: <span th:text="${qna.userName}"></span
-                  ></span>
-                  <span
-                    >작성일:
-                    <span
-                      th:text="${#temporals.format(qna.createdAt, 'yyyy.MM.dd')}"
-                    ></span
-                  ></span>
+                  <span>작성자: <span th:text="${qna.userName}"></span></span>
+                  <span>작성일: <span th:text="${#temporals.format(qna.createdAt, 'yyyy.MM.dd')}"></span></span>
                 </div>
               </div>
             </div>
@@ -129,11 +124,11 @@
             </div>
 
             <!-- Attachments -->
-            <div th:if="${qna.attachment}" class="mb-8">
+            <div th:if="${qna.attachmentFiles != null and !qna.attachmentFiles.isEmpty()}" class="mb-8">
               <h3 class="text-lg font-semibold text-gray-800 mb-4">첨부파일</h3>
               <div class="flex flex-wrap gap-3">
                 <div
-                  th:each="url : ${#strings.arraySplit(qna.attachment, ',')}"
+                  th:each="url : ${qna.attachmentFiles}"
                   class="relative w-24 h-24 border border-gray-300 rounded-md overflow-hidden flex items-center justify-center bg-gray-100"
                 >
                   <a th:href="@{${url}}" target="_blank" class="block w-full h-full">
@@ -179,7 +174,7 @@
           </div>
 
           <!-- Answer Section -->
-          <div th:if="${qna.answer}" class="bg-white rounded-lg shadow-sm p-8 mb-6">
+          <div th:if="${!accessDenied and qna.answer != null and qna.answer.length() > 0}" class="bg-white rounded-lg shadow-sm p-8 mb-6">
             <div class="mb-6">
               <h3
                 class="text-lg font-semibold text-gray-800 mb-4 flex items-center"
@@ -191,9 +186,7 @@
                 <div class="flex items-center space-x-4">
                   <div class="flex items-center space-x-2">
                     <i class="fas fa-user-tie text-gray-600"></i>
-                    <span class="text-sm font-medium text-gray-800"
-                      >Rêve 고객센터</span
-                    >
+                    <span class="text-sm font-medium text-gray-800">Rêve 고객센터</span>
                   </div>
                   <span class="text-sm text-gray-500"
                     th:text="${#temporals.format(qna.updatedAt, 'yyyy.MM.dd')}"
@@ -344,7 +337,7 @@
           $.ajax({
             url: '/board/qna/' + qnaId,
             type: 'DELETE',
-            success: function(result) {
+            success: function () {
               alert('Q&A가 삭제되었습니다.');
               window.location.href = '/board/qna/list';
             },
@@ -354,18 +347,6 @@
           });
         }
       }
-
-      // File download simulation (for non-image attachments)
-      document.querySelectorAll('a[href^="/uploads/"]').forEach((link) => {
-        // th:href 속성이 /uploads/로 시작하는 링크에만 이벤트 리스너 추가
-        link.addEventListener('click', function (e) {
-          const url = this.getAttribute('href');
-          const fileName = url.substring(url.lastIndexOf('/') + 1);
-          // 실제 다운로드 로직 대신 시뮬레이션 메시지 표시
-          alert(`${fileName} 다운로드를 시작합니다.`);
-          // 실제 다운로드를 원하면 e.preventDefault()를 제거하고 서버에서 파일 스트리밍 로직 구현 필요
-        });
-      });
 
       function editAnswer() {
         const answerDisplay = document.querySelector('.bg-green-50.border-l-4');
@@ -389,6 +370,17 @@
           answerEditForm.style.display = 'none';
         }
       }
+
+      // 게시물 수정 성공 시 alert 메시지 표시
+      document.addEventListener('DOMContentLoaded', function() {
+        const urlParams = new URLSearchParams(window.location.search);
+        const success = urlParams.get('success');
+        if (success === 'true') {
+          alert('게시물이 성공적으로 수정되었습니다.');
+          // URL에서 success 파라미터 제거 (새로고침 시 메시지 중복 방지)
+          history.replaceState({}, document.title, window.location.pathname);
+        }
+      });
     </script>
   </body>
 </html>

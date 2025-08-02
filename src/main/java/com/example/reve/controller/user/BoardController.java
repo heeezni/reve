@@ -13,6 +13,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.web.PageableDefault;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Controller;
@@ -20,10 +21,10 @@ import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
 import org.springframework.validation.FieldError;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import com.example.reve.domain.Role;
 import com.example.reve.domain.User;
+import com.example.reve.dto.NoticeResDTO;
 import com.example.reve.dto.QnaReqDTO;
 import com.example.reve.dto.QnaResDTO;
 import com.example.reve.repository.UserRepository;
@@ -32,9 +33,7 @@ import com.example.reve.service.PerfumeService;
 import com.example.reve.service.QnaService;
 
 import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
 
-@Slf4j
 @Controller
 @RequestMapping("/board")
 @RequiredArgsConstructor
@@ -81,30 +80,29 @@ public class BoardController {
           Pageable pageable,
       @RequestParam(required = false) String keyword,
       @RequestParam(required = false) String category,
-      @RequestParam(required = false, defaultValue = "createdAt,desc") String sort, // sort 파라미터 추가
+      @RequestParam(required = false) String sort,
       Principal principal) {
     model.addAttribute("isAdmin", isAdmin(principal));
 
     // sort 파라미터 파싱
+    String sortValue = (sort != null && !sort.isEmpty()) ? sort : "createdAt,desc";
     Sort sortObj;
-    if (sort.equals("createdAt,desc")) {
-      sortObj =
-          Sort.by(Sort.Direction.DESC, "important").and(Sort.by(Sort.Direction.DESC, "createdAt"));
-    } else if (sort.equals("hit,desc")) {
-      sortObj = Sort.by(Sort.Direction.DESC, "important").and(Sort.by(Sort.Direction.DESC, "hit"));
-    } else if (sort.equals("title,asc")) {
-      sortObj = Sort.by(Sort.Direction.DESC, "important").and(Sort.by(Sort.Direction.ASC, "title"));
-    } else {
-      sortObj =
-          Sort.by(Sort.Direction.DESC, "important")
-              .and(Sort.by(Sort.Direction.DESC, "createdAt")); // 기본 정렬
+
+    Sort importantSort = Sort.by(Sort.Direction.DESC, "important");
+
+    if (sortValue.equals("hit,desc")) {
+      sortObj = importantSort.and(Sort.by(Sort.Direction.DESC, "hit"));
+    } else if (sortValue.equals("createdAt,asc")) {
+      sortObj = importantSort.and(Sort.by(Sort.Direction.ASC, "createdAt"));
+    } else { // 기본값: createdAt,desc (최신순)
+      sortObj = importantSort.and(Sort.by(Sort.Direction.DESC, "createdAt"));
     }
 
     Pageable sortedPageable =
         PageRequest.of(pageable.getPageNumber(), pageable.getPageSize(), sortObj);
 
     // 공지사항 목록을 가져오는 로직 추가
-    Page<com.example.reve.domain.Notice> noticePage =
+    Page<NoticeResDTO> noticePage =
         noticeService.getAllNotices(sortedPageable, keyword, category); // sortedPageable 전달
     model.addAttribute("notices", noticePage);
     model.addAttribute("keyword", keyword);
@@ -120,7 +118,7 @@ public class BoardController {
 
     try {
       // 공지사항 상세 내용을 가져오는 로직 추가
-      com.example.reve.domain.Notice notice = noticeService.getNoticeById(noticeId);
+      NoticeResDTO notice = noticeService.getNoticeById(noticeId);
       model.addAttribute("notice", notice);
 
       // 이전/다음 공지사항 가져오기
@@ -132,7 +130,7 @@ public class BoardController {
           .ifPresent(nextNotice -> model.addAttribute("nextNotice", nextNotice));
 
       // 관련 공지사항 가져오기 (현재 공지사항 제외, 같은 카테고리 내에서, 최신순 5개)
-      List<com.example.reve.domain.Notice> relatedNotices =
+      List<NoticeResDTO> relatedNotices =
           noticeService.getRelatedNotices(noticeId, notice.getCategory(), 5);
       model.addAttribute("relatedNotices", relatedNotices);
 
@@ -160,7 +158,8 @@ public class BoardController {
           Pageable pageable,
       @RequestParam(required = false) String keyword,
       @RequestParam(required = false) String category,
-      @RequestParam(required = false, defaultValue = "") String filterAndSort) {
+      @RequestParam(required = false) String filterAndSortParam,
+      Principal principal) {
 
     // keyword에 trim() 적용
     if (keyword != null) {
@@ -168,21 +167,33 @@ public class BoardController {
     }
 
     String status = null; // QnaService에 전달할 status 값
+    String filterAndSort =
+        (filterAndSortParam != null && !filterAndSortParam.isEmpty())
+            ? filterAndSortParam
+            : ""; // 기본값 설정
     Sort sort = Sort.by(Sort.Direction.DESC, "createdAt"); // 기본 정렬: 최신순
 
-    if ("oldest".equals(filterAndSort)) {
-      sort = Sort.by(Sort.Direction.ASC, "createdAt");
-    } else if ("pending".equals(filterAndSort)) {
-      status = "pending";
-    } else if ("completed".equals(filterAndSort)) {
-      status = "completed";
+    switch (filterAndSort) {
+      case "oldest":
+        sort = Sort.by(Sort.Direction.ASC, "createdAt");
+        break;
+      case "pending":
+        status = "pending";
+        break;
+      case "completed":
+        status = "completed";
+        break;
+      default:
+        // 기본 정렬: 최신순 (이미 위에서 설정됨)
+        break;
     }
 
     Pageable pageableWithSort =
         PageRequest.of(pageable.getPageNumber(), pageable.getPageSize(), sort);
 
     // 1. QnaService를 통해 Q&A 목록을 페이징하여 가져오기
-    Page<QnaResDTO> qnaPage = qnaService.selectAll(keyword, category, status, pageableWithSort);
+    Page<QnaResDTO> qnaPage =
+        qnaService.selectAll(keyword, category, status, pageableWithSort, principal);
     // 2. 가져온 Q&A Page 객체를 "qnas"라는 이름으로 모델에 추가 (Thymeleaf에서 qnas로 사용)
     model.addAttribute("qnas", qnaPage);
     // 3. "board/qna/list.html" 뷰 반환
@@ -191,69 +202,49 @@ public class BoardController {
 
   @GetMapping("/qna/detail/{qnaId}")
   public String qnaDetail(@PathVariable Long qnaId, Model model, Principal principal) {
-    log.info("qnaDetail: Accessing Q&A with ID: {}", qnaId); // Q&A ID 로깅
+    model.addAttribute("accessDenied", false); // 기본값 false로 설정
     try {
-      // 비밀번호 없이 조회를 시도. 공개글이거나 관리자면 성공.
+      // 1. 상세 정보 가져오기 (권한 검사 포함)
       QnaResDTO qna = qnaService.getQnaById(qnaId, principal);
       model.addAttribute("qna", qna);
 
-      // 현재 로그인한 사용자 정보 확인
+      // 2. 작성자 및 관리자 여부 확인
       boolean isAuthor = false;
       boolean isAdmin = false;
 
-      log.info("qnaDetail: Principal is null: {}", (principal == null)); // Principal null 여부
       if (principal != null) {
         String loggedInUsername = principal.getName();
-        log.info("qnaDetail: Logged-in username: {}", loggedInUsername); // 로그인한 사용자 이름
         User loggedInUser = userRepository.findByLoginId(loggedInUsername).orElse(null);
-        log.info(
-            "qnaDetail: Found loggedInUser: {}",
-            (loggedInUser != null ? loggedInUser.getLoginId() : "null")); // 조회된 사용자 ID
 
-        if (loggedInUser != null) {
+        if (loggedInUser != null && qna != null && qna.getUserId() != null) {
           // 작성자 확인
-          log.info("qnaDetail: Qna userName: {}", qna.getUserName()); // Q&A 작성자 이름
-          if (qna.getUserName() != null && qna.getUserName().equals(loggedInUser.getName())) {
+          if (qna.getUserId().equals(loggedInUser.getUserId())) {
             isAuthor = true;
-            log.info("qnaDetail: User is author."); // 작성자 일치
-          } else {
-            log.info(
-                "qnaDetail: User is NOT author. Qna userName: {}, LoggedInUser name: {}",
-                qna.getUserName(),
-                loggedInUser.getName()); // 작성자 불일치
           }
           // 관리자 확인
-          if (loggedInUser.getRole().equals(Role.ADMIN)) {
+          if (loggedInUser.getRole() == Role.ADMIN) {
             isAdmin = true;
-            log.info("qnaDetail: User is admin."); // 관리자 일치
-          } else {
-            log.info(
-                "qnaDetail: User is NOT admin. User role: {}", loggedInUser.getRole()); // 관리자 불일치
           }
         }
       }
       model.addAttribute("isAuthor", isAuthor);
       model.addAttribute("isAdmin", isAdmin);
-      log.info("qnaDetail: isAuthor: {}, isAdmin: {}", isAuthor, isAdmin); // 최종 isAuthor, isAdmin 값
 
-      return "board/qna/detail";
-    } catch (IllegalAccessException e) {
-      log.error(
-          "qnaDetail: IllegalAccessException for Q&A ID {}: {}", qnaId, e.getMessage()); // 에러 로깅
-      // 비밀글이고 권한이 없으면 접근 거부 메시지를 표시하도록 모델에 플래그 추가
-      model.addAttribute("accessDenied", true);
-      // 최소한의 QnaResDTO 객체를 생성하여 isSecret을 true로 설정 (템플릿 조건 처리를 위함)
-      QnaResDTO dummyQna = new QnaResDTO();
-      dummyQna.setIsSecret(true);
-      model.addAttribute("qna", dummyQna);
-      model.addAttribute("qnaId", qnaId); // qnaId도 함께 전달
-      model.addAttribute("isAuthor", false); // 접근 권한이 없으므로 false
-      model.addAttribute("isAdmin", false); // 접근 권한이 없으므로 false
-      return "board/qna/detail";
-    } catch (IllegalArgumentException e) {
+    } catch (AccessDeniedException e) {
+      // 3. 접근 거부 시, 기본 정보만 다시 로드하여 뷰에 전달
+      QnaResDTO qna = qnaService.getQnaForDetailView(qnaId);
+      model.addAttribute("qna", qna);
+      model.addAttribute("accessDenied", true); // 접근 거부 플래그
+      model.addAttribute("isAuthor", false); // 접근 거부 시 수정/삭제 버튼 비활성화
+      model.addAttribute("isAdmin", false);
+
+    } catch (NoSuchElementException e) {
+      // 4. 게시글이 존재하지 않을 경우
       model.addAttribute("errorMessage", e.getMessage());
-      return "common/error";
+      return "common/error"; // 에러 페이지로 이동
     }
+
+    return "board/qna/detail";
   }
 
   // Q&A 삭제 API
@@ -263,7 +254,7 @@ public class BoardController {
     try {
       qnaService.deleteQna(qnaId, principal);
       return ResponseEntity.ok().body("Q&A가 성공적으로 삭제되었습니다.");
-    } catch (IllegalAccessException | IllegalArgumentException e) {
+    } catch (IllegalArgumentException e) {
       return ResponseEntity.badRequest().body("Q&A 삭제 실패: " + e.getMessage());
     } catch (IOException e) {
       return ResponseEntity.status(500).body("파일 삭제 중 오류가 발생했습니다: " + e.getMessage());
@@ -280,15 +271,10 @@ public class BoardController {
 
   @GetMapping("/qna/edit/{qnaId}")
   public String editQnaForm(@PathVariable Long qnaId, Model model, Principal principal) {
-    try {
-      QnaResDTO qna = qnaService.getQnaById(qnaId, principal);
-      model.addAttribute("qna", qna);
-      model.addAttribute("perfumes", perfumeService.getAllPerfumes());
-      return "board/qna/edit";
-    } catch (IllegalAccessException e) {
-      model.addAttribute("errorMessage", e.getMessage());
-      return "common/error";
-    }
+    QnaResDTO qna = qnaService.getQnaById(qnaId, principal);
+    model.addAttribute("qna", qna);
+    model.addAttribute("perfumes", perfumeService.getAllPerfumes());
+    return "board/qna/edit";
   }
 
   @PostMapping("/qna/edit/{qnaId}")
@@ -296,19 +282,14 @@ public class BoardController {
       @PathVariable Long qnaId,
       @Valid @ModelAttribute QnaReqDTO reqDto,
       BindingResult bindingResult,
-      Principal principal,
-      RedirectAttributes redirectAttributes) {
+      Principal principal) {
     if (bindingResult.hasErrors()) {
-      redirectAttributes.addFlashAttribute(
-          "org.springframework.validation.BindingResult.qnaReqDTO", bindingResult);
-      redirectAttributes.addFlashAttribute("qnaReqDTO", reqDto);
       return "redirect:/board/qna/edit/" + qnaId;
     }
     try {
       qnaService.updateQna(qnaId, reqDto, principal);
-      return "redirect:/board/qna/detail/" + qnaId;
-    } catch (IOException | IllegalAccessException e) {
-      redirectAttributes.addFlashAttribute("errorMessage", e.getMessage());
+      return "redirect:/board/qna/detail/" + qnaId + "?success=true"; // 성공 시 리다이렉트
+    } catch (IOException e) {
       return "redirect:/board/qna/edit/" + qnaId;
     }
   }

@@ -57,6 +57,12 @@ public class SecurityConfig {
                     .defaultSuccessUrl("/", true) // 로그인 성공 시 기본 리다이렉트 URL
                     .failureUrl("/member/login?error=true") // 로그인 실패 처리 URL
                     .permitAll())
+        .exceptionHandling(
+            exceptions ->
+                exceptions.authenticationEntryPoint(
+                    new org.springframework.security.web.authentication
+                        .LoginUrlAuthenticationEntryPoint(
+                        "/member/login?error=true"))) // 이 블록을 추가합니다.
         .logout(
             logout ->
                 logout
