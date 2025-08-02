@@ -167,4 +167,9 @@ public class UserService implements UserDetailsService { // UserDetailsService �
   public MypageDTO selectMypage(String loginId) {
     return userRepository.findUserInfoByLoginId(loginId);
   }
+
+  // 전체 회원 수 조회
+  public long getTotalUserCount() {
+    return userRepository.count();
+  }
 }
