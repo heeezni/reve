@@ -1,6 +1,8 @@
 package com.example.reve.service;
 
+import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -46,5 +48,13 @@ public class WishListService {
     return wishListRepository
         .findByUser_UserIdAndPerfume_PerfumeId(user.getUserId(), perfumeId)
         .isPresent();
+  }
+
+  // 상품목록에서 찜목록 확인하기
+  public List<Long> findWishListIdsByUser(User user) {
+    List<WishList> wishList = wishListRepository.findByUser_UserId(user.getUserId());
+    return wishList.stream()
+        .map(wish -> wish.getPerfume().getPerfumeId())
+        .collect(Collectors.toList());
   }
 }

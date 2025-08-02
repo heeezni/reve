@@ -142,7 +142,7 @@
                   <input type="hidden" name="perfumeId" th:value="${perfume.perfumeId}" />
                   <input type="hidden" id="isLoggedIn" th:value="${isLoggedIn}" />
                   <button type="submit" id="btWishlist" class="w-8 h-8 bg-white rounded-full flex items-center justify-center shadow-md hover:bg-gray-50 transition-colors">
-                    <i class="text-lg" th:class="${isWished} ? 'fas fa-heart text-red-500' : 'far fa-heart'"></i>
+                    <i class="text-lg" th:class="${wishedIds.contains(perfume.perfumeId)} ? 'fas fa-heart text-red-500' : 'far fa-heart text-gray-400'"></i>
                   </button>
                 </div>
               </form>
@@ -544,8 +544,7 @@
       form.addEventListener('submit', function (event) {
         const isLoggedIn = this.querySelector('input[name="isLoggedIn"]').value === 'true';
         if (!isLoggedIn) {
-          event.preventDefault(); // ❌ form 전송 막고
-          window.location.href = '/login'; // 🔁 로그인 페이지로 이동
+          window.location.href = '/login';
         }
       });
     });

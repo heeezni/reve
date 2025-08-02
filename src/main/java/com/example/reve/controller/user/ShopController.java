@@ -1,6 +1,7 @@
 package com.example.reve.controller.user;
 
 import java.security.Principal;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -45,6 +46,7 @@ public class ShopController {
       @RequestParam(required = false) String sort,
       @RequestParam(required = false) String scent,
       @RequestParam(required = false) String search,
+      Principal principal,
       Model model) {
 
     Page<Perfume> perfumePage = perfumeService.getPerfumes(search, scent, sort, page, size);
@@ -54,6 +56,17 @@ public class ShopController {
     model.addAttribute("search", search);
     model.addAttribute("scent", scent);
     model.addAttribute("sort", sort);
+
+    // 찜 버튼
+    List<Long> wishedIds = new ArrayList<>();
+    if (principal != null) {
+      String loginId = principal.getName();
+      User user = userRepository.findByLoginId(loginId).orElse(null);
+      if (user != null) {
+        wishedIds = wishListService.findWishListIdsByUser(user);
+      }
+      model.addAttribute("wishedIds", wishedIds);
+    }
 
     return "shop/list";
   }
