@@ -4,7 +4,7 @@ import lombok.Data;
 
 @Data
 public class WishListShowDTO {
-  //상품 아이디
+  // 상품 아이디
   private Long perfumeId;
   // 상품 이미지
   private String hoverImageUrl;
@@ -18,7 +18,7 @@ public class WishListShowDTO {
   private String scent;
   // 간략 설명
   private String desciptionTitle;
-  //용량
+  // 용량
   private String volume;
   // 별 평균
   private double ratingAvg;
