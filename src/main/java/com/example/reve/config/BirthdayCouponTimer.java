@@ -26,7 +26,7 @@ public class BirthdayCouponTimer {
   @PostConstruct
   public void startCouponTimer() {
     // 주기적으로 실행하는 인터페이스->스레드 사용
-    try (ScheduledExecutorService scheduler = Executors.newSingleThreadScheduledExecutor()) {
+    ScheduledExecutorService scheduler = Executors.newSingleThreadScheduledExecutor();
       Runnable task =
           () -> {
             try {
@@ -42,12 +42,11 @@ public class BirthdayCouponTimer {
           };
       long delayUntil = delayUntil();
       // 24시간 반복
-      long oneday = TimeUnit.DAYS.toMinutes(1);
+      long oneday = TimeUnit.DAYS.toMillis(1);
 
       // 일정 기간 반복
       scheduler.scheduleAtFixedRate(task, delayUntil, oneday, TimeUnit.MILLISECONDS);
     }
-  }
 
   // 다음 2시까지 계산
   public long delayUntil() {
