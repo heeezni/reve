@@ -2,7 +2,8 @@ package com.example.reve.controller.user;
 
 import java.util.List;
 
-import jakarta.servlet.http.HttpSession;
+import jakarta.servlet.ServletException;
+import jakarta.servlet.http.HttpServletRequest;
 
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.stereotype.Controller;
@@ -10,6 +11,7 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.multipart.MultipartFile;
 
 import com.example.reve.domain.CustomUserDetails;
 import com.example.reve.dto.CouponDTO;
@@ -86,13 +88,14 @@ public class MypageController {
   public String updateProfile(
       UpdateProfileDTO updateProfileDTO,
       Model model,
+      MultipartFile profileImage,
       @AuthenticationPrincipal CustomUserDetails customUserDetails) {
     log.info("회원 정보 수정 컨트롤러 호출");
     try {
       // 수정된 회원 정보 가져오기
       String loginId = customUserDetails.getUsername();
-      model.addAttribute("profile", userService.update(updateProfileDTO, loginId));
-      log.info("회원 정보 수정 성공 : {}", userService.update(updateProfileDTO, loginId).toString());
+      UpdateProfileDTO result = userService.update(updateProfileDTO, loginId, profileImage);
+      model.addAttribute("profile", result);
     } catch (Exception e) {
       log.error("회원 정보 수정 실패");
       throw new RuntimeException(e);
@@ -104,29 +107,25 @@ public class MypageController {
    * 비밀번호 변경 컨트롤러
    * 변경 시 자동으로 로그인 아웃
    * @param newPasswordDTO 비밀번호 변경 DTO
-   * @param session 로그인 아웃을 위한 session
+   * @param request 로그인 아웃을 위한 request
    * @return "redirect:/" 성공 시 메인페이지로 이동
    */
   @PostMapping("/account/password")
   public String updatePassword(
       NewPasswordDTO newPasswordDTO,
-      HttpSession session,
-      @AuthenticationPrincipal CustomUserDetails customUserDetails) {
-    log.info("비밀번호 변경 컨트롤러 호출");
+      HttpServletRequest request,
+      Model model,
+      @AuthenticationPrincipal CustomUserDetails customUserDetails)
+      throws ServletException {
     String loginId = customUserDetails.getUsername();
-    boolean result = userService.checkPassword(newPasswordDTO, loginId);
+    boolean result = userService.updatePassword(newPasswordDTO, loginId);
+    model.addAttribute("result", result);
+    log.debug("비밀번호 변경 여부 {}", model.addAttribute("result", result));
     if (result) {
-      boolean result2 = userService.updatePassword(newPasswordDTO, loginId);
-      if (result2) {
-        session.setAttribute("result2", true);
-        // 세션 초기화(로그인 아웃)
-        session.invalidate();
-        return "redirect:/";
-      }
-    } else {
-      log.error("비밀번호 변경 실패");
-      session.setAttribute("result", false);
+      request.logout();
+      return "redirect:/";
     }
-    return "redirect:/mypage/account";
+    model.addAttribute("profile", userService.profileById(loginId));
+    return "user/mypage/account";
   }
 }

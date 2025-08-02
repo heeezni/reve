@@ -8,9 +8,11 @@ import lombok.Data;
 public class MypageDTO {
   private String email;
   private LocalDateTime createdAt;
+  private String profileUrl;
 
-  public MypageDTO(String email, LocalDateTime createdAt) {
+  public MypageDTO(String email, LocalDateTime createdAt, String profileUrl) {
     this.email = email;
     this.createdAt = createdAt;
+    this.profileUrl = profileUrl;
   }
 }

@@ -1,7 +1,6 @@
 <!DOCTYPE html>
 <html lang="ko"
       xmlns:th="http://www.thymeleaf.org"
-      xmlns:sec="http://www.thymeleaf.org/thymeleaf-extras-springsecurity4"
 >
   <head th:replace="~{fragments/header :: head(title='회원가입 | Rêve')}">
   </head>
@@ -26,31 +25,46 @@
 
 
             <form th:action="@{/member/signup}" method="post" class="space-y-6">
+              <div id="globalError" class="hidden bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded relative mt-4"  role="alert">
+                <span> 다시 입력해 주세요</span>
+              </div>
               <!-- Basic Information Section -->
               <div class="border-t pt-6">
                 <h3 class="text-lg font-semibold text-gray-800 mb-4">
                   기본정보
                 </h3>
-                <p class="text-sm text-red-500 mb-4">필수 필수입력사항</p>
+                <p class="text-sm text-red-500 mb-4">필수입력사항</p>
 
                 <!-- Username -->
                 <div class="mb-4">
-                  <label class="block text-sm font-medium text-gray-700 mb-2">
+                  <label for="loginId" class="block text-sm font-medium text-gray-700 mb-2">
                     아이디 <span class="text-red-500">*</span>
                   </label>
-                  <label>
+
+                  <div class="flex items-center space-x-2">
                     <input
-                      type="text"
-                      name="loginId"
-                      required
-                      class="w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-gray-800 focus:border-transparent"
-                      placeholder="아이디를 입력하세요"
+                        type="text"
+                        name="loginId"
+                        id="loginId"
+                        required
+                        class="w-64 border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-gray-800 focus:border-transparent"
+                        placeholder="아이디를 입력하세요"
                     />
-                  </label>
-                  <p class="text-xs text-gray-500 mt-1">
-                    (영문소문자/숫자, 4~16자)
-                  </p>
+                    <button
+                      type="button"
+                      id="bt_check"
+                      class="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-500"
+                    >
+                      중복 확인
+                    </button>
+                  </div>
+                    <div id="loginIdCheckMessage"
+                      class="mt-2 px-4 py-2 rounded relative hidden text-sm" role="alert">
+                    </div>
+                  <p class="text-xs text-gray-500 mt-1">(영문소문자/숫자, 4~16자)</p>
+                  <p id="loginIdError" class="text-red-500 text-sm mt-1 hidden"></p>
                 </div>
+
 
                 <!-- Password -->
                 <div class="mb-4">
@@ -61,6 +75,7 @@
                     <input
                       type="password"
                       name="password"
+                      id="password"
                       required
                       class="w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-gray-800 focus:border-transparent"
                       placeholder="비밀번호를 입력하세요"
@@ -69,6 +84,7 @@
                   <p class="text-xs text-gray-500 mt-1">
                     (영문 대소문자/숫자/특수문자 중 2가지 이상 조합, 10자~16자)
                   </p>
+                  <p id="passwordError" class="text-red-500 text-sm mt-1 hidden"></p>
                 </div>
 
                 <!-- Password Confirm -->
@@ -80,11 +96,13 @@
                     <input
                       type="password"
                       name="passwordConfirm"
+                      id="passwordConfirm"
                       required
                       class="w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-gray-800 focus:border-transparent"
                       placeholder="비밀번호를 다시 입력하세요"
                     />
                   </label>
+                  <p id="passwordConfirmError" class="text-red-500 text-sm mt-1 hidden"></p>
                 </div>
 
                 <!-- Name -->
@@ -96,55 +114,60 @@
                     <input
                       type="text"
                       name="name"
+                      id="name"
                       required
                       class="w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-gray-800 focus:border-transparent"
                       placeholder="이름을 입력하세요"
                     />
                   </label>
+                  <p id="nameError" class="text-red-500 text-sm mt-1 hidden"></p>
                 </div>
 
                 <!-- Address -->
 
                 <!-- Phone Numbers -->
-                <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
-                  <div>
-                    <label class="block text-sm font-medium text-gray-700 mb-2">
-                      휴대전화 <span class="text-red-500">*</span>
-                    </label>
-                    <div class="flex space-x-2">
-                      <label>
-                        <select name="firstNum"
-                          class="border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-gray-800 focus:border-transparent"
-                        >
-                          <option>010</option>
-                          <option>011</option>
-                          <option>016</option>
-                          <option>017</option>
-                          <option>018</option>
-                          <option>019</option>
-                        </select>
-                      </label>
-                      <label>
-                        <input
-                          type="text"
-                          name="middleNum"
-                          required
-                          class="flex-1 border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-gray-800 focus:border-transparent"
-                          placeholder="-"
-                        />
-                      </label>
-                      <label>
-                        <input
-                          type="text"
-                          name="lastNum"
-                          required
-                          class="flex-1 border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-gray-800 focus:border-transparent"
-                          placeholder="-"
-                        />
-                      </label>
-                    </div>
+                <div class="mb-4">
+                  <label class="block text-sm font-medium text-gray-700 mb-2">
+                    휴대전화 <span class="text-red-500">*</span>
+                  </label>
+                  <div class="flex items-center space-x-2 w-full">
+                    <select name="firstNum"
+                            aria-label="휴대전화 앞자리"
+                            class="w-1/4 border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-gray-800 focus:border-transparent">
+                      <option>010</option>
+                      <option>011</option>
+                      <option>016</option>
+                      <option>017</option>
+                      <option>018</option>
+                      <option>019</option>
+                    </select>
+                    <input
+                      type="text"
+                      name="middleNum"
+                      aria-label="휴대전화 중간자리"
+                      id="middleNum"
+                      required
+                      maxlength="4"
+                      class="w-1/3 border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-gray-800 focus:border-transparent"
+                    />
+                    <span class="text-gray-500 text-lg">-</span>
+                    <input
+                      type="text"
+                      name="lastNum"
+                      id="lastNum"
+                      aria-label="휴대전화 마지막자리"
+                      required
+                      maxlength="4"
+                      class="w-1/3 border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-gray-800 focus:border-transparent"
+                    />
+                  </div>
+
+                  <div class="flex space-x-4 mt-1">
+                    <p id="middleNumError" class="text-red-500 hidden text-sm"></p>
+                    <p id="lastNumError" class="text-red-500 hidden text-sm"></p>
                   </div>
                 </div>
+
 
                 <!-- Email -->
                 <div class="mb-6">
@@ -155,11 +178,13 @@
                     <input
                       type="email"
                       name="email"
+                      id="email"
                       required
                       class="w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-gray-800 focus:border-transparent"
                       placeholder="이메일을 입력하세요"
                     />
                   </label>
+                  <p id="emailError" class="text-red-500 hidden text-sm mt-1"></p>
                 </div>
               </div>
               <!-- Agreement Section -->
@@ -173,7 +198,7 @@
                   <label class="flex items-start">
                     <input
                       type="checkbox"
-                      id="allAgreement"
+                      id="agreeAll"
                       class="mt-1 mr-3"
                     />
                     <div>
@@ -193,7 +218,7 @@
                       type="checkbox"
                       name="termsAgreement"
                       required
-                      class="mt-1 mr-3"
+                      class="agree-item mt-1 mr-3"
                     />
                     <div>
                       <span class="font-medium"
@@ -207,38 +232,12 @@
                       type="checkbox"
                       name="privacyAgreement"
                       required
-                      class="mt-1 mr-3"
+                      class="agree-item mt-1 mr-3"
                     />
                     <div>
                       <span class="font-medium"
                         >개인정보처리방침에 동의합니다.
                         <span class="text-red-500">(필수)</span></span
-                      >
-                    </div>
-                  </label>
-                  <label class="flex items-start">
-                    <input
-                      type="checkbox"
-                      name="smsAgreement"
-                      class="mt-1 mr-3"
-                    />
-                    <div>
-                      <span class="font-medium"
-                        >SMS 수신 동의
-                        <span class="text-gray-500">(선택)</span></span
-                      >
-                    </div>
-                  </label>
-                  <label class="flex items-start">
-                    <input
-                      type="checkbox"
-                      name="emailAgreement"
-                      class="mt-1 mr-3"
-                    />
-                    <div>
-                      <span class="font-medium"
-                        >이메일 수신 동의
-                        <span class="text-gray-500">(선택)</span></span
                       >
                     </div>
                   </label>
@@ -268,39 +267,238 @@
 
     <script src="/js/script.js"></script>
     <script>
-      // 전체 동의 체크박스 기능
-      document
-        .getElementById('allAgreement')
-        .addEventListener('change', function () {
-          const checkboxes = document.querySelectorAll(
-            'input[type="checkbox"]'
-          );
-          checkboxes.forEach((checkbox) => {
-            if (checkbox !== this) {
-              checkbox.checked = this.checked;
-            }
+      function containsEmoji(str) {
+        const emojiRegex = /[\u{1F300}-\u{1FAFF}]/u;
+        return emojiRegex.test(str);
+      }
+
+      function validateLoginId() {
+        const id = document.getElementById("loginId").value.trim();
+        const error = document.getElementById("loginIdError");
+        const valid = /^[a-z0-9]{4,16}$/.test(id);
+
+        if (!valid) {
+          error.classList.remove("hidden");
+          return true;
+        }
+        error.classList.add("hidden");
+        return false;
+      }
+
+      function validatePassword() {
+        const pw = document.getElementById("password").value.trim();
+        const error = document.getElementById("passwordError");
+        const lengthValid = pw.length >= 10 && pw.length <= 16;
+        const complexity = [
+          /[a-z]/.test(pw),
+          /[A-Z]/.test(pw),
+          /\d/.test(pw),
+          /[^A-Za-z0-9]/.test(pw),
+        ].filter(Boolean).length;
+
+        if (!lengthValid || complexity < 2) {
+          error.textContent = "비밀번호는 10~16자이며, 영문/숫자/특수문자 중 2가지 이상 포함해야 합니다.";
+          error.classList.remove("hidden");
+          return true;
+        }
+        error.classList.add("hidden");
+        return false;
+      }
+
+      function validatePasswordConfirm() {
+        const pw = document.getElementById("password").value.trim();
+        const pwc = document.getElementById("passwordConfirm").value.trim();
+        const error = document.getElementById("passwordConfirmError");
+
+        if (pwc && pw !== pwc) {
+          error.textContent = "비밀번호가 일치하지 않습니다.";
+          error.classList.remove("hidden");
+          return true;
+        }
+        error.classList.add("hidden");
+        return false;
+      }
+
+      function validateName() {
+        const name = document.getElementById("name").value.trim();
+        const error = document.getElementById("nameError");
+        const valid = /^[^\s]{1,10}$/.test(name) && !containsEmoji(name);
+
+        if (!valid) {
+          error.textContent = "이름은 공백/이모지 없이 최대 10자까지 가능합니다.";
+          error.classList.remove("hidden");
+          return true;
+        }
+        error.classList.add("hidden");
+        return false;
+      }
+
+      function validateEmail() {
+        const email = document.getElementById("email").value.trim();
+        const error = document.getElementById("emailError");
+        const valid = /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email) && !containsEmoji(email);
+
+        if (!valid) {
+          error.textContent = "이메일 형식이 올바르지 않거나 공백/이모지가 포함되었습니다.";
+          error.classList.remove("hidden");
+          return true;
+        }
+        error.classList.add("hidden");
+        return false;
+      }
+
+      function validatePhone() {
+        const middle = document.getElementById("middleNum").value.trim();
+        const last = document.getElementById("lastNum").value.trim();
+        const middleError = document.getElementById("middleNumError");
+        const lastError = document.getElementById("lastNumError");
+        let hasError = false;
+
+        if (!/^\d{3,4}$/.test(middle)) {
+          middleError.textContent = "가운데 번호는 숫자 3~4자리여야 합니다.";
+          middleError.classList.remove("hidden");
+          hasError = true;
+        } else {
+          middleError.classList.add("hidden");
+        }
+
+        if (!/^\d{4}$/.test(last)) {
+          lastError.textContent = "마지막 번호는 숫자 4자리여야 합니다.";
+          lastError.classList.remove("hidden");
+          hasError = true;
+        } else {
+          lastError.classList.add("hidden");
+        }
+
+        return hasError;
+      }
+
+      function clearInvalidFields() {
+        if (validateLoginId()) document.getElementById("loginId").value = "";
+        if (validatePassword()) document.getElementById("password").value = "";
+        if (validatePasswordConfirm()) document.getElementById("passwordConfirm").value = "";
+        if (validateName()) document.getElementById("name").value = "";
+        if (validateEmail()) document.getElementById("email").value = "";
+        if (validatePhone()) {
+          document.getElementById("middleNum").value = "";
+          document.getElementById("lastNum").value = "";
+        }
+      }
+
+      document.addEventListener("DOMContentLoaded", () => {
+        // ▶ [1] 약관 전체동의 체크 연동
+        const agreeAll = document.getElementById("agreeAll");
+        const agreeItems = document.querySelectorAll(".agree-item");
+
+        if (agreeAll) {
+          agreeAll.addEventListener("change", function () {
+            agreeItems.forEach((item) => (item.checked = this.checked));
           });
-        });
 
-      // 개별 체크박스 변경 시 전체 동의 상태 업데이트
-      document
-        .querySelectorAll('input[type="checkbox"]')
-        .forEach((checkbox) => {
-          if (checkbox.id !== 'allAgreement') {
-            checkbox.addEventListener('change', function () {
-              const allCheckboxes = document.querySelectorAll(
-                'input[type="checkbox"]'
-              );
-              const allAgreement = document.getElementById('allAgreement');
-              const checkedCount = Array.from(allCheckboxes).filter(
-                (cb) => cb.checked && cb.id !== 'allAgreement'
-              ).length;
-              const totalCount = allCheckboxes.length - 1;
+          agreeItems.forEach((item) => {
+            item.addEventListener("change", () => {
+              agreeAll.checked = Array.from(agreeItems).every((i) => i.checked);
+            });
+          });
+        }
 
-              allAgreement.checked = checkedCount === totalCount;
+        const ids = ["loginId", "password", "passwordConfirm", "name", "email", "middleNum", "lastNum"];
+        ids.forEach((id) => {
+          const el = document.getElementById(id);
+          if (el) {
+            el.addEventListener("input", () => {
+              switch (id) {
+                case "loginId": validateLoginId(); break;
+                case "password": validatePassword(); break;
+                case "passwordConfirm": validatePasswordConfirm(); break;
+                case "name": validateName(); break;
+                case "email": validateEmail(); break;
+                case "middleNum":
+                case "lastNum": validatePhone(); break;
+              }
             });
           }
         });
+
+        const form = document.querySelector("form");
+        if (form) {
+          form.addEventListener("submit", function (e) {
+            const hasError =
+                    validateLoginId() ||
+                    validatePassword() ||
+                    validatePasswordConfirm() ||
+                    validateName() ||
+                    validateEmail() ||
+                    validatePhone();
+
+            if (hasError) {
+              e.preventDefault();
+              clearInvalidFields();
+
+              let alertDiv = document.getElementById("globalError");
+              if (!alertDiv) {
+                alertDiv = document.createElement("div");
+                alertDiv.id = "globalError";
+                alertDiv.className =
+                        "bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded relative mt-4";
+                alertDiv.innerHTML =
+                        "<strong class='font-bold'>입력값을 다시 확인해주세요.</strong>";
+                document.body.prepend(alertDiv);
+              } else {
+                alertDiv.classList.remove("hidden");
+              }
+
+              window.scrollTo({ top: 0, behavior: "smooth" });
+            }
+          });
+        }
+
+        const checkBtn = document.getElementById("bt_check");
+        const messageDiv = document.getElementById("loginIdCheckMessage");
+
+        if (checkBtn && messageDiv) {
+          checkBtn.addEventListener("click", () => {
+            const loginId = document.getElementById("loginId").value.trim();
+
+            messageDiv.classList.add("hidden");
+            messageDiv.classList.remove(
+                    "text-green-600", "bg-green-100", "border-green-400",
+                    "text-red-700", "bg-red-100", "border-red-400"
+            );
+
+            if (!/^[a-z0-9]{4,16}$/.test(loginId)) {
+              messageDiv.textContent = "아이디는 영문 소문자 또는 숫자 4~16자여야 합니다.";
+              messageDiv.classList.add("text-red-700", "bg-red-100", "border", "border-red-400");
+              messageDiv.classList.remove("hidden");
+              return;
+            }
+
+            fetch("/member/check/loginId", {
+              method: "POST",
+              headers: {
+                "Content-Type": "application/x-www-form-urlencoded"
+              },
+              body: new URLSearchParams({ loginId })
+            })
+                    .then(res => res.text())
+                    .then(result => {
+                      if (result === "available") {
+                        messageDiv.textContent = "사용 가능한 아이디입니다.";
+                        messageDiv.classList.add("text-green-600", "bg-green-100", "border", "border-green-400");
+                      } else {
+                        messageDiv.textContent = "이미 사용 중인 아이디입니다.";
+                        messageDiv.classList.add("text-red-700", "bg-red-100", "border", "border-red-400");
+                      }
+                      messageDiv.classList.remove("hidden");
+                    })
+                    .catch(() => {
+                      messageDiv.textContent = "서버 오류가 발생했습니다.";
+                      messageDiv.classList.add("text-red-700", "bg-red-100", "border", "border-red-400");
+                      messageDiv.classList.remove("hidden");
+                    });
+          });
+        }
+      });
     </script>
   </body>
 </html>

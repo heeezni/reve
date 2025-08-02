@@ -34,4 +34,19 @@ public class WishListController {
     wishListService.toggleWish(user, perfumeId);
     return "redirect:/shop/detail?id=" + perfumeId;
   }
+
+  // 상품 목록에 있는 버튼
+  @PostMapping("/wishlist/list")
+  public String listWish(@RequestParam("perfumeId") Long perfumeId, Principal principal) {
+    if (principal == null) {
+      return "redirect:/login";
+    }
+    String loginId = principal.getName();
+    User user =
+        userRepository
+            .findByLoginId(loginId)
+            .orElseThrow(() -> new UsernameNotFoundException("회원을 찾을 수 없음"));
+    wishListService.toggleWish(user, perfumeId);
+    return "redirect:/shop/list";
+  }
 }

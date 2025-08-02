@@ -68,10 +68,10 @@
             </div>
             <div sec:authorize="isAuthenticated()">
               <div class="flex space-x-4">
-                <span th:if="${#authentication.principal instanceof T(com.example.reve.domain.CustomUserDetails)}">
-                    <span th:unless="${#authentication.principal.nickname != null}" th:text="${#authentication.principal.name} + '님'"></span>
-                    <span th:if="${#authentication.principal.nickname != null}" th:text="${#authentication.principal.nickname} + '님'"></span>
-                </span>
+                <span th:if="${#strings.isEmpty(#authentication.principal.nickname)}"
+                      th:text="${#authentication.principal.name} + '님'"></span>
+                <span th:if="${!#strings.isEmpty(#authentication.principal.nickname)}"
+                      th:text="${#authentication.principal.nickname} + '님'"></span>
                 <a
                   href="/mypage"
                   class="text-gray-800 font-medium hover:text-gray-600 transition-colors"

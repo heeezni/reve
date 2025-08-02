@@ -35,6 +35,7 @@ public class SecurityConfig {
                         "/images/**",
                         "/uploads/**",
                         "/webjars/**",
+                        "/member/check/**",
                         "/favicon.ico")
                     .permitAll()
                     .requestMatchers(
@@ -49,11 +50,12 @@ public class SecurityConfig {
         .csrf(AbstractHttpConfigurer::disable)
         .formLogin(
             form ->
-                form.loginPage("/member/login?error=true") // 로그인 페이지 URL
+                form.loginPage("/member/login") // 로그인 페이지 URL
                     .loginProcessingUrl("/member/login") // 로그인 처리 URL
                     .usernameParameter("loginId") // 사용자 이름 파라미터 (기본값 username)
                     .passwordParameter("password") // 비밀번호 파라미터 (기본값 password)
                     .defaultSuccessUrl("/", true) // 로그인 성공 시 기본 리다이렉트 URL
+                    .failureUrl("/member/login?error=true") // 로그인 실패 처리 URL
                     .permitAll())
         .exceptionHandling(
             exceptions ->

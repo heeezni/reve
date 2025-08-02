@@ -5,8 +5,6 @@ import com.example.reve.domain.Perfume;
 import lombok.Data;
 
 @Data
-public class WishlistDTO {
-  // 상품 아이디
+public class WishListShowDTO {
   private Perfume perfume;
-  private boolean wished;
 }
