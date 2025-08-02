@@ -1,3 +1,15 @@
+// CSRF 토큰을 모든 AJAX 요청에 추가
+$(function () {
+    var token = $("meta[name='_csrf']").attr("content");
+    var header = $("meta[name='_csrf_header']").attr("content");
+    $(document).ajaxSend(function(e, xhr, options) {
+        // 토큰과 헤더가 존재할 때만 헤더를 설정
+        if (header && token) {
+            xhr.setRequestHeader(header, token);
+        }
+    });
+});
+
 // Banner Slider Functionality
 class BannerSlider {
   constructor() {

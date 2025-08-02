@@ -1,0 +1,464 @@
+<!DOCTYPE html>
+<html lang="ko" xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+<head th:replace="~{fragments/header :: head(title='공지사항 수정 | Rêve Admin')}">
+  <title>공지사항 수정</title>
+</head>
+<body class="font-sans text-gray-800">
+<!-- Header Fragment -->
+<div th:replace="~{fragments/header :: header}"></div>
+
+<!-- Main Content -->
+<main class="pt-20">
+  <div class="min-h-screen bg-gray-50 py-12">
+    <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
+      <!-- Breadcrumb -->
+      <nav class="mb-6">
+        <ol class="flex items-center space-x-2 text-sm text-gray-600">
+          <li><a href="/" class="hover:text-gray-800">홈</a></li>
+          <li><i class="fas fa-chevron-right text-xs"></i></li>
+          <li><a href="/board/notice/list" class="hover:text-gray-800">공지사항</a></li>
+          <li><i class="fas fa-chevron-right text-xs"></i></li>
+          <li class="text-gray-800">공지사항 수정</li>
+        </ol>
+      </nav>
+
+      <!-- Page Title -->
+      <div class="mb-8">
+        <h1 class="text-3xl font-bold text-gray-800 mb-2">공지사항 수정</h1>
+        <p class="text-gray-600">공지사항 내용을 수정합니다.</p>
+      </div>
+
+      <!-- Notice Edit Form -->
+      <div sec:authorize="!hasRole('ADMIN')" class="bg-white rounded-lg shadow-sm p-8 text-center">
+        <p class="text-lg text-gray-700">공지사항 수정은 관리자만 가능합니다.</p>
+        <a href="/member/login" class="mt-4 inline-block px-6 py-3 bg-gray-800 text-white rounded-md hover:bg-gray-700">로그인</a>
+      </div>
+
+      <div sec:authorize="hasRole('ADMIN')" class="bg-white rounded-lg shadow-sm p-8">
+        <form id="notice-edit-form" th:action="@{/admin/board/notice/edit/{noticeId}(noticeId=${notice.noticeId})}" method="post" enctype="multipart/form-data" th:object="${notice}" class="space-y-8">
+          <input type="hidden" th:field="*{noticeId}" />
+
+          <!-- Category Selection -->
+          <div>
+            <label
+                    for="notice-category"
+                    class="block text-sm font-medium text-gray-700 mb-3"
+            >
+              카테고리 <span class="text-red-500">*</span>
+            </label>
+            <select
+                    id="notice-category"
+                    th:field="*{category}"
+                    class="w-full border border-gray-300 rounded-md px-4 py-3 focus:outline-none focus:ring-2 focus:ring-800 focus:border-transparent"
+            >
+              <option value="일반">일반</option>
+              <option value="이벤트">이벤트</option>
+              <option value="시스템">시스템</option>
+              <option value="배송">배송</option>
+            </select>
+          </div>
+          
+          <!-- Title -->
+          <div>
+            <label
+                    for="notice-title"
+                    class="block text-sm font-medium text-gray-700 mb-3"
+            >
+              제목 <span class="text-red-500">*</span>
+            </label>
+            <input
+                    type="text"
+                    id="notice-title"
+                    th:field="*{title}"
+                    placeholder="공지사항 제목을 입력해주세요"
+                    class="w-full border border-gray-300 rounded-md px-4 py-3 focus:outline-none focus:ring-2 focus:ring-gray-800 focus:border-transparent"
+                    maxlength="100"
+            />
+            <div class="flex justify-between items-center mt-1">
+              <p class="text-sm text-gray-500">
+                최대 100자까지 입력 가능합니다
+              </p>
+              <p class="text-sm text-gray-500">
+                <span id="titleCharCount">0</span>/100
+              </p>
+            </div>
+          </div>
+
+          <!-- Content -->
+          <div>
+            <label
+                    for="notice-content"
+                    class="block text-sm font-medium text-gray-700 mb-3"
+            >
+              공지 내용 <span class="text-red-500">*</span>
+            </label>
+            <textarea
+                    id="notice-content"
+                    th:field="*{content}"
+                    placeholder="공지사항 내용을 작성해주세요"
+                    rows="10"
+                    class="w-full border border-gray-300 rounded-md px-4 py-3 focus:outline-none focus:ring-2 focus:ring-gray-800 focus:border-transparent resize-none"
+                    maxlength="2000"
+            ></textarea>
+            <div class="flex justify-between items-center mt-1">
+              <p class="text-sm text-gray-500">
+                최대 2,000자까지 입력 가능합니다
+              </p>
+              <p class="text-sm text-gray-500">
+                <span id="charCount">0</span>/2,000
+              </p>
+            </div>
+          </div>
+
+          <!-- File Upload -->
+          <div>
+            <label class="block text-sm font-medium text-gray-700 mb-3">
+              첨부파일
+            </label>
+            <!-- Existing Files -->
+            <div id="existingFiles" class="mt-4 space-y-2">
+              <div th:if="${notice.attachmentFiles != null and !notice.attachmentFiles.isEmpty()}">
+                <div th:each="filePath : ${notice.attachmentFiles}" class="flex items-center justify-between p-3 bg-gray-50 rounded-md">
+                  <div class="flex items-center space-x-3">
+                    <i th:classappend="${filePath.endsWith('.pdf') ? 'fas fa-file-pdf text-red-500' : (filePath.endsWith('.jpg') || filePath.endsWith('.jpeg') || filePath.endsWith('.png') || filePath.endsWith('.gif') ? 'fas fa-file-image text-blue-500' : 'fas fa-file text-gray-500')}"></i>
+                    <span class="text-sm text-gray-700" th:text="${filePath.substring(filePath.lastIndexOf('/') + 1)}"></span>
+                  </div>
+                  <button type="button" class="text-red-500 hover:text-red-700" th:attr="data-filepath=${filePath}" onclick="removeExistingFile(this)">
+                    <i class="fas fa-times"></i>
+                  </button>
+                </div>
+              </div>
+            </div>
+            <div id="deleted-files-container"></div>
+
+            <div
+                    class="border-2 border-dashed border-gray-300 rounded-lg p-6 text-center hover:border-gray-400 transition-colors mt-4"
+            >
+              <div class="space-y-4">
+                <i
+                        class="fas fa-cloud-upload-alt text-3xl text-gray-400"
+                ></i>
+                <div>
+                  <p class="text-sm text-gray-600 mb-2">
+                    새 파일을 추가하세요
+                  </p>
+                  <p class="text-xs text-gray-500">
+                    최대 5개 파일, 각 파일 10MB 이하 (JPG, PNG, PDF, DOC,
+                    DOCX)
+                  </p>
+                </div>
+                <input
+                        type="file"
+                        multiple
+                        accept=".jpg,.jpeg,.png,.pdf,.doc,.docx"
+                        class="hidden"
+                        id="fileInput"
+                        name="newAttachmentFiles"
+                />
+                <button
+                        type="button"
+                        onclick="document.getElementById('fileInput').click()"
+                        class="inline-flex items-center px-4 py-2 border border-gray-300 rounded-md text-sm font-medium text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-gray-800 focus:border-transparent"
+                >
+                  <i class="fas fa-folder-open mr-2"></i>
+                  파일 선택
+                </button>
+              </div>
+            </div>
+            <!-- New File List -->
+            <div id="newFileList" class="mt-4 space-y-2"></div>
+          </div>
+
+          <!-- Important Checkbox -->
+          <div>
+            <label class="flex items-center">
+              <input
+                type="checkbox"
+                th:field="*{important}"
+                class="w-4 h-4 text-purple-600 border-gray-300 rounded focus:ring-purple-500"
+              />
+              <span class="ml-2 text-sm text-gray-700">중요 공지 (상단에 고정)</span>
+            </label>
+          </div>
+
+          <!-- Notice -->
+          <div class="bg-blue-50 border-l-4 border-blue-400 p-4">
+            <div class="flex">
+              <i class="fas fa-info-circle text-blue-500 mt-1 mr-3"></i>
+              <div class="text-sm text-blue-700">
+                <p class="font-medium mb-1">공지사항 작성 시 주의사항</p>
+                <ul class="list-disc list-inside space-y-1">
+                  <li>
+                    공지사항은 모든 사용자에게 공개됩니다. 신중하게 작성해주세요.
+                  </li>
+                  <li>욕설, 비방, 광고성 내용은 삭제될 수 있습니다.</li>
+                  <li>중요한 내용은 명확하고 간결하게 작성해주세요.</li>
+                </ul>
+              </div>
+            </div>
+          </div>
+
+          <!-- Submit Buttons -->
+          <div
+                  class="flex items-center justify-between pt-6 border-t border-gray-200"
+          >
+            <a
+                    th:href="@{/board/notice/detail/{noticeId}(noticeId=${notice.noticeId})}"
+                    class="inline-flex items-center px-6 py-3 border border-gray-300 rounded-md text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-gray-800 focus:border-transparent font-medium"
+            >
+              <i class="fas fa-arrow-left mr-2"></i>
+              취소
+            </a>
+            <div class="flex space-x-3">
+              <button
+                      type="submit"
+                      id="submit-notice-edit"
+                      class="inline-flex items-center px-6 py-3 bg-blue-600 text-white rounded-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent font-medium"
+              >
+                <i class="fas fa-save mr-2"></i>
+                수정 완료
+              </button>
+              <button
+                      type="button"
+                      id="delete-notice-btn"
+                      th:attr="data-notice-id=${notice.noticeId}"
+                      onclick="deleteNotice(this)"
+                      class="inline-flex items-center px-6 py-3 bg-red-600 text-white rounded-md hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-red-500 focus:border-transparent font-medium"
+              >
+                <i class="fas fa-trash-alt mr-2"></i>
+                삭제
+              </button>
+            </div>
+          </div>
+        </form>
+      </div>
+
+      <!-- Quick Links -->
+      <div class="mt-8 grid md:grid-cols-2 gap-4">
+        <a
+                href="/admin/board/notice/list"
+                class="flex items-center justify-center p-4 bg-white rounded-lg shadow-sm hover:shadow-md transition-shadow"
+        >
+          <div class="text-center">
+            <i class="fas fa-list text-2xl text-blue-500 mb-2"></i>
+            <p class="font-medium text-gray-800">공지사항 목록</p>
+            <p class="text-sm text-gray-600">
+              등록된 공지사항을 확인하세요
+            </p>
+          </div>
+        </a>
+
+        <a
+                href="/admin/dashboard"
+                class="flex items-center justify-center p-4 bg-white rounded-lg shadow-sm hover:shadow-md transition-shadow"
+        >
+          <div class="text-center">
+            <i class="fas fa-tachometer-alt text-2xl text-green-500 mb-2"></i>
+            <p class="font-medium text-gray-800">관리자 대시보드</p>
+            <p class="text-sm text-gray-600">
+              관리자 페이지로 돌아가기
+            </p>
+          </div>
+        </a>
+      </div>
+    </div>
+  </div>
+</main>
+
+<!-- Footer Fragment -->
+<div th:replace="~{fragments/footer :: footer}"></div>
+
+<!-- Login Modal Fragment -->
+<div th:replace="~{fragments/modal :: loginModal}"></div>
+
+<script src="/js/script.js"></script>
+<script th:inline="javascript">
+  console.log('notice edit script 실행됨');
+
+  // Character count for textarea
+  const textarea = $('#notice-content'); // jQuery 선택자 사용
+  const charCount = $('#charCount'); // jQuery 선택자 사용
+
+  textarea.on('input', function () { // .on() 메소드 사용
+    const length = $(this).val().length; // .val() 메소드 사용
+    charCount.text(length.toString()); // .text() 메소드 사용
+    if (length > 1900) {
+      charCount.addClass('text-red-500'); // .addClass() 메소드 사용
+    } else {
+      charCount.removeClass('text-red-500'); // .removeClass() 메소드 사용
+    }
+  });
+
+  // Character count for title
+  const titleInput = $('#notice-title');
+  const titleCharCount = $('#titleCharCount');
+
+  titleInput.on('input', function () {
+    const length = $(this).val().length;
+    titleCharCount.text(length.toString());
+    if (length > 90) { // 90자 초과 시 색상 변경
+      titleCharCount.addClass('text-red-500');
+    } else {
+      titleCharCount.removeClass('text-red-500');
+    }
+  });
+
+  // File upload functionality (jQuery로 변경)
+  const fileInput = $('#fileInput');
+  const newFileList = $('#newFileList');
+  const existingFilesContainer = $('#existingFiles');
+  const deletedFilesContainer = $('#deleted-files-container');
+
+  // 허용되는 파일 확장자 및 최대 파일 크기 정의 (백엔드와 일치하도록)
+  const MAX_FILES = 5;
+  const MAX_FILE_SIZE_MB = 10; // MB
+  const MAX_FILE_SIZE_BYTES = MAX_FILE_SIZE_MB * 1024 * 1024;
+  const ALLOWED_EXTENSIONS = ['jpg', 'jpeg', 'png', 'pdf', 'doc', 'docx'];
+
+  let currentNewFiles = new DataTransfer();
+
+  fileInput.on('change', function () {
+    newFileList.empty(); // 기존 새 파일 목록 초기화
+    let selectedFiles = Array.from(this.files);
+    const validFiles = [];
+
+    // 파일 개수 제한 검사
+    if (selectedFiles.length > MAX_FILES) {
+      alert(`최대 ${MAX_FILES}개의 파일만 첨부할 수 있습니다.`);
+      selectedFiles = selectedFiles.slice(0, MAX_FILES);
+    }
+
+    selectedFiles.forEach((file) => {
+      let isValid = true;
+      let errorMessage = '';
+
+      // 파일 크기 검증
+      if (file.size > MAX_FILE_SIZE_BYTES) {
+        errorMessage = `파일 크기가 ${MAX_FILE_SIZE_MB}MB를 초과합니다.`;
+        isValid = false;
+      }
+
+      // 파일 타입 검증
+      const fileExtension = file.name.split('.').pop().toLowerCase();
+      if (!ALLOWED_EXTENSIONS.includes(fileExtension)) {
+        errorMessage = `허용되지 않는 파일 형식입니다. (허용: ${ALLOWED_EXTENSIONS.join(', ').toUpperCase()})`;
+        isValid = false;
+      }
+
+      if (isValid) {
+        currentNewFiles.items.add(file);
+        const fileItem = $('<div></div>');
+        fileItem.addClass('flex items-center justify-between p-3 bg-gray-50 rounded-md');
+
+        const fileInfoContainer = $('<div></div>').addClass('flex items-center space-x-3');
+
+        if (file.type.startsWith('image/')) {
+          const reader = new FileReader();
+          reader.onload = function (e) {
+            const img = $('<img>');
+            img.attr('src', e.target.result);
+            img.addClass('w-16 h-16 object-cover rounded-md');
+            fileInfoContainer.prepend(img);
+          };
+          reader.readAsDataURL(file);
+        } else {
+          fileInfoContainer.append('<i class="fas fa-file text-gray-500 text-2xl w-16 text-center"></i>');
+        }
+
+        const textInfo = $('<div></div>');
+        textInfo.append(`<span class="text-sm text-gray-700">${file.name}</span>`);
+        textInfo.append(`<br><span class="text-xs text-gray-500">(${(file.size / 1024 / 1024).toFixed(2)}MB)</span>`);
+        fileInfoContainer.append(textInfo);
+
+        const removeBtn = $(`<button type="button" class="text-red-500 hover:text-red-700" data-file-name="${file.name}"><i class="fas fa-times"></i></button>`);
+        removeBtn.on('click', function() {
+          removeNewFile($(this).data('file-name'));
+        });
+
+        fileItem.append(fileInfoContainer);
+        fileItem.append(removeBtn);
+        newFileList.append(fileItem);
+      } else {
+        alert(`파일 업로드 실패: ${file.name} - ${errorMessage}`);
+      }
+    });
+
+    fileInput[0].files = currentNewFiles.files;
+  });
+
+  function removeNewFile(fileName) {
+    const dt = new DataTransfer();
+    Array.from(currentNewFiles.files)
+      .filter(file => file.name !== fileName)
+      .forEach(file => dt.items.add(file));
+    currentNewFiles = dt;
+    fileInput[0].files = currentNewFiles.files;
+    newFileList.find(`[data-file-name="${fileName}"]`).remove();
+  }
+
+  function removeExistingFile(button) {
+    const filePath = $(button).data('filepath');
+    const hiddenInput = $('<input type="hidden" name="deletedAttachmentFiles" />');
+    hiddenInput.val(filePath);
+    deletedFilesContainer.append(hiddenInput);
+
+    $(button).closest('.flex.items-center.justify-between').remove();
+  }
+
+  // Submit form
+  $('#notice-edit-form').on('submit', function(e) {
+    e.preventDefault();
+
+    const form = $(this);
+    const formData = new FormData(form[0]);
+
+    // FormData에서 기본적으로 추가된 newAttachmentFiles를 제거합니다.
+    // (DataTransfer 객체에서 직접 관리하기 위함)
+    formData.delete('newAttachmentFiles');
+
+    // 새로 추가된 파일들을 formData에 추가합니다.
+    Array.from(currentNewFiles.files).forEach(file => {
+      formData.append('newAttachmentFiles', file);
+    });
+
+    // 삭제하기로 선택된 기존 파일 목록을 formData에 추가합니다.
+    deletedFilesContainer.find('input[name="deletedAttachmentFiles"]').each(function() {
+      formData.append('deletedAttachmentFiles', $(this).val());
+    });
+
+    $.ajax({
+      url: form.attr('action'),
+      type: 'PUT',
+      data: formData,
+      processData: false,
+      contentType: false,
+      success: function(response) {
+        alert('공지사항이 성공적으로 수정되었습니다.');
+        location.href = '/board/notice/detail/' + response.noticeId;
+      },
+      error: function(xhr, status, error) {
+        alert('공지사항 수정에 실패했습니다: ' + (xhr.responseText || error));
+      }
+    });
+  });
+
+  // Delete notice
+  function deleteNotice(button) {
+    const noticeId = $(button).data('notice-id');
+    if (confirm('정말로 이 공지사항을 삭제하시겠습니까?')) {
+      $.ajax({
+        url: '/admin/board/notice/' + noticeId,
+        type: 'DELETE',
+        success: function(result) {
+          alert('공지사항이 삭제되었습니다.');
+          location.href = '/board/notice/list';
+        },
+        error: function(xhr, status, error) {
+          alert('공지사항 삭제에 실패했습니다: ' + (xhr.responseText || error));
+        }
+      });
+    }
+  }
+</script>
+</body>
+</html>

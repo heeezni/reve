@@ -1,6 +1,8 @@
 package com.example.reve.controller.admin;
 
+import java.io.IOException;
 import java.security.Principal;
+import java.util.Map;
 import java.util.NoSuchElementException;
 
 import jakarta.validation.Valid;
@@ -11,6 +13,9 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.web.PageableDefault;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.AccessDeniedException;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
@@ -42,10 +47,11 @@ public class AdminBoardController {
   }
 
   @GetMapping("/notice/edit/{noticeId}")
-  public String noticeEditForm(@PathVariable Long noticeId, Model model) {
+  public String noticeEditForm(@PathVariable Long noticeId, Model model, Principal principal) {
     try {
       Notice notice = noticeService.getNoticeById(noticeId);
       model.addAttribute("notice", notice);
+      model.addAttribute("isAdmin", isAdmin(principal)); // isAdmin 추가
       return "admin/board/notice/edit";
     } catch (NoSuchElementException e) {
       model.addAttribute("errorMessage", e.getMessage());
@@ -66,10 +72,34 @@ public class AdminBoardController {
       noticeService.createNotice(noticeReqDTO, principal);
       redirectAttributes.addFlashAttribute("successMessage", "공지사항이 성공적으로 등록되었습니다.");
       return "redirect:/board/notice/list";
+    } catch (AccessDeniedException e) {
+      redirectAttributes.addFlashAttribute("errorMessage", e.getMessage());
+      return "redirect:/admin/board/notice/register";
     } catch (Exception e) {
       log.error("공지사항 등록 중 오류 발생: {}", e.getMessage());
       redirectAttributes.addFlashAttribute("errorMessage", "공지사항 등록에 실패했습니다.");
       return "redirect:/admin/board/notice/register";
+    }
+  }
+
+  @PutMapping("/notice/edit/{noticeId}")
+  @ResponseBody
+  public ResponseEntity<?> updateNotice(
+      @PathVariable Long noticeId,
+      @Valid @ModelAttribute NoticeReqDTO noticeReqDTO,
+      BindingResult bindingResult,
+      Principal principal) {
+    if (bindingResult.hasErrors()) {
+      return ResponseEntity.badRequest().body(bindingResult.getAllErrors());
+    }
+    try {
+      Notice updatedNotice = noticeService.updateNotice(noticeId, noticeReqDTO, principal);
+      return ResponseEntity.ok(Map.of("noticeId", updatedNotice.getNoticeId()));
+    } catch (IOException | AccessDeniedException e) {
+      return ResponseEntity.status(403).body(Map.of("error", e.getMessage()));
+    } catch (Exception e) {
+      log.error("공지사항 수정 중 오류 발생: {}", e.getMessage());
+      return ResponseEntity.status(500).body(Map.of("error", "공지사항 수정에 실패했습니다."));
     }
   }
 
@@ -159,12 +189,22 @@ public class AdminBoardController {
     try {
       noticeService.deleteNotice(noticeId, principal);
       return ResponseEntity.ok("공지사항이 성공적으로 삭제되었습니다.");
-    } catch (IllegalAccessException e) {
+    } catch (AccessDeniedException e) {
       return ResponseEntity.status(403).body("권한이 없습니다.");
     } catch (NoSuchElementException e) {
       return ResponseEntity.status(404).body("공지사항을 찾을 수 없습니다.");
     } catch (Exception e) {
       return ResponseEntity.status(500).body("공지사항 삭제 중 오류가 발생했습니다: " + e.getMessage());
     }
+  }
+
+  private boolean isAdmin(Principal principal) {
+    if (principal == null) {
+      return false;
+    }
+    Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+    return authentication != null
+        && authentication.getAuthorities().stream()
+            .anyMatch(a -> a.getAuthority().equals("ROLE_ADMIN"));
   }
 }
