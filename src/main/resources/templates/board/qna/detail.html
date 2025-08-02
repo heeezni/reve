@@ -32,8 +32,7 @@
           </div>
 
           <!-- Question Section -->
-          <div th:unless="${(qna.isSecret ?: false) and !(isAuthor ?: false) and !(isAdmin ?: false)}"
-            class="bg-white rounded-lg shadow-sm p-8 mb-6">
+          <div th:if="${!accessDenied}" class="bg-white rounded-lg shadow-sm p-8 mb-6">
             <div class="border-b border-gray-200 pb-6 mb-6">
               <!-- Category and Status -->
               <div class="flex items-center space-x-3 mb-4">
@@ -75,7 +74,7 @@
                 <!-- Title -->
               </h1>
               <!-- Admin/Author Buttons -->
-              <div th:if="${(isAuthor != null && isAuthor) || (isAdmin != null && isAdmin)}" class="flex items-center justify-end space-x-2 mb-4">
+              <div th:if="${isAuthor or isAdmin}" class="flex items-center justify-end space-x-2 mb-4">
                 <a
                   th:href="@{/board/qna/edit/{qnaId}(qnaId=${qna.qnaId})}"
                   class="inline-flex items-center px-4 py-2 bg-blue-500 text-white rounded-md hover:bg-blue-600 transition-colors font-medium text-sm"
@@ -175,7 +174,7 @@
           </div>
 
           <!-- Answer Section -->
-          <div th:if="${qna.answer}" class="bg-white rounded-lg shadow-sm p-8 mb-6">
+          <div th:if="${!accessDenied and qna.answer != null and qna.answer.length() > 0}" class="bg-white rounded-lg shadow-sm p-8 mb-6">
             <div class="mb-6">
               <h3
                 class="text-lg font-semibold text-gray-800 mb-4 flex items-center"

@@ -157,7 +157,8 @@ public class BoardController {
           Pageable pageable,
       @RequestParam(required = false) String keyword,
       @RequestParam(required = false) String category,
-      @RequestParam(required = false) String filterAndSortParam) {
+      @RequestParam(required = false) String filterAndSortParam,
+      Principal principal) {
 
     // keyword에 trim() 적용
     if (keyword != null) {
@@ -190,7 +191,8 @@ public class BoardController {
         PageRequest.of(pageable.getPageNumber(), pageable.getPageSize(), sort);
 
     // 1. QnaService를 통해 Q&A 목록을 페이징하여 가져오기
-    Page<QnaResDTO> qnaPage = qnaService.selectAll(keyword, category, status, pageableWithSort);
+    Page<QnaResDTO> qnaPage =
+        qnaService.selectAll(keyword, category, status, pageableWithSort, principal);
     // 2. 가져온 Q&A Page 객체를 "qnas"라는 이름으로 모델에 추가 (Thymeleaf에서 qnas로 사용)
     model.addAttribute("qnas", qnaPage);
     // 3. "board/qna/list.html" 뷰 반환
@@ -198,30 +200,48 @@ public class BoardController {
   }
 
   @GetMapping("/qna/detail/{qnaId}")
-  public String qnaDetail(@PathVariable Long qnaId, Model model, Principal principal)
-      throws AccessDeniedException {
-    // try-catch 블록 제거
-    QnaResDTO qna = qnaService.getQnaById(qnaId, principal);
-    model.addAttribute("qna", qna);
+  public String qnaDetail(@PathVariable Long qnaId, Model model, Principal principal) {
+    model.addAttribute("accessDenied", false); // 기본값 false로 설정
+    try {
+      // 1. 상세 정보 가져오기 (권한 검사 포함)
+      QnaResDTO qna = qnaService.getQnaById(qnaId, principal);
+      model.addAttribute("qna", qna);
 
-    // 현재 로그인한 사용자 정보 확인
-    boolean isAuthor = false;
-    boolean isAdmin = false;
+      // 2. 작성자 및 관리자 여부 확인
+      boolean isAuthor = false;
+      boolean isAdmin = false;
 
-    if (principal != null) {
-      String loggedInUsername = principal.getName();
-      User loggedInUser = userRepository.findByLoginId(loggedInUsername).orElse(null);
+      if (principal != null) {
+        String loggedInUsername = principal.getName();
+        User loggedInUser = userRepository.findByLoginId(loggedInUsername).orElse(null);
 
-      // 관리자 확인
-      if (loggedInUser == null) {
-        throw new IllegalStateException("로그인된 사용자 정보가 없습니다.");
+        if (loggedInUser != null && qna != null && qna.getUserId() != null) {
+          // 작성자 확인
+          if (qna.getUserId().equals(loggedInUser.getUserId())) {
+            isAuthor = true;
+          }
+          // 관리자 확인
+          if (loggedInUser.getRole() == Role.ADMIN) {
+            isAdmin = true;
+          }
+        }
       }
-      if (loggedInUser.getRole().equals(Role.ADMIN)) {
-        isAdmin = true;
-      }
+      model.addAttribute("isAuthor", isAuthor);
+      model.addAttribute("isAdmin", isAdmin);
+
+    } catch (AccessDeniedException e) {
+      // 3. 접근 거부 시, 기본 정보만 다시 로드하여 뷰에 전달
+      QnaResDTO qna = qnaService.getQnaForDetailView(qnaId);
+      model.addAttribute("qna", qna);
+      model.addAttribute("accessDenied", true); // 접근 거부 플래그
+      model.addAttribute("isAuthor", false); // 접근 거부 시 수정/삭제 버튼 비활성화
+      model.addAttribute("isAdmin", false);
+
+    } catch (NoSuchElementException e) {
+      // 4. 게시글이 존재하지 않을 경우
+      model.addAttribute("errorMessage", e.getMessage());
+      return "common/error"; // 에러 페이지로 이동
     }
-    model.addAttribute("isAuthor", isAuthor);
-    model.addAttribute("isAdmin", isAdmin);
 
     return "board/qna/detail";
   }

@@ -166,14 +166,28 @@ public class QnaService {
    * @return QnaResDTO의 Page 객체
    */
   public Page<QnaResDTO> selectAll(
-      String keyword, String category, String status, Pageable pageable) {
-    // QnaRepository를 사용하여 데이터베이스에서 Qna 엔티티를 페이징하여 가져오기
-    // findAll(Pageable) 메소드는 Page<Qna>를 반환하며, 정렬 정보는 pageable에 포함되어 있음
+      String keyword, String category, String status, Pageable pageable, Principal principal) {
     Page<Qna> qnaPage = qnaRepository.findFilteredQnas(keyword, category, status, pageable);
 
-    // Page<Qna>를 Page<QnaResDTO>로 변환
+    User loggedInUser = null;
+    if (principal != null) {
+      loggedInUser = userRepository.findByLoginId(principal.getName()).orElse(null);
+    }
+
+    final User finalLoggedInUser = loggedInUser;
     List<QnaResDTO> qnaResDtoList =
-        qnaPage.getContent().stream().map(QnaResDTO::new).collect(Collectors.toList());
+        qnaPage.getContent().stream()
+            .map(
+                qna -> {
+                  boolean isAuthor =
+                      finalLoggedInUser != null
+                          && qna.getUser() != null
+                          && finalLoggedInUser.getUserId().equals(qna.getUser().getUserId());
+                  boolean isAdmin =
+                      finalLoggedInUser != null && finalLoggedInUser.getRole() == Role.ADMIN;
+                  return new QnaResDTO(qna, isAuthor, isAdmin);
+                })
+            .collect(Collectors.toList());
 
     return new PageImpl<>(qnaResDtoList, pageable, qnaPage.getTotalElements());
   }
@@ -189,7 +203,7 @@ public class QnaService {
     Qna qna =
         qnaRepository
             .findById(qnaId)
-            .orElseThrow(() -> new IllegalArgumentException("해당 Q&A를 찾을 수 없습니다. ID: " + qnaId));
+            .orElseThrow(() -> new NoSuchElementException("Q&A를 찾을 수 없습니다. ID: " + qnaId));
 
     // 공개글이더라도 로그인하지 않은 사용자에게는 접근을 허용하지 않음
     if (principal == null) {
@@ -206,6 +220,14 @@ public class QnaService {
     return new QnaResDTO(qna, prevQnaId, nextQnaId);
   }
 
+  public QnaResDTO getQnaForDetailView(Long qnaId) {
+    Qna qna =
+        qnaRepository
+            .findById(qnaId)
+            .orElseThrow(() -> new NoSuchElementException("해당 Q&A를 찾을 수 없습니다. ID: " + qnaId));
+    return new QnaResDTO(qna);
+  }
+
   private Long findAccessiblePrevQnaId(Long currentQnaId, Principal principal) {
     Long prevId = currentQnaId;
     while (true) {
@@ -219,8 +241,12 @@ public class QnaService {
         if (!qna.getIsSecret()) { // 공개글이면 바로 반환
           return prevId;
         } else { // 비밀글이면 권한 확인
-          validateUserPermission(principal, qna);
-          return prevId; // 권한 있으면 반환
+          try {
+            validateUserPermission(principal, qna);
+            return prevId; // 권한 있으면 반환
+          } catch (AccessDeniedException e) {
+            // 권한 없으면 다음으로 넘어감
+          }
         }
       }
     }
@@ -239,8 +265,12 @@ public class QnaService {
         if (!qna.getIsSecret()) { // 공개글이면 바로 반환
           return nextId;
         } else { // 비밀글이면 권한 확인
-          validateUserPermission(principal, qna);
-          return nextId; // 권한 있으면 반환
+          try {
+            validateUserPermission(principal, qna);
+            return nextId; // 권한 있으면 반환
+          } catch (AccessDeniedException e) {
+            // 권한 없으면 다음으로 넘어감
+          }
         }
       }
     }
@@ -257,7 +287,7 @@ public class QnaService {
     Qna qna =
         qnaRepository
             .findById(qnaId)
-            .orElseThrow(() -> new IllegalArgumentException("해당 Q&A를 찾을 수 없습니다. ID: " + qnaId));
+            .orElseThrow(() -> new NoSuchElementException("Q&A를 찾을 수 없습니다. ID: " + qnaId));
 
     validateUserPermission(principal, qna);
 
@@ -283,7 +313,7 @@ public class QnaService {
     Qna qna =
         qnaRepository
             .findById(qnaId)
-            .orElseThrow(() -> new IllegalArgumentException("해당 Q&A를 찾을 수 없습니다. ID: " + qnaId));
+            .orElseThrow(() -> new NoSuchElementException("Q&A를 찾을 수 없습니다. ID: " + qnaId));
 
     validateAdminPermission(principal);
 
@@ -305,7 +335,7 @@ public class QnaService {
     Qna qna =
         qnaRepository
             .findById(qnaId)
-            .orElseThrow(() -> new IllegalArgumentException("해당 Q&A를 찾을 수 없습니다. ID: " + qnaId));
+            .orElseThrow(() -> new NoSuchElementException("Q&A를 찾을 수 없습니다. ID: " + qnaId));
 
     validateAdminPermission(principal);
 
@@ -325,7 +355,7 @@ public class QnaService {
     Qna qna =
         qnaRepository
             .findById(qnaId)
-            .orElseThrow(() -> new IllegalArgumentException("해당 Q&A를 찾을 수 없습니다. ID: " + qnaId));
+            .orElseThrow(() -> new NoSuchElementException("Q&A를 찾을 수 없습니다. ID: " + qnaId));
 
     validateAdminPermission(principal);
 

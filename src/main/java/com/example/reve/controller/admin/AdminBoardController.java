@@ -110,7 +110,8 @@ public class AdminBoardController {
           Pageable pageable,
       @RequestParam(required = false) String keyword,
       @RequestParam(required = false) String category,
-      @RequestParam(required = false) String filterAndSort) {
+      @RequestParam(required = false) String filterAndSort,
+      Principal principal) {
 
     // keyword에 trim() 적용
     if (keyword != null) {
@@ -132,7 +133,8 @@ public class AdminBoardController {
         PageRequest.of(pageable.getPageNumber(), pageable.getPageSize(), sort);
 
     // QnaService를 통해 Q&A 목록을 페이징하여 가져오기
-    Page<QnaResDTO> qnaPage = qnaService.selectAll(keyword, category, status, pageableWithSort);
+    Page<QnaResDTO> qnaPage =
+        qnaService.selectAll(keyword, category, status, pageableWithSort, principal);
     // 가져온 Q&A Page 객체를 "qnas"라는 이름으로 모델에 추가
     model.addAttribute("qnas", qnaPage);
     model.addAttribute("keyword", keyword);
