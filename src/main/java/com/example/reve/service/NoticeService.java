@@ -126,16 +126,26 @@ public class NoticeService {
     return noticeRepository.save(notice);
   }
 
-  // 이전 공지사항 가져오기
+  // 이전 공지사항 가져오기 (중요도, 생성일, ID 고려)
   @Transactional(readOnly = true)
   public Optional<Notice> getPrevNotice(Long currentNoticeId) {
-    return noticeRepository.findPrevNotice(currentNoticeId);
+    Notice currentNotice =
+        noticeRepository
+            .findById(currentNoticeId)
+            .orElseThrow(() -> new NoSuchElementException("공지사항을 찾을 수 없습니다: " + currentNoticeId));
+    return noticeRepository.findPrevNoticeByImportantAndCreatedAt(
+        currentNoticeId, currentNotice.isImportant(), currentNotice.getCreatedAt());
   }
 
-  // 다음 공지사항 가져오기
+  // 다음 공지사항 가져오기 (중요도, 생성일, ID 고려)
   @Transactional(readOnly = true)
   public Optional<Notice> getNextNotice(Long currentNoticeId) {
-    return noticeRepository.findNextNotice(currentNoticeId);
+    Notice currentNotice =
+        noticeRepository
+            .findById(currentNoticeId)
+            .orElseThrow(() -> new NoSuchElementException("공지사항을 찾을 수 없습니다: " + currentNoticeId));
+    return noticeRepository.findNextNoticeByImportantAndCreatedAt(
+        currentNoticeId, currentNotice.isImportant(), currentNotice.getCreatedAt());
   }
 
   // 관련 공지사항 가져오기 (현재 공지사항 제외, 같은 카테고리 내에서, 최신순)
