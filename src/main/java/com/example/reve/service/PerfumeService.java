@@ -13,6 +13,8 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.transaction.support.TransactionSynchronization;
+import org.springframework.transaction.support.TransactionSynchronizationManager;
 import org.springframework.web.multipart.MultipartFile;
 
 import com.example.reve.domain.Perfume;
@@ -91,12 +93,18 @@ public class PerfumeService {
             .findById(perfumeId)
             .orElseThrow(() -> new IllegalArgumentException("해당 향수가 존재하지 않습니다."));
 
-    // 1. 이미지 파일 삭제
-    deleteImage(perfume.getImageUrl());
-    deleteImage(perfume.getHoverImageUrl());
-
     // 2. 향수 DB에서 삭제
     perfumeRepository.delete(perfume);
+
+    // 트랜잭션 커밋 이후 이미지 삭제
+    TransactionSynchronizationManager.registerSynchronization(
+        new TransactionSynchronization() {
+          @Override
+          public void afterCommit() {
+            deleteImage(perfume.getImageUrl());
+            deleteImage(perfume.getHoverImageUrl());
+          }
+        });
   }
 
   private void deleteImage(String imageUrl) {
@@ -119,15 +127,28 @@ public class PerfumeService {
   public void deletePerfumes(List<Long> perfumeIdList) {
     List<Perfume> perfumes = perfumeRepository.findAllById(perfumeIdList);
 
-    // 이미지 파일 삭제
-    perfumes.forEach(
-        perfume -> {
-          deleteImage(perfume.getImageUrl());
-          deleteImage(perfume.getHoverImageUrl());
-        });
+    List<String> imageUrls =
+        perfumes.stream().map(Perfume::getImageUrl).collect(Collectors.toList());
 
-    // DB에서 향수 삭제
+    List<String> hoverImageUrls =
+        perfumes.stream().map(Perfume::getHoverImageUrl).collect(Collectors.toList());
+
     perfumeRepository.deleteAllByIdInBatch(perfumeIdList);
+
+    TransactionSynchronizationManager.registerSynchronization(
+        new TransactionSynchronization() {
+          @Override
+          public void afterCommit() {
+            imageUrls.forEach(this::safeDelete);
+            hoverImageUrls.forEach(this::safeDelete);
+          }
+
+          private void safeDelete(String url) {
+            if (url != null && !url.isBlank()) {
+              deleteImage(url);
+            }
+          }
+        });
   }
 
   // ============================= 향수 수정하는 로직임(CRUD 중 U) ==========================================
