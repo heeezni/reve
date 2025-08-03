@@ -35,8 +35,9 @@
                   </div>
                 </div>
               </div>
+            </form>
               <!-- 오류 메시지 출력 -->
-              <div th:if="${error}" class="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded relative mb-4">
+              <div th:if="${error}"class="opacity-100 transition-opacity duration-500 text-red-700 text-base font-semibold bg-red-100 border border-red-400 rounded px-4 py-3 mb-4">
                 <strong class="font-bold"></strong>
                 <span th:text="${error}"></span>
               </div>
@@ -118,7 +119,6 @@
                 </div>
               </div>
 
-            </form> <!-- 선택 삭제 전체 form 끝 -->
 
             <!-- 위시리스트 비어있을 때 -->
             <div id="emptyWishlist" th:if="${wishlist.size() == 0}" class="p-12 text-center">
@@ -290,151 +290,168 @@
     <script src="/js/script.js"></script>
     <script>
       document.addEventListener("DOMContentLoaded", () => {
-        const errorValue = document.body.getAttribute("data-error");
-        const hasServerError = errorValue && errorValue.trim().length > 0;
-
-        const wishlistItems = document.querySelectorAll(".wishlist-item");
         const checkboxes = document.querySelectorAll(".wishlist-checkbox");
         const selectAllBtn = document.getElementById("selectAll");
         const removeSelectedBtn = document.getElementById("removeSelected");
         const emptyWishlist = document.getElementById("emptyWishlist");
         const wishlistContent = document.querySelector(".p-6");
+        const selectedForm = document.getElementById("selectedDeleteForm");
 
-        // 공통 알림 모달
-        const alertModal = {
-          modal: document.getElementById("alertModal"),
-          message: document.getElementById("alertMessage"),
-          okBtn: document.getElementById("alertOkBtn"),
-          show(msg) {
-            if (hasServerError) return;
-            this.message.textContent = msg;
-            this.modal.classList.remove("hidden");
-          },
-          hide() {
-            this.modal.classList.add("hidden");
-          },
-        };
-        alertModal.okBtn.addEventListener("click", () => alertModal.hide());
+        // 서버 에러 감지
+        const errorValue = document.body.getAttribute("data-error");
+        const hasServerError = errorValue && errorValue.trim().length > 0;
 
-        // 삭제 확인 모달
-        const deleteModal = {
-          modal: document.getElementById("deleteConfirmModal"),
-          message: document.getElementById("deleteConfirmMessage"),
-          confirmBtn: document.getElementById("confirmDeleteBtn"),
-          cancelBtn: document.getElementById("cancelDeleteBtn"),
-          targetForm: null,
-          show(msg, form) {
-            this.message.innerHTML = msg;
-            this.targetForm = form;
-            this.modal.classList.remove("hidden");
-          },
-          hide() {
-            this.modal.classList.add("hidden");
-            this.targetForm = null;
-          },
-          submit() {
-            if (this.targetForm) this.targetForm.submit();
-            this.hide();
-          },
-        };
-        deleteModal.confirmBtn.addEventListener("click", () => deleteModal.submit());
-        deleteModal.cancelBtn.addEventListener("click", () => deleteModal.hide());
+        // 모달 객체 생성
+        const alertModal = setupModal("alertModal", "alertMessage", "alertOkBtn");
+        const deleteModal = setupModal("deleteConfirmModal", "deleteConfirmMessage", "confirmDeleteBtn", "cancelDeleteBtn");
+        const cartModal = setupModal("confirmCartModal", "confirmCartMessage", "confirmCartBtn", "cancelCartBtn");
 
-        //  장바구니 확인 모달
-        const cartModal = {
-          modal: document.getElementById("confirmCartModal"),
-          message: document.getElementById("confirmCartMessage"),
-          confirmBtn: document.getElementById("confirmCartBtn"),
-          cancelBtn: document.getElementById("cancelCartBtn"),
-          form: null,
-          show(msg, form) {
-            this.message.textContent = msg;
-            this.form = form;
-            this.modal.classList.remove("hidden");
-          },
-          hide() {
-            this.modal.classList.add("hidden");
-            this.form = null;
-          },
-          submit() {
-            if (this.form) this.form.submit();
-            this.hide();
-          },
-        };
-        cartModal.confirmBtn.addEventListener("click", () => cartModal.submit());
-        cartModal.cancelBtn.addEventListener("click", () => cartModal.hide());
+        // 페이지 로드 시 서버 에러 있으면 alert 표시
+        if (hasServerError) {
+          alertModal.show(errorValue);
+        }
+
+        function setupModal(modalId, msgId, okId, cancelId = null) {
+          const modal = document.getElementById(modalId);
+          const message = document.getElementById(msgId);
+          const okBtn = document.getElementById(okId);
+          const cancelBtn = cancelId ? document.getElementById(cancelId) : null;
+          let form = null;
+
+          if (okBtn) {
+            okBtn.addEventListener("click", () => {
+              if (form && !hasServerError) form.submit();
+              modal.classList.add("hidden");
+              form = null;
+            });
+          }
+
+          if (cancelBtn) {
+            cancelBtn.addEventListener("click", () => {
+              modal.classList.add("hidden");
+              form = null;
+            });
+          }
+
+          return {
+            show(msg, targetForm = null) {
+              message.innerHTML = msg;
+              form = targetForm;
+              modal.classList.remove("hidden");
+            }
+          };
+        }
 
         // 전체 선택 토글
-        selectAllBtn.addEventListener("click", function () {
-          const allChecked = Array.from(checkboxes).every((c) => c.checked);
-          checkboxes.forEach((c) => (c.checked = !allChecked));
-          this.textContent = allChecked ? "전체 선택" : "선택 해제";
+        selectAllBtn?.addEventListener("click", () => {
+          if (hasServerError) {
+            alertModal.show(errorValue);
+            return;
+          }
+
+          const allChecked = Array.from(checkboxes).every(cb => cb.checked);
+          checkboxes.forEach(cb => cb.checked = !allChecked);
+          selectAllBtn.textContent = allChecked ? "전체 선택" : "선택 해제";
         });
 
-        // 선택 삭제 버튼
-        removeSelectedBtn.addEventListener("click", () => {
+        // 선택 삭제
+        removeSelectedBtn?.addEventListener("click", () => {
+          if (hasServerError) {
+            alertModal.show(errorValue);
+            return;
+          }
+
           const checked = document.querySelectorAll(".wishlist-checkbox:checked");
           if (checked.length === 0) {
             alertModal.show("삭제할 상품을 선택해주세요.");
             return;
           }
-          deleteModal.show(`${checked.length}개 상품을 삭제하시겠습니까?`, document.getElementById("selectedDeleteForm"));
+
+          selectedForm.querySelectorAll("input[type='hidden'][name='perfumeIds']").forEach(e => e.remove());
+
+          checked.forEach(cb => {
+            const hidden = document.createElement("input");
+            hidden.type = "hidden";
+            hidden.name = "perfumeIds";
+            hidden.value = cb.value;
+            selectedForm.appendChild(hidden);
+          });
+
+          deleteModal.show(`${checked.length}개 상품을 삭제하시겠습니까?`, selectedForm);
         });
 
-        // 개별 삭제 버튼
+        // 바로구매 버튼 → 단순 알림 모달
+        document.querySelectorAll("button").forEach(btn => {
+          if (btn.textContent.includes("바로구매")) {
+            btn.addEventListener("click", () => {
+              if (hasServerError) {
+                alertModal.show(errorValue);
+                return;
+              }
+              const item = btn.closest(".wishlist-item");
+              const productName = item?.querySelector("h3 a")?.textContent.trim() || "상품";
+              alertModal.show(`"${productName}" 바로구매 페이지로 이동합니다.`);
+            });
+          }
+        });
+
         document.querySelectorAll(".remove-wishlist").forEach((btn) => {
           btn.addEventListener("click", function (e) {
+            if (hasServerError) {
+              alertModal.show(errorValue);
+              return;
+            }
             e.preventDefault();
             const form = this.closest("form");
             const item = this.closest(".wishlist-item");
-            const productName = item.querySelector("h3 a").textContent.trim();
+            const productName = item?.querySelector("h3 a")?.textContent.trim() || "상품";
             deleteModal.show(`"${productName}"을(를) 위시리스트에서<br>삭제하시겠습니까?`, form);
           });
         });
 
-        // 장바구니 버튼 (모달 확인 후 submit)
-        document.querySelectorAll("form[action='/wishlist/addCart'] button[type='submit']").forEach((btn) => {
-          btn.addEventListener("click", function (e) {
-            if (hasServerError) return;
+        // 장바구니 버튼 → 모달 확인 후 form submit
+        document.querySelectorAll("form[action='/wishlist/addCart'] button[type='submit']").forEach(btn => {
+          btn.addEventListener("click", e => {
+            if (hasServerError) {
+              alertModal.show(errorValue);
+              return;
+            }
             e.preventDefault();
-            const form = this.closest("form");
-            const item = this.closest(".wishlist-item");
+            const form = btn.closest("form");
+            const item = btn.closest(".wishlist-item");
             const productName = item?.querySelector("h3 a")?.textContent.trim() || "상품";
             cartModal.show(`"${productName}"을(를) 장바구니에 추가하시겠습니까?`, form);
           });
         });
 
-        // 바로구매 알림
-        document.querySelectorAll("button")
-                .forEach((btn) => {
-                  if (btn.textContent.includes("바로구매")) {
-                    btn.addEventListener("click", () => {
-                      const item = btn.closest(".wishlist-item");
-                      const productName = item.querySelector("h3 a").textContent.trim();
-                      alertModal.show(`"${productName}" 바로구매 페이지로 이동합니다.`);
-                    });
-                  }
-                });
+        // 페이지 상태 초기화
+        updateWishlistCount();
+        checkEmptyState();
 
-        // 위시리스트 개수 및 빈 상태 처리
         function updateWishlistCount() {
-          const remaining = document.querySelectorAll(".wishlist-item").length;
           const countEl = document.querySelector(".text-sm.text-gray-500");
-          if (countEl) countEl.textContent = `총 ${remaining}개 상품`;
+          const count = document.querySelectorAll(".wishlist-item").length;
+          if (countEl) countEl.textContent = `총 ${count}개 상품`;
         }
 
         function checkEmptyState() {
-          const remaining = document.querySelectorAll(".wishlist-item").length;
-          wishlistContent.style.display = remaining === 0 ? "none" : "block";
-          emptyWishlist.classList.toggle("hidden", remaining > 0);
+          const hasItems = document.querySelectorAll(".wishlist-item").length > 0;
+          if (wishlistContent) wishlistContent.style.display = hasItems ? "block" : "none";
+          if (emptyWishlist) emptyWishlist.classList.toggle("hidden", hasItems);
         }
-
-        updateWishlistCount();
-        checkEmptyState();
       });
     </script>
-
-
+    <script>
+      document.addEventListener("DOMContentLoaded", () => {
+        const errorBox = document.getElementById("errorBox");
+        if (errorBox) {
+          setTimeout(() => {
+            errorBox.classList.add("opacity-0");
+            setTimeout(() => errorBox.remove(), 500); // CSS transition 이후 제거
+          }, 3000); // 3초 후 사라지기
+        }
+      });
+    </script>
     <!-- 삭제 확인 모달 -->
     <div id="deleteConfirmModal" class="modal hidden fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
       <div class="modal-content bg-white rounded-lg p-6 w-80 text-center relative">
