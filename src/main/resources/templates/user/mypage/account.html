@@ -236,6 +236,7 @@
                           <input
                             type="password"
                             name="password"
+                            id="curPw"
                             placeholder="현재 비밀번호를 입력하세요"
                             class="w-full border border-gray-300 rounded-md px-4 py-3 focus:outline-none focus:ring-2 focus:ring-gray-800 focus:border-transparent"
                           />
@@ -252,6 +253,7 @@
                           <input
                             type="password"
                             name="newPassword"
+                            id="newPw"
                             placeholder="새 비밀번호를 입력하세요"
                             class="w-full border border-gray-300 rounded-md px-4 py-3 focus:outline-none focus:ring-2 focus:ring-gray-800 focus:border-transparent"
                           />
@@ -272,6 +274,7 @@
                           <input
                             type="password"
                             placeholder="새 비밀번호를 다시 입력하세요"
+                            id="confirmPw"
                             class="w-full border border-gray-300 rounded-md px-4 py-3 focus:outline-none focus:ring-2 focus:ring-gray-800 focus:border-transparent"
                           />
                         </label>
@@ -402,212 +405,211 @@
     <!-- Footer Fragment -->
     <div th:replace="~{fragments/footer :: footer}"></div>
     <script>
+      document.addEventListener("DOMContentLoaded", () => {
+        // 프로필 이미지 미리보기
+        document.getElementById("profileImageInput")?.addEventListener("change", function () {
+          const file = this.files[0];
+          if (file) {
+            const reader = new FileReader();
+            reader.onload = function (e) {
+              const previewImg = document.getElementById("profilePreview");
+              const defaultIcon = document.getElementById("defaultIcon");
+              if (previewImg) {
+                previewImg.src = e.target.result;
+              } else {
+                const newImg = document.createElement("img");
+                newImg.id = "profilePreview";
+                newImg.src = e.target.result;
+                newImg.className = "w-full h-full object-cover rounded-full border";
+                defaultIcon?.replaceWith(newImg);
+              }
+            };
+            reader.readAsDataURL(file);
+          }
+        });
 
-      document.getElementById("profileImageInput").addEventListener("change", function () {
-        const file = this.files[0];
-        if (file) {
-          const reader = new FileReader();
-          reader.onload = function (e) {
-            const previewImg = document.getElementById("profilePreview");
-            const defaultIcon = document.getElementById("defaultIcon");
+        // 프로필 이미지 클릭 → input 트리거
+        document.getElementById("bt_profile")?.addEventListener("click", function () {
+          this.previousElementSibling.click();
+        });
 
-            if (previewImg) {
-              previewImg.src = e.target.result;
-            } else {
-              // 기존 아이콘을 이미지로 교체
-              const newImg = document.createElement("img");
-              newImg.id = "profilePreview";
-              newImg.src = e.target.result;
-              newImg.className = "w-full h-full object-cover rounded-full border";
+        // 이름, 전화번호 유효성 검사
+        const nameInput = document.querySelector('input[name="name"]');
+        const phoneInput = document.querySelector('input[name="phone"]');
+        const updateForm = document.getElementById("updateForm");
 
-              defaultIcon.replaceWith(newImg);
-            }
-          };
-          reader.readAsDataURL(file);
-        }
-      });
-
-
-
-      // 프로필 이미지 버튼 → 파일 input 클릭
-      document.getElementById("bt_profile").addEventListener("click", function () {
-        this.previousElementSibling.click();
-      });
-
-      // 이름, 전화번호 유효성 검사
-      const nameInput = document.querySelector('input[name="name"]');
-      const phoneInput = document.querySelector('input[name="phone"]');
-      const updateForm = document.getElementById("updateForm");
-
-      function showError(input, message) {
-        clearError(input);
-        const msg = document.createElement("p");
-        msg.className = "text-red-500 text-sm mt-1 error-msg";
-        msg.innerText = message;
-        input.insertAdjacentElement("afterend", msg);
-      }
-
-      function clearError(input) {
-        const next = input.nextElementSibling;
-        if (next && next.classList.contains("error-msg")) {
-          next.remove();
-        }
-      }
-
-      nameInput.addEventListener("input", function () {
-        const value = this.value;
-        clearError(this);
-        if (!/^[가-힣a-zA-Z]+$/.test(value)) {
-          showError(this, "이름은 문자만 입력 가능합니다.");
-        } else if (value.length >= 10) {
-          showError(this, "이름은 10자 미만으로 입력해주세요.");
-        }
-      });
-
-      phoneInput.addEventListener("input", function () {
-        const value = this.value;
-        clearError(this);
-        if (!/^\d*$/.test(value)) {
-          showError(this, "숫자만 입력 가능합니다.");
-        } else if (value.length < 7 || value.length > 11) {
-          showError(this, "휴대전화는 7~11자리 숫자여야 합니다.");
-        }
-      });
-
-      updateForm.addEventListener("submit", function (e) {
-        const nameValid = /^[가-힣a-zA-Z]{1,9}$/.test(nameInput.value);
-        const phoneValid = /^\d{7,11}$/.test(phoneInput.value);
-
-        clearError(nameInput);
-        clearError(phoneInput);
-
-        if (!nameValid) showError(nameInput, "이름은 문자만, 10자 미만이어야 합니다.");
-        if (!phoneValid) showError(phoneInput, "휴대전화는 7~11자리 숫자만 가능합니다.");
-
-        if (!nameValid || !phoneValid) {
-          e.preventDefault();
-          return;
-        }
-
-        // 유효성 통과 시
-        alert("정보가 성공적으로 수정되었습니다.");
-      });
-
-      const passwordForm = document.getElementById("passwordForm");
-      const currentInput = passwordForm.querySelector('input[name="password"]');
-      const newInput = passwordForm.querySelector('input[name="newPassword"]');
-      const confirmInput = passwordForm.querySelector('input[placeholder="새 비밀번호를 다시 입력하세요"]');
-
-      function createMessageEl(input) {
-        let msg = input.nextElementSibling;
-        if (!msg || !msg.classList.contains("error-msg")) {
-          msg = document.createElement("div");
+        function showError(input, message) {
+          clearError(input);
+          const msg = document.createElement("p");
           msg.className = "text-red-500 text-sm mt-1 error-msg";
+          msg.innerText = message;
           input.insertAdjacentElement("afterend", msg);
         }
-        return msg;
-      }
 
-      function validateNewPassword(value) {
-        const hasLower = /[a-z]/.test(value);
-        const hasUpper = /[A-Z]/.test(value);
-        const hasDigit = /\d/.test(value);
-        const hasSpecial = /[^a-zA-Z0-9]/.test(value);
-        const hasWhitespace = /\s/.test(value);
-        const lengthValid = value.length >= 10 && value.length <= 16;
-        const typeCount = [hasLower, hasUpper, hasDigit, hasSpecial].filter(Boolean).length;
-
-        if (!lengthValid) return "비밀번호는 10~16자여야 합니다.";
-        if (hasWhitespace) return "공백은 사용할 수 없습니다.";
-        if (typeCount < 2) return "영문 대소문자, 숫자, 특수문자 중 2가지 이상 조합이어야 합니다.";
-        return "";
-      }
-
-      function resetIfInvalid(input, message) {
-        const msgEl = createMessageEl(input);
-        msgEl.textContent = message;
-        input.value = "";
-      }
-
-      newInput.addEventListener("input", () => {
-        const msgEl = createMessageEl(newInput);
-        msgEl.textContent = error;
-      });
-
-      confirmInput.addEventListener("input", () => {
-        const msgEl = createMessageEl(confirmInput);
-        msgEl.textContent = newInput.value !== confirmInput.value ? "비밀번호가 일치하지 않습니다." : "";
-      });
-
-      passwordForm.addEventListener("submit", function (e) {
-        const newPw = newInput.value;
-        const curPw = currentInput.value;
-        const confirmPw = confirmInput.value;
-
-        let hasError = false;
-
-        if (!curPw || !newPw || !confirmPw) {
-          alert("모든 항목을 입력해주세요.");
-          return e.preventDefault();
+        function clearError(input) {
+          const next = input.nextElementSibling;
+          if (next && next.classList.contains("error-msg")) {
+            next.remove();
+          }
         }
 
-        const newPwError = validateNewPassword(newPw);
-        if (newPwError) {
-          resetIfInvalid(newInput, newPwError);
-          resetIfInvalid(confirmInput, "새 비밀번호를 다시 입력해주세요.");
-          hasError = true;
-        }
-
-        if (curPw === newPw) {
-          resetIfInvalid(newInput, "기존 비밀번호와 동일합니다.");
-          resetIfInvalid(confirmInput, "새 비밀번호를 다시 입력해주세요.");
-          hasError = true;
-        }
-
-        if (newPw !== confirmPw) {
-          resetIfInvalid(confirmInput, "비밀번호가 일치하지 않습니다.");
-          hasError = true;
-        }
-
-        if (hasError) {
-          e.preventDefault();
-        }
-      });
-
-
-      // 탭 전환
-      const tabBtns = document.querySelectorAll('.tab-btn');
-      const tabContents = document.querySelectorAll('.tab-content');
-      tabBtns.forEach((btn) => {
-        btn.addEventListener('click', function () {
-          const targetTab = this.getAttribute('data-tab');
-          tabBtns.forEach((b) => {
-            b.classList.remove('border-gray-800', 'text-gray-800');
-            b.classList.add('border-transparent', 'text-gray-500');
-          });
-          this.classList.remove('border-transparent', 'text-gray-500');
-          this.classList.add('border-gray-800', 'text-gray-800');
-          tabContents.forEach((content) => content.classList.add('hidden'));
-          document.getElementById(targetTab).classList.remove('hidden');
+        nameInput?.addEventListener("input", function () {
+          const value = this.value;
+          clearError(this);
+          if (!/^[가-힣a-zA-Z]+$/.test(value)) {
+            showError(this, "이름은 문자만 입력 가능합니다.");
+          } else if (value.length >= 10) {
+            showError(this, "이름은 10자 미만으로 입력해주세요.");
+          }
         });
-      });
 
-      // 탈퇴 확인
-      Array.from(document.querySelectorAll('button'))
-              .find((button) => button.textContent.includes('탈퇴하기'))
-              .addEventListener('click', function () {
-                if (confirm('정말로 회원 탈퇴를 하시겠습니까?\n탈퇴 시 모든 데이터가 삭제되며 복구할 수 없습니다.')) {
-                  alert('회원 탈퇴가 처리되었습니다.');
-                }
-              });
+        phoneInput?.addEventListener("input", function () {
+          const value = this.value;
+          clearError(this);
+          if (!/^\d*$/.test(value)) {
+            showError(this, "숫자만 입력 가능합니다.");
+          } else if (value.length < 7 || value.length > 11) {
+            showError(this, "휴대전화는 7~11자리 숫자여야 합니다.");
+          }
+        });
+
+        updateForm?.addEventListener("submit", function (e) {
+          const nameValid = /^[가-힣a-zA-Z]{1,9}$/.test(nameInput.value);
+          const phoneValid = /^\d{7,11}$/.test(phoneInput.value);
+
+          clearError(nameInput);
+          clearError(phoneInput);
+
+          if (!nameValid) showError(nameInput, "이름은 문자만, 10자 미만이어야 합니다.");
+          if (!phoneValid) showError(phoneInput, "휴대전화는 7~11자리 숫자만 가능합니다.");
+
+          if (!nameValid || !phoneValid) {
+            e.preventDefault();
+            return;
+          }
+
+          alert("정보가 성공적으로 수정되었습니다.");
+        });
+
+        // 비밀번호 변경 유효성 검사
+        const passwordForm = document.getElementById("passwordForm");
+        const currentInput = passwordForm?.querySelector('input[name="password"]');
+        const newInput = passwordForm?.querySelector('input[name="newPassword"]');
+        const confirmInput = passwordForm?.querySelector('input[placeholder="새 비밀번호를 다시 입력하세요"]');
+
+        function createMessageEl(input) {
+          let msg = input.nextElementSibling;
+          if (!msg || !msg.classList.contains("error-msg")) {
+            msg = document.createElement("div");
+            msg.className = "text-red-500 text-sm mt-1 error-msg";
+            input.insertAdjacentElement("afterend", msg);
+          }
+          return msg;
+        }
+
+        function validateNewPassword(value) {
+          const hasLower = /[a-z]/.test(value);
+          const hasUpper = /[A-Z]/.test(value);
+          const hasDigit = /\d/.test(value);
+          const hasSpecial = /[^a-zA-Z0-9]/.test(value);
+          const hasWhitespace = /\s/.test(value);
+          const lengthValid = value.length >= 10 && value.length <= 16;
+          const typeCount = [hasLower, hasUpper, hasDigit, hasSpecial].filter(Boolean).length;
+
+          if (!lengthValid) return "비밀번호는 10~16자여야 합니다.";
+          if (hasWhitespace) return "공백은 사용할 수 없습니다.";
+          if (typeCount < 2) return "영문 대소문자, 숫자, 특수문자 중 2가지 이상 조합이어야 합니다.";
+          return "";
+        }
+
+        function resetIfInvalid(input, message) {
+          const msgEl = createMessageEl(input);
+          msgEl.textContent = message;
+          input.value = "";
+        }
+
+        newInput?.addEventListener("input", () => {
+          const msgEl = createMessageEl(newInput);
+          const errMsg = validateNewPassword(newInput.value);
+          msgEl.textContent = errMsg;
+        });
+
+        confirmInput?.addEventListener("input", () => {
+          const msgEl = createMessageEl(confirmInput);
+          msgEl.textContent = newInput.value !== confirmInput.value ? "비밀번호가 일치하지 않습니다." : "";
+        });
+
+        passwordForm?.addEventListener("submit", function (e) {
+          const newPw = newInput.value;
+          const curPw = currentInput.value;
+          const confirmPw = confirmInput.value;
+
+          let hasError = false;
+
+          if (!curPw || !newPw || !confirmPw) {
+            alert("모든 항목을 입력해주세요.");
+            e.preventDefault();
+            return;
+          }
+
+          const newPwError = validateNewPassword(newPw);
+          if (newPwError) {
+            resetIfInvalid(newInput, newPwError);
+            resetIfInvalid(confirmInput, "새 비밀번호를 다시 입력해주세요.");
+            hasError = true;
+          }
+
+          if (curPㄹw === newPw) {
+            resetIfInvalid(newInput, "기존 비밀번호와 동일합니다.");
+            resetIfInvalid(confirmInput, "새 비밀번호를 다시 입력해주세요.");
+            hasError = true;
+          }
+
+          if (newPw !== confirmPw) {
+            resetIfInvalid(confirmInput, "비밀번호가 일치하지 않습니다.");
+            hasError = true;
+          }
+
+          if (hasError) {
+            e.preventDefault();
+          }
+        });
+
+        // 탭 전환 처리
+        const tabBtns = document.querySelectorAll('.tab-btn');
+        const tabContents = document.querySelectorAll('.tab-content');
+        tabBtns.forEach((btn) => {
+          btn.addEventListener('click', function () {
+            const targetTab = this.getAttribute('data-tab');
+            tabBtns.forEach((b) => {
+              b.classList.remove('border-gray-800', 'text-gray-800');
+              b.classList.add('border-transparent', 'text-gray-500');
+            });
+            this.classList.remove('border-transparent', 'text-gray-500');
+            this.classList.add('border-gray-800', 'text-gray-800');
+            tabContents.forEach((content) => content.classList.add('hidden'));
+            document.getElementById(targetTab)?.classList.remove('hidden');
+          });
+        });
+
+        // 탈퇴 확인
+        Array.from(document.querySelectorAll('button'))
+                .find((button) => button.textContent.includes('탈퇴하기'))
+                ?.addEventListener('click', function () {
+                  if (confirm('정말로 회원 탈퇴를 하시겠습니까?\n탈퇴 시 모든 데이터가 삭제되며 복구할 수 없습니다.')) {
+                    alert('회원 탈퇴가 처리되었습니다.');
+                  }
+                });
+      });
     </script>
+
+    <!-- 서버 결과로 탭 전환 (Thymeleaf용) -->
     <script th:inline="javascript">
       /*<![CDATA[*/
       const result = /*[[${result}]]*/ null;
-      console.log("result value:", result);
       if (result === false) {
         alert("현재 비밀번호가 일치하지 않습니다");
-        document.querySelector('[data-tab="password"]').click();
+        document.querySelector('[data-tab="password"]')?.click();
       }
       /*]]>*/
     </script>
