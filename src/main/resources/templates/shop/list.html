@@ -136,15 +136,16 @@
                   </span>
               </div>
 
-              <!-- 찜 버튼-->
-              <form th:action="@{/wishlist/list}" th:method="post" class="wishlist-form">
-                <div class="absolute top-4 right-4 space-y-2 opacity-0 group-hover:opacity-100 transition-opacity duration-300">
-                  <input type="hidden" name="perfumeId" th:value="${perfume.perfumeId}" />
-                  <button type="submit" id="btWishlist" class="w-8 h-8 bg-white rounded-full flex items-center justify-center shadow-md hover:bg-gray-50 transition-colors">
-                    <i class="text-lg"th:class="${wishedIds != null and wishedIds.contains(perfume.perfumeId)} ? 'fas fa-heart text-red-500' : 'far fa-heart text-gray-400'"></i>
-                  </button>
-                </div>
-              </form>
+              <!-- 찜 버튼 -->
+              <div class="absolute top-4 right-4 space-y-2 opacity-0 group-hover:opacity-100 transition-opacity duration-300">
+                <button
+                        type="button"
+                        class="wishlist-btn w-8 h-8 bg-white rounded-full flex items-center justify-center shadow-md hover:bg-gray-50 transition-colors"
+                        th:data-perfume-id="${perfume.perfumeId}">
+                  <i class="text-lg"
+                     th:class="${wishedIds != null and wishedIds.contains(perfume.perfumeId)} ? 'fas fa-heart text-red-500' : 'far fa-heart text-gray-400'"></i>
+                </button>
+              </div>
             </div>
 
             <div class="p-4">
@@ -444,30 +445,37 @@
     });
   });
 
-  // Wishlist functionality
-  document.querySelectorAll('.fa-heart').forEach((heart) => {
-    heart.addEventListener('click', function (e) {
+  $('.wishlist-btn').on('click', function (e) {
+    e.preventDefault();
+    e.stopPropagation();
 
-      // 찜 버튼 클릭 시, 삭제 모드 버튼의 이벤트 전파를 막음
-      e.stopPropagation();
+    const isLoggedIn = $('#isLoggedIn').val() === "true";
+    if (!isLoggedIn) {
+      $('#loginAlertModal').css('display', 'flex');
+      return;
+    }
 
-      // 로그인 여부 확인
-      const isLoggedIn = document.getElementById('isLoggedIn').value === 'true';
+    const $btn = $(this);
+    const perfumeId = $btn.data('perfume-id');
 
-      if (!isLoggedIn) {
-        e.preventDefault(); // 찜 버튼 클릭 이벤트를 막음
-        $('#loginAlertModal').css('display', 'flex'); // 로그인 모달 띄우기
-      } else {
-        // 로그인 상태일 경우 찜 상태 변경
-        if (this.classList.contains('far')) {
-          this.classList.remove('far');
-          this.classList.add('fas');
-          this.style.color = '#ef4444';
-        } else {
-          this.classList.remove('fas');
-          this.classList.add('far');
-          this.style.color = '';
+    $.ajax({
+      type: 'POST',
+      url: '/wishlist/toggle-ajax', // Ajax용 컨트롤러 URL
+      data: { perfumeId: perfumeId },
+      success: function (response) {
+        // response는 서버에서 "added" 또는 "removed" 문자열을 받는다고 가정
+        if (response === "added") {
+          $btn.find('i')
+                  .removeClass('far fa-heart text-gray-400')
+                  .addClass('fas fa-heart text-red-500');
+        } else if (response === "removed") {
+          $btn.find('i')
+                  .removeClass('fas fa-heart text-red-500')
+                  .addClass('far fa-heart text-gray-400');
         }
+      },
+      error: function (xhr) {
+        console.error('찜 실패:', xhr.responseText);
       }
     });
   });
