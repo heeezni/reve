@@ -37,6 +37,7 @@ public class PointService {
     // 포인트 조회
     public Integer getPointAmount(String loginId) {
         User user = userRepository.findByLoginId(loginId).orElseThrow();
+        log.info("회원 {} 님이 소유한 적립급 : {}",user.getLoginId(),pointRepository.findPointAmountByUserId(user.getUserId()).orElse(0));
         return pointRepository.findPointAmountByUserId(user.getUserId()).orElse(0);
     }
 }
