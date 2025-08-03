@@ -298,8 +298,8 @@ public class PerfumeService {
           perfumeRepository.findBySearchAndScentWithDiscountPriceDesc(search, scent, pageable);
       case "review" ->
           perfumeRepository.findBySearchAndScentWithReviewJoin(search, scent, pageable);
-      case "new" -> perfumeRepository.findBySearchAndScentWithReviewJoin(search, scent, pageable);
-      default -> perfumeRepository.findBySearchAndScentWithReviewJoin(search, scent, pageable);
+      default ->
+          perfumeRepository.findBySearchAndScentOrderByCreatedAtDesc(search, scent, pageable);
     };
   }
 }
