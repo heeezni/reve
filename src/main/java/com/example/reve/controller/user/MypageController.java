@@ -3,6 +3,7 @@ package com.example.reve.controller.user;
 import java.security.Principal;
 import java.util.List;
 
+import com.example.reve.service.PointService;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 
@@ -35,6 +36,7 @@ public class MypageController {
   private final UserService userService;
   private final CouponService couponService;
   private final WishListService wishListService;
+  private final PointService  pointService;
 
   @GetMapping
   public String mypage(Model model, @AuthenticationPrincipal CustomUserDetails customUserDetails) {
@@ -42,6 +44,7 @@ public class MypageController {
     if (loginId != null) {
       model.addAttribute("mypage", userService.selectMypage(loginId));
       model.addAttribute("wish", wishListService.getCount(loginId));
+      model.addAttribute("point", pointService.getPointAmount(loginId));
       int result = couponService.countCoupon(loginId);
       model.addAttribute("countCoupon", result);
       return "user/mypage/index";
