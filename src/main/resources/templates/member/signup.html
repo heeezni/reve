@@ -267,9 +267,10 @@
 
     <script src="/js/script.js"></script>
     <script>
+      let isLoginIdChecked = false;
+
       function containsEmoji(str) {
-        const emojiRegex = /[\u{1F300}-\u{1FAFF}]/u;
-        return emojiRegex.test(str);
+        return /[\u{1F300}-\u{1FAFF}]/u.test(str);
       }
 
       function validateLoginId() {
@@ -386,7 +387,6 @@
       }
 
       document.addEventListener("DOMContentLoaded", () => {
-        // ▶ [1] 약관 전체동의 체크 연동
         const agreeAll = document.getElementById("agreeAll");
         const agreeItems = document.querySelectorAll(".agree-item");
 
@@ -394,7 +394,6 @@
           agreeAll.addEventListener("change", function () {
             agreeItems.forEach((item) => (item.checked = this.checked));
           });
-
           agreeItems.forEach((item) => {
             item.addEventListener("change", () => {
               agreeAll.checked = Array.from(agreeItems).every((i) => i.checked);
@@ -407,6 +406,7 @@
           const el = document.getElementById(id);
           if (el) {
             el.addEventListener("input", () => {
+              if (id === "loginId") isLoginIdChecked = false;
               switch (id) {
                 case "loginId": validateLoginId(); break;
                 case "password": validatePassword(); break;
@@ -430,6 +430,16 @@
                     validateName() ||
                     validateEmail() ||
                     validatePhone();
+
+            if (!isLoginIdChecked) {
+              e.preventDefault();
+              const messageDiv = document.getElementById("loginIdCheckMessage");
+              messageDiv.textContent = "아이디 중복 확인을 해주세요.";
+              messageDiv.classList.add("text-red-700", "bg-red-100", "border", "border-red-400");
+              messageDiv.classList.remove("hidden");
+              window.scrollTo({ top: 0, behavior: "smooth" });
+              return;
+            }
 
             if (hasError) {
               e.preventDefault();
@@ -475,9 +485,7 @@
 
             fetch("/member/check/loginId", {
               method: "POST",
-              headers: {
-                "Content-Type": "application/x-www-form-urlencoded"
-              },
+              headers: { "Content-Type": "application/x-www-form-urlencoded" },
               body: new URLSearchParams({ loginId })
             })
                     .then(res => res.text())
@@ -485,9 +493,11 @@
                       if (result === "available") {
                         messageDiv.textContent = "사용 가능한 아이디입니다.";
                         messageDiv.classList.add("text-green-600", "bg-green-100", "border", "border-green-400");
+                        isLoginIdChecked = true;
                       } else {
                         messageDiv.textContent = "이미 사용 중인 아이디입니다.";
                         messageDiv.classList.add("text-red-700", "bg-red-100", "border", "border-red-400");
+                        isLoginIdChecked = false;
                       }
                       messageDiv.classList.remove("hidden");
                     })
@@ -495,10 +505,12 @@
                       messageDiv.textContent = "서버 오류가 발생했습니다.";
                       messageDiv.classList.add("text-red-700", "bg-red-100", "border", "border-red-400");
                       messageDiv.classList.remove("hidden");
+                      isLoginIdChecked = false;
                     });
           });
         }
       });
     </script>
+
   </body>
 </html>

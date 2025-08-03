@@ -65,7 +65,7 @@
               <div class="flex items-center justify-between">
                 <div>
                   <p class="text-sm font-medium text-gray-600">적립금</p>
-                  <p class="text-2xl font-bold text-gray-800">12,500원</p>
+                  <p class="text-2xl font-bold text-gray-800" th:if="${point != null}" th:text="${point}+' p'"></p>
                 </div>
                 <div class="w-12 h-12 bg-blue-100 rounded-full flex items-center justify-center">
                   <i class="fas fa-coins text-blue-600"></i>
