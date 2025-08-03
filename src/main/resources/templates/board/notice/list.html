@@ -71,8 +71,8 @@
                       <option value="hit,desc" th:selected="${sort == 'hit,desc'}">조회순</option>
                     </select>
                   </label>
-                  <!-- 관리자 버튼: 공지사항 등록 -->
-                  <div th:if="${isAdmin}" class="md:ml-auto">
+                  <!-- 관리자 버튼: 공지사항 등록 및 선택 삭제 -->
+                  <div th:if="${isAdmin}" class="md:ml-auto flex space-x-2">
                     <a
                       href="/admin/board/notice/register"
                       class="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-purple-600 hover:bg-purple-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-purple-500"
@@ -80,6 +80,14 @@
                       <i class="fas fa-plus-circle mr-2"></i>
                       공지사항 등록
                     </a>
+                    <button
+                      type="button"
+                      id="delete-selected-btn"
+                      class="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-red-600 hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500"
+                    >
+                      <i class="fas fa-trash-alt mr-2"></i>
+                      선택 삭제
+                    </button>
                   </div>
                 </div>
               </div>
@@ -93,9 +101,13 @@
               <div
                 class="grid grid-cols-12 gap-4 text-sm font-medium text-gray-700"
               >
-                <div class="col-span-1 text-center">번호</div>
+                <div class="col-span-1 text-center">
+                  <label for="select-all-checkbox" class="sr-only">모든 공지사항 선택</label>
+                  <input type="checkbox" id="select-all-checkbox" th:if="${isAdmin}" />
+                  <span th:unless="${isAdmin}">번호</span>
+                </div>
                 <div class="col-span-1 text-center">분류</div>
-                <div class="col-span-6">제목</div>
+                <div class="col-span-5">제목</div>
                 <div class="col-span-2 text-center">작성일</div>
                 <div class="col-span-1 text-center">조회</div>
                 <div class="col-span-1 text-center">첨부</div>
@@ -107,13 +119,16 @@
               <div th:each="notice, iStat : ${notices.content}" class="px-6 py-4 hover:bg-gray-50 transition-colors">
                 <div class="grid grid-cols-12 gap-4 items-center">
                   <div class="col-span-1 text-center">
+                    <label th:for="'notice-checkbox-' + ${notice.noticeId}" class="sr-only" th:text="${notice.title} + ' 선택'"></label>
+                    <input type="checkbox" class="notice-checkbox" th:id="'notice-checkbox-' + ${notice.noticeId}" th:value="${notice.noticeId}" th:if="${isAdmin}" />
                     <span
+                      th:unless="${isAdmin}"
                       th:if="${notice.important}"
                       class="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-yellow-100 text-yellow-800"
                     >
                       <i class="fas fa-star mr-1"></i> 중요
                     </span>
-                    <span th:unless="${notice.important}" th:text="${notices.totalElements - (notices.number * notices.size) - iStat.index}" class="text-sm text-gray-600"></span>
+                    <span th:unless="${isAdmin or notice.important}" th:text="${notices.totalElements - (notices.number * notices.size) - iStat.index}" class="text-sm text-gray-600"></span>
                   </div>
                   <div class="col-span-1 text-center">
                     <span
@@ -123,7 +138,7 @@
                     >
                     </span>
                   </div>
-                  <div class="col-span-6">
+                  <div class="col-span-5">
                     <a
                       th:href="@{/board/notice/detail/{noticeId}(noticeId=${notice.noticeId})}"
                       th:text="${notice.title}"
@@ -148,7 +163,7 @@
           </div>
 
           <!-- Pagination -->
-          <div class="mt-8 flex items-center justify-center">
+          <div th:if="${notices.totalPages > 0}" class="mt-8 flex items-center justify-center">
             <nav class="flex items-center space-x-2">
               <!-- Previous Page -->
               <a th:if="${notices.hasPrevious()}"
@@ -163,7 +178,7 @@
               </button>
 
               <!-- Page Numbers -->
-              <th:block th:each="i : ${#numbers.sequence(0, notices.totalPages - 1)}">
+              <th:block th:if="${notices.totalPages > 0}" th:each="i : ${#numbers.sequence(0, notices.totalPages - 1)}">
                 <a th:href="@{/board/notice/list(page=${i}, keyword=${keyword}, category=${category})}"
                    th:text="${i + 1}"
                    th:classappend="${i == notices.number ? 'text-white bg-gray-800 border-gray-800' : 'text-gray-700 bg-white border-gray-300'}"
@@ -253,9 +268,51 @@
         });
       });
 
-      
+      // Delete selected notices
+      const deleteSelectedBtn = document.getElementById('delete-selected-btn');
+      if (deleteSelectedBtn) {
+        deleteSelectedBtn.addEventListener('click', () => {
+          const selectedNoticeIds = Array.from(document.querySelectorAll('.notice-checkbox:checked')).map(checkbox => checkbox.value);
 
-      
+          if (selectedNoticeIds.length === 0) {
+            alert('삭제할 공지사항을 선택해주세요.');
+            return;
+          }
+
+          if (confirm('선택한 공지사항을 정말 삭제하시겠습니까?')) {
+            fetch('/admin/board/notices', {
+              method: 'DELETE',
+              headers: {
+                'Content-Type': 'application/json',
+              },
+              body: JSON.stringify(selectedNoticeIds),
+            })
+            .then(response => {
+              if (response.ok) {
+                alert('선택한 공지사항이 삭제되었습니다.');
+                location.reload();
+              } else {
+                alert('공지사항 삭제에 실패했습니다.');
+              }
+            })
+            .catch(error => {
+              console.error('Error:', error);
+              alert('오류가 발생했습니다.');
+            });
+          }
+        });
+      }
+
+      // Select all checkboxes
+      const selectAllCheckbox = document.getElementById('select-all-checkbox');
+      if (selectAllCheckbox) {
+        selectAllCheckbox.addEventListener('change', (event) => {
+          const checkboxes = document.querySelectorAll('.notice-checkbox');
+          checkboxes.forEach(checkbox => {
+            checkbox.checked = event.target.checked;
+          });
+        });
+      }
     </script>
   </body>
 </html>
