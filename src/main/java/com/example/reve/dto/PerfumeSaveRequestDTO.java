@@ -10,7 +10,7 @@ import lombok.*;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-public class PerfumeSaveRequestDto {
+public class PerfumeSaveRequestDTO {
 
   // 향수 이름
   private String perfumeName;

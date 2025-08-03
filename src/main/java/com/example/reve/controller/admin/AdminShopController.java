@@ -7,8 +7,8 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
-import com.example.reve.dto.PerfumeDetailResponseDto;
-import com.example.reve.dto.PerfumeSaveRequestDto;
+import com.example.reve.dto.PerfumeDetailResponseDTO;
+import com.example.reve.dto.PerfumeSaveRequestDTO;
 import com.example.reve.service.PerfumeService;
 
 import lombok.RequiredArgsConstructor;
@@ -33,7 +33,7 @@ public class AdminShopController {
   // 향수를 등록하기
   @PostMapping("/regist")
   public String addPerfume(
-      PerfumeSaveRequestDto requestDto,
+      PerfumeSaveRequestDTO requestDto,
       @RequestParam("imageFile") MultipartFile imageFile,
       @RequestParam("hoverImageFile") MultipartFile hoverImageFile) {
 
@@ -64,7 +64,7 @@ public class AdminShopController {
   // 향수 수정폼 가져오기
   @GetMapping("/edit/{perfumeId}")
   public String showEditForm(@PathVariable("perfumeId") Long perfumeId, Model model) {
-    PerfumeDetailResponseDto perfume = perfumeService.getPerfumeDetail(perfumeId);
+    PerfumeDetailResponseDTO perfume = perfumeService.getPerfumeDetail(perfumeId);
     model.addAttribute("perfume", perfume);
     return "shop/edit";
   }
@@ -73,7 +73,7 @@ public class AdminShopController {
   @PostMapping("/edit/{perfumeId}")
   public String updatePerfume(
       @PathVariable("perfumeId") Long perfumeId,
-      @ModelAttribute PerfumeSaveRequestDto requestDto,
+      @ModelAttribute PerfumeSaveRequestDTO requestDto,
       @RequestParam(value = "imageFile", required = false) MultipartFile imageFile,
       @RequestParam(value = "hoverImageFile", required = false) MultipartFile hoverImageFile) {
 

@@ -17,8 +17,8 @@ import org.springframework.web.bind.annotation.RequestParam;
 import com.example.reve.domain.Perfume;
 import com.example.reve.domain.Review;
 import com.example.reve.domain.User;
-import com.example.reve.dto.PerfumeDetailResponseDto;
-import com.example.reve.dto.PerfumeListResponseDto;
+import com.example.reve.dto.PerfumeDetailResponseDTO;
+import com.example.reve.dto.PerfumeListResponseDTO;
 import com.example.reve.dto.QnaResDTO;
 import com.example.reve.repository.UserRepository;
 import com.example.reve.service.PerfumeService;
@@ -54,7 +54,7 @@ public class ShopController {
       Model model) {
 
     Page<Perfume> perfumePage = perfumeService.getPerfumes(search, scent, sort, page, size);
-    Page<PerfumeListResponseDto> dtoPage = perfumePage.map(PerfumeListResponseDto::fromEntity);
+    Page<PerfumeListResponseDTO> dtoPage = perfumePage.map(PerfumeListResponseDTO::fromEntity);
 
     model.addAttribute("perfumePage", dtoPage);
     model.addAttribute("search", search);
@@ -80,12 +80,12 @@ public class ShopController {
   @GetMapping("/detail")
   public String productDetail(
       @RequestParam("id") Long perfumeId, Model model, Principal principal) {
-    PerfumeDetailResponseDto perfumeDetail = perfumeService.getPerfumeDetail(perfumeId);
+    PerfumeDetailResponseDTO perfumeDetail = perfumeService.getPerfumeDetail(perfumeId);
     model.addAttribute("perfume", perfumeDetail);
 
     // 관련 상품 (같은 향 기준 최대 4개)
     String scent = perfumeDetail.getScent();
-    List<PerfumeListResponseDto> relatedPerfumes = perfumeService.getRelatedPerfumesByScent(scent);
+    List<PerfumeListResponseDTO> relatedPerfumes = perfumeService.getRelatedPerfumesByScent(scent);
 
     // 현재 상세 상품은 관련 상품에서 제외
     relatedPerfumes =
@@ -161,7 +161,7 @@ public class ShopController {
   @GetMapping("/review")
   public String reviewForm(
       @RequestParam("perfumeId") Long perfumeId, Model model, Principal principal) {
-    PerfumeDetailResponseDto perfumeDetail = perfumeService.getPerfumeDetail(perfumeId);
+    PerfumeDetailResponseDTO perfumeDetail = perfumeService.getPerfumeDetail(perfumeId);
     model.addAttribute("perfume", perfumeDetail);
 
     model.addAttribute("perfumeId", perfumeId);
