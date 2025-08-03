@@ -5,12 +5,12 @@ import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
-import com.example.reve.domain.*;
-import com.example.reve.repository.*;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import com.example.reve.domain.*;
 import com.example.reve.dto.WishListShowDTO;
+import com.example.reve.repository.*;
 
 import lombok.RequiredArgsConstructor;
 
@@ -110,27 +110,36 @@ public class WishListService {
     User user = userRepository.findByLoginId(loginId).orElseThrow();
     return wishListRepository.findByUser_UserId(user.getUserId()).size();
   }
-  //찜 상품 삭제
-  public void wishperfumeDelete(Long perfumeId,Long userId) {
-    Optional<WishList> wish=wishListRepository.findByUser_UserIdAndPerfume_PerfumeId(userId, perfumeId);
+
+  // 찜 상품 삭제
+  public void wishperfumeDelete(Long perfumeId, String loginId) {
+    User user = userRepository.findByLoginId(loginId).orElseThrow();
+    Optional<WishList> wish =
+        wishListRepository.findByUser_UserIdAndPerfume_PerfumeId(user.getUserId(), perfumeId);
     if (wish.isPresent()) {
       wishListRepository.delete(wish.get());
     }
   }
-  //찜 상품들 삭제
-  public void wishlistDelete(Long perfumeId,Long userId) {
-    List<WishList> wishLists = wishListRepository.findByUser_UserId(userId);
+
+  // 찜 상품들 삭제
+  public void wishlistDelete(Long perfumeId, String loginId) {
+    User user = userRepository.findByLoginId(loginId).orElseThrow();
+    List<WishList> wishLists = wishListRepository.findByUser_UserId(user.getUserId());
     if (wishLists.size() > 0) {
-      for(WishList wishList : wishLists) {
+      for (WishList wishList : wishLists) {
         wishListRepository.delete(wishList);
       }
     }
   }
-  //장바구니에 담기
-  public void cartAdd(Perfume perfume,User user) {
+
+  // 장바구니에 담기
+  public boolean cartAdd(Long perfumeId, String loginId) {
+    User user = userRepository.findByLoginId(loginId).orElseThrow();
+    Perfume perfume = perfumeRepository.findByPerfumeId(perfumeId).orElse(null);
     Cart cart = new Cart();
     cart.setPerfume(perfume);
     cart.setUser(user);
     cartRepository.save(cart);
- }
+    return true;
+  }
 }

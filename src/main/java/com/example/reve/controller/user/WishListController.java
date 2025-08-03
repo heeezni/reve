@@ -1,6 +1,7 @@
 package com.example.reve.controller.user;
 
 import java.security.Principal;
+import java.util.List;
 
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Controller;
@@ -8,6 +9,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 
 import com.example.reve.domain.User;
+import com.example.reve.domain.WishList;
 import com.example.reve.repository.UserRepository;
 import com.example.reve.service.WishListService;
 
@@ -49,19 +51,31 @@ public class WishListController {
     wishListService.toggleWish(user, perfumeId);
     return "redirect:/shop/list";
   }
-  //선택한 상품 삭제 버튼
+
+  // 선택한 상품 삭제 버튼
   @PostMapping("/wishlist/delete")
   public void deleteWish(@RequestParam Long perfumeId, Principal principal) {
-
+    String loginId = principal.getName();
+    wishListService.wishperfumeDelete(perfumeId, loginId);
   }
-  //선택한 상품즐 삭제 버튼
+
+  // 선택한 상품즐 삭제 버튼
   @PostMapping("/wishlist/deleteList")
-  public void deleteListWish(@RequestParam Long perfumeId, Principal principal) {
-
+  public void deleteListWish(@RequestParam List<WishList> wishlist, Principal principal) {
+    for (WishList wishList : wishlist) {
+      Long perfumeId = wishList.getPerfume().getPerfumeId();
+      String loginId = principal.getName();
+      wishListService.wishlistDelete(perfumeId, loginId);
+    }
   }
-  //장바구니 추가버튼
+
+  // 장바구니 추가버튼
   @PostMapping("/wishlist/addCart")
   public void addCart(@RequestParam Long perfumeId, Principal principal) {
-
+    String loginId = principal.getName();
+    boolean result = wishListService.cartAdd(perfumeId, loginId);
+    if (result) {
+      wishListService.wishperfumeDelete(perfumeId, loginId);
+    }
   }
 }
