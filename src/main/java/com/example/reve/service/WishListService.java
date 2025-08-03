@@ -30,7 +30,7 @@ public class WishListService {
 
   // 찜목록에 추가하거나 삭제하는 로직임.
   @Transactional
-  public void toggleWish(User user, Long perfumeId) {
+  public boolean toggleWish(User user, Long perfumeId) {
     Perfume perfume =
         perfumeRepository
             .findById(perfumeId)
@@ -41,8 +41,10 @@ public class WishListService {
 
     if (wish.isPresent()) {
       wishListRepository.delete(wish.get()); // 찜 해제
+      return false; // 해제됨
     } else {
       wishListRepository.save(WishList.builder().user(user).perfume(perfume).build()); // 찜 추가
+      return true; // 추가됨
     }
   }
 
