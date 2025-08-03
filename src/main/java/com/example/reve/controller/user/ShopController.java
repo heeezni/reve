@@ -133,25 +133,24 @@ public class ShopController {
             .count(); // QnA 개수 계산
     model.addAttribute("qnaCount", qnaCount);
 
-    // isAdmin 추가: 로그인한 사용자가 'admin'인 경우에만 true
-    boolean isAdmin = principal != null && "admin".equals(principal.getName());
-    model.addAttribute("isAdmin", isAdmin);
-
-    // QnA 리스트 추가 (필요하면 페이지네이션 적용)
+    // QnA 리스트 추가 (비밀글 포함)
     List<QnaResDTO> qnaList =
         qnaService.selectAll(null, null, null, Pageable.unpaged(), principal).stream()
-            .filter(qna -> qna.getPerfumeId().equals(perfumeId)) // 향수 ID 기준으로 필터링
-            .filter(
+            .filter(qna -> qna.getPerfumeId().equals(perfumeId)) // 향수 ID 기준 필터링
+            .map(
                 qna -> {
-                  // 비밀글인 경우 본인 또는 관리자만 볼 수 있도록 처리
-                  if (qna.getIsSecret()) {
-                    return principal != null
-                        && (qna.getUserName().equals(principal.getName()) || isAdmin);
-                  }
-                  // 비밀글이 아니면 모두 볼 수 있음
-                  return true;
+                  // DTO 변환 시 isSecret 값도 포함시킴
+                  QnaResDTO dto = new QnaResDTO();
+                  dto.setPerfumeId(qna.getPerfumeId());
+                  dto.setUserName(qna.getUserName());
+                  dto.setTitle(qna.getTitle());
+                  dto.setContent(qna.getContent());
+                  dto.setIsSecret(qna.getIsSecret()); // 비밀글 정보 포함
+                  dto.setCategory(qna.getCategory());
+                  dto.setAnswer(qna.getAnswer());
+                  return dto;
                 })
-            .toList();
+            .toList(); // 필터링에서 비밀글 체크 제거
 
     model.addAttribute("qnaList", qnaList);
 
