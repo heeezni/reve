@@ -3,7 +3,6 @@ package com.example.reve.controller.user;
 import java.security.Principal;
 import java.util.List;
 
-import com.example.reve.service.PointService;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 
@@ -21,6 +20,7 @@ import com.example.reve.dto.NewPasswordDTO;
 import com.example.reve.dto.UpdateProfileDTO;
 import com.example.reve.dto.WishListShowDTO;
 import com.example.reve.service.CouponService;
+import com.example.reve.service.PointService;
 import com.example.reve.service.UserService;
 import com.example.reve.service.WishListService;
 
@@ -36,7 +36,7 @@ public class MypageController {
   private final UserService userService;
   private final CouponService couponService;
   private final WishListService wishListService;
-  private final PointService  pointService;
+  private final PointService pointService;
 
   @GetMapping
   public String mypage(Model model, @AuthenticationPrincipal CustomUserDetails customUserDetails) {
