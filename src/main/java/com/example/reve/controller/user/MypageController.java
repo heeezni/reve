@@ -41,6 +41,7 @@ public class MypageController {
     String loginId = customUserDetails.getUsername();
     if (loginId != null) {
       model.addAttribute("mypage", userService.selectMypage(loginId));
+      model.addAttribute("wish", wishListService.getCount(loginId));
       int result = couponService.countCoupon(loginId);
       model.addAttribute("countCoupon", result);
       return "user/mypage/index";
