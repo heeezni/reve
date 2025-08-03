@@ -72,4 +72,22 @@ public interface PerfumeRepository extends JpaRepository<Perfume, Long> {
       @Param("scents") Set<String> scents,
       @Param("excludeIds") List<Long> excludeIds,
       Pageable pageable);
+
+  @Query(
+      "SELECT p FROM Perfume p LEFT JOIN p.reviewList r "
+          + "WHERE (:search IS NULL OR LOWER(p.perfumeName) LIKE LOWER(CONCAT('%', :search, '%'))) "
+          + "AND (:scent IS NULL OR p.scent = :scent) "
+          + "GROUP BY p.perfumeId "
+          + "ORDER BY (p.price - p.discount) ASC")
+  Page<Perfume> findBySearchAndScentWithDiscountPriceAsc(
+      @Param("search") String search, @Param("scent") String scent, Pageable pageable);
+
+  @Query(
+      "SELECT p FROM Perfume p LEFT JOIN p.reviewList r "
+          + "WHERE (:search IS NULL OR LOWER(p.perfumeName) LIKE LOWER(CONCAT('%', :search, '%'))) "
+          + "AND (:scent IS NULL OR p.scent = :scent) "
+          + "GROUP BY p.perfumeId "
+          + "ORDER BY (p.price - p.discount) DESC")
+  Page<Perfume> findBySearchAndScentWithDiscountPriceDesc(
+      @Param("search") String search, @Param("scent") String scent, Pageable pageable);
 }

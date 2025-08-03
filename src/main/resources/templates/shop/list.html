@@ -228,17 +228,17 @@
     </span>
 
           <!-- 페이지 번호 버튼들 -->
-          <span th:each="pageNum : ${#numbers.sequence(0, perfumePage.totalPages - 1)}">
-      <a th:if="${pageNum != perfumePage.number}"
-         th:href="@{/shop/list(page=${pageNum}, size=${perfumePage.size}, sort=${sort}, scent=${scent}, search=${search})}"
-         th:text="${pageNum + 1}"
-         class="px-3 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-md hover:bg-gray-50">
-      </a>
-      <span th:if="${pageNum == perfumePage.number}"
-            th:text="${pageNum + 1}"
-            class="px-3 py-2 text-sm font-medium text-white bg-gray-800 border border-gray-800 rounded-md cursor-default">
-      </span>
-    </span>
+          <span th:each="pageNum : ${#numbers.sequence(0, perfumePage.totalPages > 0 ? perfumePage.totalPages - 1 : 0)}">
+            <a th:if="${pageNum != perfumePage.number}"
+               th:href="@{/shop/list(page=${pageNum}, size=${perfumePage.size}, sort=${sort}, scent=${scent}, search=${search})}"
+               th:text="${pageNum + 1}"
+               class="px-3 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-md hover:bg-gray-50">
+            </a>
+            <span th:if="${pageNum == perfumePage.number}"
+                  th:text="${pageNum + 1}"
+                  class="px-3 py-2 text-sm font-medium text-white bg-gray-800 border border-gray-800 rounded-md cursor-default">
+            </span>
+          </span>
 
           <!-- 다음 페이지 버튼 -->
           <a th:if="${perfumePage.hasNext()}"
