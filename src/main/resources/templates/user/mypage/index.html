@@ -97,7 +97,7 @@
               <div class="flex items-center justify-between">
                 <div>
                   <p class="text-sm font-medium text-gray-600">위시리스트</p>
-                  <p class="text-2xl font-bold text-gray-800">8개</p>
+                  <p class="text-2xl font-bold text-gray-800" th:text="${wish}+' 개'"></p>
                 </div>
                 <div
                   class="w-12 h-12 bg-red-100 rounded-full flex items-center justify-center"
@@ -116,7 +116,7 @@
             <div class="bg-white rounded-lg shadow-sm p-6">
               <div class="flex items-center justify-between">
                 <div>
-                  <p class="text-sm font-medium text-gray-600">배송중</p>
+                  <p class="text-sm font-medium text-gray-600">주문내역</p>
                   <p class="text-2xl font-bold text-gray-800">2건</p>
                 </div>
                 <div
@@ -344,13 +344,6 @@
                     >
                       <i class="far fa-heart text-gray-600"></i>
                       <span class="text-gray-800">위시리스트</span>
-                    </a>
-                    <a
-                      href="/mypage/points"
-                      class="flex items-center space-x-3 p-3 rounded-md hover:bg-gray-50 transition-colors"
-                    >
-                      <i class="fas fa-coins text-gray-600"></i>
-                      <span class="text-gray-800">적립금</span>
                     </a>
                     <a
                       href="/mypage/coupons"
