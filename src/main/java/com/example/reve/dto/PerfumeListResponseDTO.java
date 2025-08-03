@@ -15,7 +15,7 @@ import lombok.*;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-public class PerfumeListResponseDto {
+public class PerfumeListResponseDTO {
 
   // PK
   private Long perfumeId;
@@ -46,7 +46,7 @@ public class PerfumeListResponseDto {
   private Integer reviewCount;
 
   // 향수에 대한 정보를 빌더에 저장함.
-  public static PerfumeListResponseDto fromEntity(Perfume perfume) {
+  public static PerfumeListResponseDTO fromEntity(Perfume perfume) {
     // 리뷰에 관한 로직임.
     List<Review> reviewList = perfume.getReviewList();
     int count = reviewList.size();
@@ -57,7 +57,7 @@ public class PerfumeListResponseDto {
       avgRating = Math.round((sum / count) * 10) / 10.0; // 소수점 1자리 반올림
     }
 
-    return PerfumeListResponseDto.builder()
+    return PerfumeListResponseDTO.builder()
         .perfumeId(perfume.getPerfumeId())
         .perfumeName(perfume.getPerfumeName())
         .scent(perfume.getScent())
