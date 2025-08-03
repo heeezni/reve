@@ -196,6 +196,19 @@ public class AdminBoardController {
     }
   }
 
+  @DeleteMapping("/notices")
+  public ResponseEntity<String> deleteSelectedNotices(
+      @RequestBody java.util.List<Long> noticeIds, Principal principal) {
+    try {
+      noticeService.deleteNotices(noticeIds, principal);
+      return ResponseEntity.ok("선택된 공지사항이 성공적으로 삭제되었습니다.");
+    } catch (AccessDeniedException e) {
+      return ResponseEntity.status(403).body("권한이 없습니다.");
+    } catch (Exception e) {
+      return ResponseEntity.status(500).body("공지사항 삭제 중 오류가 발생했습니다: " + e.getMessage());
+    }
+  }
+
   private boolean isAdmin(Principal principal) {
     if (principal == null) {
       return false;
