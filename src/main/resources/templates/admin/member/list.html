@@ -64,5 +64,8 @@
             </tr>
         </tbody>
     </table>
+    <script th:if="${message}">
+        alert(decodeURIComponent('[[${message}]]'));
+    </script>
 </body>
 </html>
