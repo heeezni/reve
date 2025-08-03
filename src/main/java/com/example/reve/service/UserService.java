@@ -1,5 +1,7 @@
 package com.example.reve.service;
 
+import java.io.IOException;
+
 import org.springframework.dao.DuplicateKeyException;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -8,10 +10,12 @@ import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.multipart.MultipartFile;
 
 import com.example.reve.domain.CustomUserDetails;
 import com.example.reve.domain.User;
 import com.example.reve.dto.*;
+import com.example.reve.repository.CouponRepository;
 import com.example.reve.repository.UserRepository;
 
 import lombok.RequiredArgsConstructor;
@@ -27,6 +31,8 @@ public class UserService implements UserDetailsService { // UserDetailsService �
   private final UserRepository userRepository;
   private final PasswordEncoder passwordEncoder;
   private final CouponService couponService;
+  private final ProfileUrlService profileUrlService;
+  private final CouponRepository couponRepository;
 
   /**
    * 회원 가입 서비스
@@ -81,6 +87,12 @@ public class UserService implements UserDetailsService { // UserDetailsService �
     return user;
   }
 
+  // 아이디 중복 검사
+  public boolean checklogin(String loginId) {
+    log.info("아이디 중복 검사 {}", userRepository.existsByLoginId(loginId));
+    return userRepository.existsByLoginId(loginId);
+  }
+
   /**
    * Spring Security의 UserDetailsService 인터페이스 구현 사용자 이름(loginId)으로 사용자 정보를 로드
    *
@@ -106,17 +118,37 @@ public class UserService implements UserDetailsService { // UserDetailsService �
    * @param updateProfileDTO (프로필 사진, 이름, 닉네임, 이메일, 생일,휴대폰 번호)
    * @return user
    */
-  public UpdateProfileDTO update(UpdateProfileDTO updateProfileDTO, String loginId) {
+  public UpdateProfileDTO update(
+      UpdateProfileDTO updateProfileDTO, String loginId, MultipartFile profileImg) {
     // 로그인 아이디가 같은 회원
     User user = userRepository.findByLoginId(loginId).orElseThrow();
+    log.info("profile image : {}", profileImg);
+
+    if (profileImg != null && !profileImg.isEmpty()) {
+      try {
+        if (user.getProfileUrl() != null) {
+          profileUrlService.deleteProfileImage(user.getProfileUrl());
+        }
+        // 파일 저장
+        String userIdStr = Long.toString(user.getUserId());
+        log.info("userIdStr : {}", userIdStr);
+        String saveUrl = profileUrlService.saveProfileImage(profileImg, "profile", userIdStr);
+        log.info("saveUrl : {}", saveUrl);
+        // 프로필 사진 경로
+        user.setProfileUrl(saveUrl);
+      } catch (IOException e) {
+        throw new RuntimeException(e);
+      }
+    }
+
     // 이름
     user.setName(updateProfileDTO.getName());
-    // 프로필 사진 경로
-    user.setProfileUrl(updateProfileDTO.getProfileUrl());
     // 생일
     user.setBirthday(updateProfileDTO.getBirthday());
     // 휴대폰 번호
     user.setPhone(updateProfileDTO.getPhone());
+    // 닉네임
+    user.setNickname(updateProfileDTO.getNickname());
 
     log.info("회원 정보 변경 : {}", user);
     // 수정하기
@@ -132,36 +164,24 @@ public class UserService implements UserDetailsService { // UserDetailsService �
     return userRepository.findUserUpdate(loginId);
   }
 
-  /**
-   * 비밀번호 변경 서비스 -기존 비밀번호 확인 후 새 비밀번호 암호화 후 저장
-   *
-   * @param newPasswordDTO (로그인 아이디, 기존 비밀번호, 변경 비밀번호)
-   */
-  public boolean checkPassword(NewPasswordDTO newPasswordDTO, String loginId) {
-    // 로그인 아이디가 같은 회원 정보 가져오기
-    User user = userRepository.findByLoginId(loginId).orElseThrow();
-    // 기존 비밀번호가 일치한지 확인하기
-    if (passwordEncoder.matches(newPasswordDTO.getPassword(), user.getPassword())) {
-      return true;
-    } else {
-      log.error("비밀번호가 일치하지 않음");
-      return false;
-    }
-  }
-
   public boolean updatePassword(NewPasswordDTO newPasswordDTO, String loginId) {
     User user = userRepository.findByLoginId(loginId).orElseThrow();
-    // 새 비밀번호와 기존 비밀번호가 일치한지 비교
-    if (!newPasswordDTO.getPassword().equals(newPasswordDTO.getNewPassword())) {
-      // 새 비밀번호 암호화
-      String encodedNewPassword = passwordEncoder.encode(newPasswordDTO.getNewPassword());
-      user.setPassword(encodedNewPassword);
-      // 저장
-      userRepository.save(user);
-      return true;
-    } else {
-      throw new BadCredentialsException("비밀번호의 변경사함이 없음");
+    // 비밀번호 일치 비교
+    if (!passwordEncoder.matches(newPasswordDTO.getPassword(), user.getPassword())) {
+      log.error("비밀번호 불일치");
+      return false;
     }
+    // 새 비밀번호가 기존과 같은지 확인
+    if (passwordEncoder.matches(newPasswordDTO.getNewPassword(), user.getPassword())) {
+      log.error("현재 비밀번호와 새 비밀번호가 일치");
+      return false;
+    }
+    // 새 비밀번호 암호화 및 저장
+    String encodedNewPassword = passwordEncoder.encode(newPasswordDTO.getNewPassword());
+    user.setPassword(encodedNewPassword);
+    userRepository.save(user);
+    log.info("비밀번호 성공");
+    return true;
   }
 
   public MypageDTO selectMypage(String loginId) {
@@ -176,5 +196,24 @@ public class UserService implements UserDetailsService { // UserDetailsService �
   // 모든 사용자 조회
   public java.util.List<User> getAllUsers() {
     return userRepository.findAll();
+  }
+
+  // 사용자 삭제
+  @Transactional
+  public void deleteUser(Long userId) {
+    // 해당 사용자의 모든 쿠폰 삭제
+    couponRepository.deleteAll(couponRepository.findByUser_UserId(userId));
+    userRepository.deleteById(userId);
+  }
+
+  // 사용자 권한 변경
+  @Transactional
+  public void updateUserRole(Long userId, com.example.reve.domain.Role newRole) {
+    User user =
+        userRepository
+            .findById(userId)
+            .orElseThrow(() -> new IllegalArgumentException("해당 사용자를 찾을 수 없습니다."));
+    user.setRole(newRole);
+    userRepository.save(user);
   }
 }

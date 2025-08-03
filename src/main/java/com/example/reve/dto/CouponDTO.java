@@ -10,6 +10,8 @@ import lombok.Data;
 @Data
 public class CouponDTO {
 
+  // PK
+  private Long couponId;
   // 쿠폰명
   private CouponName couponName;
   // 만료일

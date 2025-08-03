@@ -10,19 +10,69 @@
         th { background-color: #f2f2f2; }
         .actions a { margin-right: 5px; text-decoration: none; color: #007bff; }
         .actions a:hover { text-decoration: underline; }
-        .add-button { margin-bottom: 20px; padding: 10px 15px; background-color: #28a745; color: white; border: none; border-radius: 5px; cursor: pointer; text-decoration: none; }
+        .add-button { padding: 10px 15px; background-color: #28a745; color: white; border: none; border-radius: 5px; cursor: pointer; text-decoration: none; }
         .add-button:hover { background-color: #218838; }
+        .delete-form { display: inline; }
+        .delete-button { background: none; border: none; color: #dc3545; cursor: pointer; padding: 0; font-size: inherit; }
+        .delete-button:hover { text-decoration: none; }
+        .bulk-actions { margin-top: 10px; margin-bottom: 20px; }
+        .bulk-actions button { padding: 8px 15px; background-color: #dc3545; color: white; border: none; border-radius: 5px; cursor: pointer; }
+        .bulk-actions button:hover { background-color: #c82333; }
+        .shop-list-button { display: inline-block; margin-left: 10px; padding: 10px 15px; background-color: #007bff; color: white; border: none; border-radius: 5px; text-decoration: none; }
+        .shop-list-button:hover { background-color: #0056b3; }
     </style>
+    <script>
+        function toggleAll(source) {
+            checkboxes = document.querySelectorAll('input[name="perfumeIdList"]');
+            for(var i=0, n=checkboxes.length;i<n;i++) {
+                checkboxes[i].checked = source.checked;
+            }
+        }
+
+        function submitBulkDelete() {
+            const checkedItems = document.querySelectorAll('input[name="perfumeIdList"]:checked');
+            if (checkedItems.length === 0) {
+                alert('삭제할 상품을 선택해주세요.');
+                return false;
+            }
+
+            if (confirm('선택된 상품들을 정말로 삭제하시겠습니까?')) {
+                const form = document.createElement('form');
+                form.method = 'post';
+                form.action = '/admin/shop/delete';
+
+                checkedItems.forEach(item => {
+                    const input = document.createElement('input');
+                    input.type = 'hidden';
+                    input.name = 'perfumeIdList';
+                    input.value = item.value;
+                    form.appendChild(input);
+                });
+
+                document.body.appendChild(form);
+                form.submit();
+            }
+            return false;
+        }
+    </script>
 </head>
 <body>
     <h1>상품 목록</h1>
 
-    <a th:href="@{/admin/product/add}" class="add-button">새 상품 추가</a>
-    <a th:href="@{/admin/dashboard}" class="add-button" style="background-color: #6c757d;">대시보드로 돌아가기</a>
+    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
+        <div>
+            <a th:href="@{/admin/dashboard}" class="add-button" style="background-color: #6c757d; margin-right: 10px;">관리자 대시보드로 돌아가기</a>
+            <a th:href="@{/shop/list}" class="shop-list-button">쇼핑몰 상품 목록보기</a>
+        </div>
+        <div>
+            <a th:href="@{/admin/shop/regist}" class="add-button">새 상품 추가</a>
+        </div>
+    </div>
 
     <table>
         <thead>
             <tr>
+                <th><input type="checkbox" onclick="toggleAll(this)" aria-label="모두 선택"></th>
                 <th>ID</th>
                 <th>상품명</th>
                 <th>향</th>
@@ -35,6 +85,7 @@
         </thead>
         <tbody>
             <tr th:each="perfume : ${perfumes}">
+                <td><input type="checkbox" name="perfumeIdList" th:value="${perfume.perfumeId}" aria-label="상품 선택"></td>
                 <td th:text="${perfume.perfumeId}"></td>
                 <td th:text="${perfume.perfumeName}"></td>
                 <td th:text="${perfume.scent}"></td>
@@ -43,11 +94,18 @@
                 <td th:text="${perfume.discount}"></td>
                 <td><img th:src="${perfume.imageUrl}" alt="상품 이미지" style="width: 50px; height: 50px; object-fit: cover;"></td>
                 <td class="actions">
-                    <a th:href="@{/admin/product/edit(perfumeId=${perfume.perfumeId})}">수정</a>
-                    <a th:href="@{/admin/product/delete(perfumeId=${perfume.perfumeId})}" onclick="return confirm('정말로 삭제하시겠습니까?');">삭제</a>
+                    <a th:href="@{/admin/shop/edit/{perfumeId}(perfumeId=${perfume.perfumeId})}">수정</a>
+                    <form th:action="@{/admin/shop/delete}" method="post" class="delete-form" onsubmit="return confirm('정말로 삭제하시겠습니까?');">
+                        <input type="hidden" name="id" th:value="${perfume.perfumeId}">
+                        <button type="submit" class="delete-button">삭제</button>
+                    </form>
                 </td>
             </tr>
         </tbody>
     </table>
+
+    <div class="bulk-actions">
+        <button type="button" onclick="submitBulkDelete();">선택된 상품 삭제</button>
+    </div>
 </body>
 </html>

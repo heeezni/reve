@@ -21,27 +21,27 @@
           <!-- User Profile Section -->
           <div class="bg-white rounded-lg shadow-sm p-6 mb-8">
             <div class="flex items-center space-x-6">
-              <div
-                class="w-20 h-20 bg-gray-200 rounded-full flex items-center justify-center"
-              >
-                <i class="fas fa-user text-3xl text-gray-400"></i>
+              <div class="w-20 h-20 rounded-full overflow-hidden bg-gray-200 flex items-center justify-center">
+                <!-- 프로필 이미지가 있는 경우 -->
+                <img th:if="${mypage.profileUrl != null}"
+                     th:src="@{${mypage.profileUrl}}"
+                     alt="프로필 이미지"
+                     class="w-full h-full object-cover rounded-full border" />
+
+                <!-- 프로필 이미지가 없는 경우 -->
+                <i th:if="${mypage.profileUrl == null}"
+                   class="fas fa-user text-3xl text-gray-400"></i>
               </div>
               <div class="flex-1">
                 <div class="flex items-center space-x-3 mb-2">
-                  <h2 class="text-xl font-bold text-gray-800" th:unless="${#authentication.principal.nickname !=null}" th:text="${#authentication.principal.name} +'님'"></h2>
-                  <h2 class="text-xl font-bold text-gray-800" th:if="${#authentication.principal.nickname !=null}" th:text="${#authentication.principal.nickname} +'님'"></h2>
-                  <span
-                    class="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-purple-100 text-purple-800"
-                  >
-                    VIP 회원
-                  </span>
+                  <h2 class="text-xl font-bold text-gray-800" th:text="${mypage.name} +'님'"></h2>
                 </div>
                 <p class="text-gray-600 mb-3" th:text=" ${mypage.email}"></p>
                 <div class="flex items-center space-x-6 text-sm text-gray-500">
                   <span th:text="'가입날짜 : '+${#temporals.format(mypage.createdAt, 'yyyy-MM-dd')}"></span>
                 </div>
               </div>
-              <div class="flex space-x-3">
+              <div class="flex space-x-3" th:if="${mypage.userId == currentUserId}">
                 <a
                   href="/mypage/account"
                   class="px-4 py-2 border border-gray-300 rounded-md text-gray-700 hover:bg-gray-50 transition-colors text-sm"
@@ -64,20 +64,12 @@
               <div class="flex items-center justify-between">
                 <div>
                   <p class="text-sm font-medium text-gray-600">적립금</p>
-                  <p class="text-2xl font-bold text-gray-800">12,500원</p>
+                  <p class="text-2xl font-bold text-gray-800" th:if="${point != null}" th:text="${point}+' p'"></p>
                 </div>
-                <div
-                  class="w-12 h-12 bg-blue-100 rounded-full flex items-center justify-center"
-                >
+                <div class="w-12 h-12 bg-blue-100 rounded-full flex items-center justify-center">
                   <i class="fas fa-coins text-blue-600"></i>
                 </div>
               </div>
-              <a
-                href="/mypage/points"
-                class="text-sm text-blue-600 hover:underline mt-2 inline-block"
-              >
-                적립내역 보기 →
-              </a>
             </div>
 
             <div class="bg-white rounded-lg shadow-sm p-6">
@@ -104,7 +96,7 @@
               <div class="flex items-center justify-between">
                 <div>
                   <p class="text-sm font-medium text-gray-600">위시리스트</p>
-                  <p class="text-2xl font-bold text-gray-800">8개</p>
+                  <p class="text-2xl font-bold text-gray-800" th:text="${wish}+' 개'"></p>
                 </div>
                 <div
                   class="w-12 h-12 bg-red-100 rounded-full flex items-center justify-center"
@@ -123,7 +115,7 @@
             <div class="bg-white rounded-lg shadow-sm p-6">
               <div class="flex items-center justify-between">
                 <div>
-                  <p class="text-sm font-medium text-gray-600">배송중</p>
+                  <p class="text-sm font-medium text-gray-600">주문내역</p>
                   <p class="text-2xl font-bold text-gray-800">2건</p>
                 </div>
                 <div
@@ -351,13 +343,6 @@
                     >
                       <i class="far fa-heart text-gray-600"></i>
                       <span class="text-gray-800">위시리스트</span>
-                    </a>
-                    <a
-                      href="/mypage/points"
-                      class="flex items-center space-x-3 p-3 rounded-md hover:bg-gray-50 transition-colors"
-                    >
-                      <i class="fas fa-coins text-gray-600"></i>
-                      <span class="text-gray-800">적립금</span>
                     </a>
                     <a
                       href="/mypage/coupons"

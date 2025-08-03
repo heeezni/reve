@@ -54,7 +54,7 @@ public class CouponService {
     LocalDate birthday = null;
     LocalDate expiresDate = null;
     LocalDate validFrom = null;
-    if (user.getBirthday() != null) {
+    if (user.getBirthday() != null && !user.getBirthday().isBlank()) {
       try {
         birthday = LocalDate.parse(user.getBirthday());
         expiresDate = birthday.plusDays(6);
