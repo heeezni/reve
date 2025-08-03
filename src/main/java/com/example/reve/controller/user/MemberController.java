@@ -7,6 +7,7 @@ import org.springframework.web.bind.annotation.*;
 
 import com.example.reve.dto.CreateUserDTO;
 import com.example.reve.service.CouponService;
+import com.example.reve.service.PointService;
 import com.example.reve.service.UserService;
 
 import lombok.RequiredArgsConstructor;
@@ -19,6 +20,7 @@ import lombok.extern.slf4j.Slf4j;
 public class MemberController {
   private final UserService userService;
   private final CouponService couponService;
+  private final PointService pointService;
 
   @GetMapping("/login")
   public String login(@RequestParam(value = "error", required = false) String error, Model model) {
@@ -49,6 +51,7 @@ public class MemberController {
     log.info("가입 정보 {}", create);
     Long userId = userService.signup(create);
     couponService.newUserCoupon(userId);
+    pointService.getPoint(userId, 1000);
     return "index";
   }
 }
