@@ -148,7 +148,7 @@
           </div>
 
           <!-- Pagination -->
-          <div class="mt-8 flex items-center justify-center">
+          <div th:if="${notices.totalPages > 0}" class="mt-8 flex items-center justify-center">
             <nav class="flex items-center space-x-2">
               <!-- Previous Page -->
               <a th:if="${notices.hasPrevious()}"
@@ -163,7 +163,7 @@
               </button>
 
               <!-- Page Numbers -->
-              <th:block th:each="i : ${#numbers.sequence(0, notices.totalPages - 1)}">
+              <th:block th:if="${notices.totalPages > 0}" th:each="i : ${#numbers.sequence(0, notices.totalPages - 1)}">
                 <a th:href="@{/board/notice/list(page=${i}, keyword=${keyword}, category=${category})}"
                    th:text="${i + 1}"
                    th:classappend="${i == notices.number ? 'text-white bg-gray-800 border-gray-800' : 'text-gray-700 bg-white border-gray-300'}"
