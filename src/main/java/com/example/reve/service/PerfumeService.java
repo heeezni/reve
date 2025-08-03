@@ -16,9 +16,9 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
 import com.example.reve.domain.Perfume;
-import com.example.reve.dto.PerfumeDetailResponseDto;
-import com.example.reve.dto.PerfumeListResponseDto;
-import com.example.reve.dto.PerfumeSaveRequestDto;
+import com.example.reve.dto.PerfumeDetailResponseDTO;
+import com.example.reve.dto.PerfumeListResponseDTO;
+import com.example.reve.dto.PerfumeSaveRequestDTO;
 import com.example.reve.repository.PerfumeRepository;
 
 import lombok.RequiredArgsConstructor;
@@ -38,7 +38,7 @@ public class PerfumeService {
   // ============================= 향수 등록 및 삭제하는 로직임(CRUD 중 C, D) ==================================
   // 관리자 향수 등록
   @Transactional
-  public void savePerfume(PerfumeSaveRequestDto requestDto) {
+  public void savePerfume(PerfumeSaveRequestDTO requestDto) {
     Perfume perfume =
         Perfume.builder()
             .perfumeName(requestDto.getPerfumeName())
@@ -134,7 +134,7 @@ public class PerfumeService {
   @Transactional
   public void updatePerfume(
       Long perfumeId,
-      PerfumeSaveRequestDto requestDto,
+      PerfumeSaveRequestDTO requestDto,
       MultipartFile imageFile,
       MultipartFile hoverImageFile) {
 
@@ -175,9 +175,9 @@ public class PerfumeService {
 
   // ============================= 향수 조회하는 로직임(CRUD 중 R) ==========================================
   // 모든 향수
-  public List<PerfumeListResponseDto> getAllPerfumes() {
+  public List<PerfumeListResponseDTO> getAllPerfumes() {
     List<Perfume> perfumes = perfumeRepository.findAllByOrderByCreatedAtDesc();
-    return perfumes.stream().map(PerfumeListResponseDto::fromEntity).collect(Collectors.toList());
+    return perfumes.stream().map(PerfumeListResponseDTO::fromEntity).collect(Collectors.toList());
   }
 
   // 검색어로 향수를 검색
@@ -225,22 +225,22 @@ public class PerfumeService {
   }
 
   // 향수 한 건 조회
-  public PerfumeDetailResponseDto getPerfumeDetail(Long perfumeId) {
+  public PerfumeDetailResponseDTO getPerfumeDetail(Long perfumeId) {
     Perfume perfume =
         perfumeRepository
             .findByPerfumeId(perfumeId)
             .orElseThrow(() -> new RuntimeException("해당 향수를 찾을 수 없습니다."));
 
-    return PerfumeDetailResponseDto.fromEntity(perfume);
+    return PerfumeDetailResponseDTO.fromEntity(perfume);
   }
 
   // 같은 향 기준 관련 상품 최대 4개 조회
-  public List<PerfumeListResponseDto> getRelatedPerfumesByScent(String scent) {
+  public List<PerfumeListResponseDTO> getRelatedPerfumesByScent(String scent) {
     Pageable limit = PageRequest.of(0, 4); // 0번째 페이지, 4개 한정
     List<Perfume> relatedPerfumes = perfumeRepository.findByScent(scent, limit).getContent();
 
     return relatedPerfumes.stream()
-        .map(PerfumeListResponseDto::fromEntity)
+        .map(PerfumeListResponseDTO::fromEntity)
         .collect(Collectors.toList());
   }
 
