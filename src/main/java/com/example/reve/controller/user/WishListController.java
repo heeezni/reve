@@ -49,4 +49,19 @@ public class WishListController {
     wishListService.toggleWish(user, perfumeId);
     return "redirect:/shop/list";
   }
+  //선택한 상품 삭제 버튼
+  @PostMapping("/wishlist/delete")
+  public void deleteWish(@RequestParam Long perfumeId, Principal principal) {
+
+  }
+  //선택한 상품즐 삭제 버튼
+  @PostMapping("/wishlist/deleteList")
+  public void deleteListWish(@RequestParam Long perfumeId, Principal principal) {
+
+  }
+  //장바구니 추가버튼
+  @PostMapping("/wishlist/addCart")
+  public void addCart(@RequestParam Long perfumeId, Principal principal) {
+
+  }
 }

@@ -109,4 +109,10 @@ public class WishListService {
     }
     return avgRating;
   }
+
+  // 찜 상품 개수 보기
+  public int getCount(String loginId) {
+    User user = userRepository.findByLoginId(loginId).orElseThrow();
+    return wishListRepository.findByUser_UserId(user.getUserId()).size();
+  }
 }
