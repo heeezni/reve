@@ -13,19 +13,20 @@ import com.example.reve.dto.WishListShowDTO;
 import com.example.reve.repository.*;
 
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 
 /*
 찜목록 로직을 처리하는 서비스임.
  */
 @Service
 @RequiredArgsConstructor
+@Slf4j
 public class WishListService {
 
   private final WishListRepository wishListRepository;
   private final PerfumeRepository perfumeRepository;
   private final ReviewRepository reviewRepository;
   private final UserRepository userRepository;
-  private final CartRepository cartRepository;
 
   // 찜목록에 추가하거나 삭제하는 로직임.
   @Transactional
@@ -113,33 +114,29 @@ public class WishListService {
 
   // 찜 상품 삭제
   public void wishperfumeDelete(Long perfumeId, String loginId) {
+    log.info("찜 상품 삭제 서비스 호출");
     User user = userRepository.findByLoginId(loginId).orElseThrow();
     Optional<WishList> wish =
         wishListRepository.findByUser_UserIdAndPerfume_PerfumeId(user.getUserId(), perfumeId);
     if (wish.isPresent()) {
       wishListRepository.delete(wish.get());
+      log.info("삭제 성공");
     }
   }
 
   // 찜 상품들 삭제
-  public void wishlistDelete(Long perfumeId, String loginId) {
+  public void wishlistDelete(List<Long> perfumeIds, String loginId) {
+    log.info("선택한 찜상품들 삭제 서비스 호출");
     User user = userRepository.findByLoginId(loginId).orElseThrow();
-    List<WishList> wishLists = wishListRepository.findByUser_UserId(user.getUserId());
-    if (wishLists.size() > 0) {
-      for (WishList wishList : wishLists) {
-        wishListRepository.delete(wishList);
-      }
-    }
-  }
 
-  // 장바구니에 담기
-  public boolean cartAdd(Long perfumeId, String loginId) {
-    User user = userRepository.findByLoginId(loginId).orElseThrow();
-    Perfume perfume = perfumeRepository.findByPerfumeId(perfumeId).orElse(null);
-    Cart cart = new Cart();
-    cart.setPerfume(perfume);
-    cart.setUser(user);
-    cartRepository.save(cart);
-    return true;
+    List<WishList> wishLists = wishListRepository.findByUser_UserId(user.getUserId());
+
+    List<WishList> toDelete =
+        wishLists.stream()
+            .filter(wish -> perfumeIds.contains(wish.getPerfume().getPerfumeId()))
+            .collect(Collectors.toList());
+
+    wishListRepository.deleteAll(toDelete);
+    log.info("선택된 찜상품들 삭제 완료");
   }
 }

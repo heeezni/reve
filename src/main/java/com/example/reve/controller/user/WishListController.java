@@ -7,10 +7,11 @@ import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import com.example.reve.domain.User;
-import com.example.reve.domain.WishList;
 import com.example.reve.repository.UserRepository;
+import com.example.reve.service.CartService;
 import com.example.reve.service.WishListService;
 
 import lombok.RequiredArgsConstructor;
@@ -24,6 +25,7 @@ public class WishListController {
 
   private final WishListService wishListService;
   private final UserRepository userRepository;
+  private final CartService cartService;
 
   // 찜목록에 추가 버튼
   @PostMapping("/wishlist/toggle")
@@ -54,28 +56,42 @@ public class WishListController {
 
   // 선택한 상품 삭제 버튼
   @PostMapping("/wishlist/delete")
-  public void deleteWish(@RequestParam Long perfumeId, Principal principal) {
+  public String deleteWish(@RequestParam Long perfumeId, Principal principal) {
+
+    if (principal == null) {
+      return "redirect:/login";
+    }
     String loginId = principal.getName();
     wishListService.wishperfumeDelete(perfumeId, loginId);
+    return "redirect:/mypage/wishlist";
   }
 
-  // 선택한 상품즐 삭제 버튼
+  // 선택한 상품들 삭제 버튼
   @PostMapping("/wishlist/deleteList")
-  public void deleteListWish(@RequestParam List<WishList> wishlist, Principal principal) {
-    for (WishList wishList : wishlist) {
-      Long perfumeId = wishList.getPerfume().getPerfumeId();
-      String loginId = principal.getName();
-      wishListService.wishlistDelete(perfumeId, loginId);
+  public String deleteListWish(
+      @RequestParam("perfumeIds") List<Long> perfurmList, Principal principal) {
+    if (principal == null) {
+      return "redirect:/login";
     }
+    String loginId = principal.getName();
+    wishListService.wishlistDelete(perfurmList, loginId);
+    return "redirect:/mypage/wishlist";
   }
 
   // 장바구니 추가버튼
   @PostMapping("/wishlist/addCart")
-  public void addCart(@RequestParam Long perfumeId, Principal principal) {
-    String loginId = principal.getName();
-    boolean result = wishListService.cartAdd(perfumeId, loginId);
-    if (result) {
-      wishListService.wishperfumeDelete(perfumeId, loginId);
+  public String addCart(
+      @RequestParam Long perfumeId, Principal principal, RedirectAttributes redirectAttributes) {
+    if (principal == null) {
+      return "redirect:/login";
     }
+    String loginId = principal.getName();
+    try {
+      int result = cartService.addToCart(loginId, perfumeId, 1);
+      wishListService.wishperfumeDelete(perfumeId, loginId);
+    } catch (Exception e) {
+      redirectAttributes.addFlashAttribute("error", "이미 장바구니에 있는 상품 입니다");
+    }
+    return "redirect:/mypage/wishlist";
   }
 }
