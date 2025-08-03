@@ -5,18 +5,12 @@ import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
+import com.example.reve.domain.*;
+import com.example.reve.repository.*;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import com.example.reve.domain.Perfume;
-import com.example.reve.domain.Review;
-import com.example.reve.domain.User;
-import com.example.reve.domain.WishList;
 import com.example.reve.dto.WishListShowDTO;
-import com.example.reve.repository.PerfumeRepository;
-import com.example.reve.repository.ReviewRepository;
-import com.example.reve.repository.UserRepository;
-import com.example.reve.repository.WishListRepository;
 
 import lombok.RequiredArgsConstructor;
 
@@ -31,6 +25,7 @@ public class WishListService {
   private final PerfumeRepository perfumeRepository;
   private final ReviewRepository reviewRepository;
   private final UserRepository userRepository;
+  private final CartRepository cartRepository;
 
   // 찜목록에 추가하거나 삭제하는 로직임.
   @Transactional
@@ -115,4 +110,27 @@ public class WishListService {
     User user = userRepository.findByLoginId(loginId).orElseThrow();
     return wishListRepository.findByUser_UserId(user.getUserId()).size();
   }
+  //찜 상품 삭제
+  public void wishperfumeDelete(Long perfumeId,Long userId) {
+    Optional<WishList> wish=wishListRepository.findByUser_UserIdAndPerfume_PerfumeId(userId, perfumeId);
+    if (wish.isPresent()) {
+      wishListRepository.delete(wish.get());
+    }
+  }
+  //찜 상품들 삭제
+  public void wishlistDelete(Long perfumeId,Long userId) {
+    List<WishList> wishLists = wishListRepository.findByUser_UserId(userId);
+    if (wishLists.size() > 0) {
+      for(WishList wishList : wishLists) {
+        wishListRepository.delete(wishList);
+      }
+    }
+  }
+  //장바구니에 담기
+  public void cartAdd(Perfume perfume,User user) {
+    Cart cart = new Cart();
+    cart.setPerfume(perfume);
+    cart.setUser(user);
+    cartRepository.save(cart);
+ }
 }
