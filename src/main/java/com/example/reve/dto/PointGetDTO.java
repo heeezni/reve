@@ -4,7 +4,6 @@ import lombok.Data;
 
 @Data
 public class PointGetDTO {
-    private Long userId;
-    private int pointAmount;
-
+  private Long userId;
+  private int pointAmount;
 }

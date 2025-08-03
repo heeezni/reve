@@ -26,12 +26,12 @@ public class Point extends BaseEntity {
   private int pointAmount;
 
   // 포인트랑 유저(N:1)
-  @ManyToOne(fetch = FetchType.LAZY)
-  @JoinColumn(name = "user_id")
+  @ManyToOne(fetch = FetchType.LAZY, optional = false)
+  @JoinColumn(name = "user_id", nullable = false)
   private User user;
 
-  // 포인트랑 주문(N:1)
-  @ManyToOne(fetch = FetchType.LAZY)
+  // 포인트랑 주문(1:N)
+  @ManyToOne(fetch = FetchType.LAZY, optional = true)
   @JoinColumn(name = "order_id")
   private Order order;
 }
