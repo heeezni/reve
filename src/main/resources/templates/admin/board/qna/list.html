@@ -70,6 +70,14 @@
                   </select>
                 </label>
                 <button type="submit" class="hidden"></button> <!-- Hidden submit button for search input -->
+                <button
+                  type="button"
+                  id="delete-selected-btn"
+                  class="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-red-600 hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500"
+                >
+                  <i class="fas fa-trash-alt mr-2"></i>
+                  선택 삭제
+                </button>
               </div>
             </form>
           </div>
@@ -81,7 +89,12 @@
               <div
                 class="grid grid-cols-12 gap-4 text-sm font-medium text-gray-700"
               >
-                <div class="col-span-1 text-center">번호</div>
+                <div class="col-span-1 text-center">
+                  <label>
+                    <span class="sr-only">모든 Q&A 선택</span>
+                    <input type="checkbox" id="select-all-checkbox" />
+                  </label>
+                </div>
                 <div class="col-span-1 text-center">분류</div>
                 <div class="col-span-1 text-center">상태</div>
                 <div class="col-span-5">제목</div>
@@ -98,8 +111,11 @@
                 class="px-6 py-4 hover:bg-gray-50 transition-colors"
               >
                 <div class="grid grid-cols-12 gap-4 items-center">
-                  <div class="col-span-1 text-center text-sm text-gray-600" th:text="${qnas.totalElements - (qnas.number * qnas.size + i.index)}">
-                    <!-- 번호 (역순으로 표시) -->
+                  <div class="col-span-1 text-center">
+                    <label>
+                      <span class="sr-only" th:text="${qna.title} + ' 선택'"></span>
+                      <input type="checkbox" class="qna-checkbox" th:value="${qna.qnaId}" />
+                    </label>
                   </div>
                   <div class="col-span-1 text-center">
                     <span
@@ -214,5 +230,52 @@
     <div th:replace="~{fragments/modal :: loginModal}"></div>
 
     <script src="/js/script.js"></script>
+    <script>
+      // Delete selected qnas
+      const deleteSelectedBtn = document.getElementById('delete-selected-btn');
+      if (deleteSelectedBtn) {
+        deleteSelectedBtn.addEventListener('click', () => {
+          const selectedQnaIds = Array.from(document.querySelectorAll('.qna-checkbox:checked')).map(checkbox => checkbox.value);
+
+          if (selectedQnaIds.length === 0) {
+            alert('삭제할 Q&A를 선택해주세요.');
+            return;
+          }
+
+          if (confirm('선택한 Q&A를 정말 삭제하시겠습니까?')) {
+            fetch('/admin/board/qnas', {
+              method: 'DELETE',
+              headers: {
+                'Content-Type': 'application/json',
+              },
+              body: JSON.stringify(selectedQnaIds),
+            })
+            .then(response => {
+              if (response.ok) {
+                alert('선택한 Q&A가 삭제되었습니다.');
+                location.reload();
+              } else {
+                alert('Q&A 삭제에 실패했습니다.');
+              }
+            })
+            .catch(error => {
+              console.error('Error:', error);
+              alert('오류가 발생했습니다.');
+            });
+          }
+        });
+      }
+
+      // Select all checkboxes
+      const selectAllCheckbox = document.getElementById('select-all-checkbox');
+      if (selectAllCheckbox) {
+        selectAllCheckbox.addEventListener('change', (event) => {
+          const checkboxes = document.querySelectorAll('.qna-checkbox');
+          checkboxes.forEach(checkbox => {
+            checkbox.checked = event.target.checked;
+          });
+        });
+      }
+    </script>
   </body>
 </html>
