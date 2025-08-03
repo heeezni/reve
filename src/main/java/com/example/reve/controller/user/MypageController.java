@@ -1,5 +1,6 @@
 package com.example.reve.controller.user;
 
+import java.security.Principal;
 import java.util.List;
 
 import jakarta.servlet.ServletException;
@@ -17,8 +18,11 @@ import com.example.reve.domain.CustomUserDetails;
 import com.example.reve.dto.CouponDTO;
 import com.example.reve.dto.NewPasswordDTO;
 import com.example.reve.dto.UpdateProfileDTO;
+import com.example.reve.dto.WishListShowDTO;
 import com.example.reve.service.CouponService;
+import com.example.reve.service.PointService;
 import com.example.reve.service.UserService;
+import com.example.reve.service.WishListService;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -31,12 +35,16 @@ public class MypageController {
 
   private final UserService userService;
   private final CouponService couponService;
+  private final WishListService wishListService;
+  private final PointService pointService;
 
   @GetMapping
   public String mypage(Model model, @AuthenticationPrincipal CustomUserDetails customUserDetails) {
     String loginId = customUserDetails.getUsername();
     if (loginId != null) {
       model.addAttribute("mypage", userService.selectMypage(loginId));
+      model.addAttribute("wish", wishListService.getCount(loginId));
+      model.addAttribute("point", pointService.getPointAmount(loginId));
       int result = couponService.countCoupon(loginId);
       model.addAttribute("countCoupon", result);
       return "user/mypage/index";
@@ -53,7 +61,10 @@ public class MypageController {
 
   // 찜 목록
   @GetMapping("/wishlist")
-  public String wishlist() {
+  public String wishlist(Principal principal, Model model) {
+    String loginId = principal.getName();
+    List<WishListShowDTO> getWishlist = wishListService.getWishList(loginId);
+    model.addAttribute("wishlist", getWishlist);
     return "user/mypage/wishlist";
   }
 
