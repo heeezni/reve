@@ -7,6 +7,7 @@ import java.util.List;
 import java.util.Map;
 
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -18,8 +19,10 @@ import com.example.reve.domain.Review;
 import com.example.reve.domain.User;
 import com.example.reve.dto.PerfumeDetailResponseDto;
 import com.example.reve.dto.PerfumeListResponseDto;
+import com.example.reve.dto.QnaResDTO;
 import com.example.reve.repository.UserRepository;
 import com.example.reve.service.PerfumeService;
+import com.example.reve.service.QnaService;
 import com.example.reve.service.ReviewService;
 import com.example.reve.service.WishListService;
 
@@ -37,6 +40,7 @@ public class ShopController {
   private final UserRepository userRepository;
   private final WishListService wishListService;
   private final ReviewService reviewService;
+  private final QnaService qnaService;
 
   // 향수 목록을 가져오는 매핑임.
   @GetMapping("/list")
@@ -121,6 +125,34 @@ public class ShopController {
     // 리뷰 리스트 불러와서 모델에 추가
     List<Review> reviews = reviewService.getReviewsWithUserByPerfumeId(perfumeId);
     model.addAttribute("reviews", reviews);
+
+    // QnA 개수
+    long qnaCount =
+        qnaService.selectAll(null, null, null, Pageable.unpaged(), principal).stream()
+            .filter(qna -> qna.getPerfumeId().equals(perfumeId)) // 향수 ID 기준 필터링
+            .count(); // QnA 개수 계산
+    model.addAttribute("qnaCount", qnaCount);
+
+    // QnA 리스트 추가 (비밀글 포함)
+    List<QnaResDTO> qnaList =
+        qnaService.selectAll(null, null, null, Pageable.unpaged(), principal).stream()
+            .filter(qna -> qna.getPerfumeId().equals(perfumeId)) // 향수 ID 기준 필터링
+            .map(
+                qna -> {
+                  // DTO 변환 시 isSecret 값도 포함시킴
+                  QnaResDTO dto = new QnaResDTO();
+                  dto.setPerfumeId(qna.getPerfumeId());
+                  dto.setUserName(qna.getUserName());
+                  dto.setTitle(qna.getTitle());
+                  dto.setContent(qna.getContent());
+                  dto.setIsSecret(qna.getIsSecret()); // 비밀글 정보 포함
+                  dto.setCategory(qna.getCategory());
+                  dto.setAnswer(qna.getAnswer());
+                  return dto;
+                })
+            .toList(); // 필터링에서 비밀글 체크 제거
+
+    model.addAttribute("qnaList", qnaList);
 
     return "shop/detail";
   }

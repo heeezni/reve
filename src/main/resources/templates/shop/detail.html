@@ -328,10 +328,10 @@
                 >
                 </button>
                 <button
-                  class="tab-btn py-4 px-1 border-b-2 border-transparent text-gray-500 hover:text-gray-700 font-medium text-sm"
-                  data-tab="qna"
+                        class="tab-btn py-4 px-1 border-b-2 border-transparent text-gray-500 hover:text-gray-700 font-medium text-sm"
+                        data-tab="qna"
                 >
-                  Q&A (23)
+                  Q&A (<span th:text="${qnaCount}">0</span>)
                 </button>
               </nav>
             </div>
@@ -524,46 +524,61 @@
                 <div class="space-y-6">
                   <div class="flex items-center justify-between">
                     <h3 class="text-lg font-semibold text-gray-800">Q&A</h3>
-                    <button class="text-sm text-blue-600 hover:underline">
-                      문의하기
-                    </button>
+                    <a th:href="@{/board/qna/list}">
+                      <button class="btn btn-primary">문의하기</button>
+                    </a>
                   </div>
 
                   <div class="space-y-4">
-                    <div
-                            class="border border-gray-200 rounded-lg p-4"
-                            th:each="qna : ${qnaList}"
-                    >
-                      <div class="flex items-start justify-between mb-3">
-                        <div class="flex items-center space-x-3">
-            <span
-                    class="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-blue-100 text-blue-800"
-                    th:text="${qna.category}"
-            >
-              상품문의
-            </span>
-                          <span class="text-sm text-gray-600" th:text="${qna.userName != null ? qna.userName : '익명'}">
-              익명
-            </span>
+                    <div class="border border-gray-200 rounded-lg p-4" th:each="qna : ${qnaList}">
+
+                      <div th:if="${qna.isSecret}">
+                        <div class="flex items-start justify-between mb-3">
+                          <div class="flex items-center space-x-3">
+                            <th:block th:switch="${qna.category}">
+                              <span th:case="'product'" class="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-blue-100 text-blue-800">상품문의</span>
+                              <span th:case="'delivery'" class="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-green-100 text-green-800">배송문의</span>
+                              <span th:case="'payment'" class="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-purple-100 text-purple-800">결제문의</span>
+                              <span th:case="'return'" class="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-red-100 text-red-800">반품/교환</span>
+                              <span th:case="*" class="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-gray-100 text-gray-800">기타</span>
+                            </th:block>
+                            <span class="text-sm text-gray-600" th:text="${qna.userName != null ? qna.userName : '익명'}">익명</span>
+                          </div>
+                          <span class="text-sm text-gray-500" th:text="${#temporals.format(qna.createdAt, 'yyyy.MM.dd')}"></span>
                         </div>
-                        <span class="text-sm text-gray-500" th:text="${#dates.format(qna.createdAt, 'yyyy.MM.dd')}">
-            2024.01.10
-          </span>
+                        <div class="text-gray-700 mb-3">
+                          <i class="fas fa-lock mr-2" style="color: #9CA3AF;"></i>
+                          <span class="text-black-500">비밀글입니다.</span>
+                        </div>
                       </div>
 
-                      <h4 class="font-medium text-gray-800 mb-2" th:text="${qna.title}">
-                        향이 얼마나 오래 지속되나요?
-                      </h4>
+                      <div th:unless="${qna.isSecret}">
+                        <div class="flex items-start justify-between mb-3">
+                          <div class="flex items-center space-x-3">
+                            <th:block th:switch="${qna.category}">
+                              <span th:case="'product'" class="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-blue-100 text-blue-800">상품문의</span>
+                              <span th:case="'delivery'" class="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-green-100 text-green-800">배송문의</span>
+                              <span th:case="'payment'" class="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-purple-100 text-purple-800">결제문의</span>
+                              <span th:case="'return'" class="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-red-100 text-red-800">반품/교환</span>
+                              <span th:case="*" class="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-gray-100 text-gray-800">기타</span>
+                            </th:block>
+                            <span class="text-sm text-gray-600" th:text="${qna.userName != null ? qna.userName : '익명'}">익명</span>
+                          </div>
+                          <span class="text-sm text-gray-500" th:text="${#temporals.format(qna.createdAt, 'yyyy.MM.dd')}"></span>
+                        </div>
 
-                      <p class="text-gray-700 mb-3" th:text="${qna.content}">
-                        보통 6-8시간 정도 지속됩니다. 개인의 체질과 사용 환경에 따라 차이가 있을 수 있습니다.
-                      </p>
+                        <h4 class="font-medium text-gray-800 mb-2" th:text="${qna.title}">향이 얼마나 오래 지속되나요?</h4>
 
-                      <div class="bg-gray-50 p-3 rounded-md" th:if="${qna.answer != null}">
-                        <div class="text-sm text-gray-600 mb-1">답변</div>
-                        <p class="text-gray-700" th:text="${qna.answer}">
-                          안녕하세요! 디어 무드 퍼퓸은 평균 6-8시간 지속됩니다. 더 오래 지속되길 원하시면 옷에 스프레이하시는 것을 추천드립니다.
+                        <p class="text-gray-700 mb-3" th:text="${qna.content}">
+                          보통 6-8시간 정도 지속됩니다. 개인의 체질과 사용 환경에 따라 차이가 있을 수 있습니다.
                         </p>
+
+                        <div class="bg-gray-50 p-3 rounded-md">
+                          <div class="text-sm text-gray-600 mb-1">답변</div>
+                          <p class="text-gray-700" th:text="${qna.answer}">
+                            안녕하세요! 디어 무드 퍼퓸은 평균 6-8시간 지속됩니다. 더 오래 지속되길 원하시면 옷에 스프레이하시는 것을 추천드립니다.
+                          </p>
+                        </div>
                       </div>
                     </div>
                   </div>
@@ -631,6 +646,13 @@
 
     <script src="/js/script.js"></script>
     <script>
+      document.addEventListener('DOMContentLoaded', function() {
+        // data-isSecret 속성을 가진 div 요소들 선택
+        document.querySelectorAll('div[data-isSecret]').forEach((item) => {
+          const isSecret = item.getAttribute('data-isSecret');
+          console.log('isSecret:', isSecret);
+        });
+      });
       // Image slider functionality
       const mainImage = document.getElementById('mainImage');
       const thumbnailBtns = document.querySelectorAll('.thumbnail-btn');
@@ -709,7 +731,6 @@
           event.preventDefault(); // form 제출 막기
           document.getElementById("loginAlertModal").style.display = "flex";
           return false;
-          window.location.href = "/login";
         }
         return true;
       }

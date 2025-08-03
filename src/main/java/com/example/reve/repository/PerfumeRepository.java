@@ -2,6 +2,7 @@ package com.example.reve.repository;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
 
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -65,4 +66,10 @@ public interface PerfumeRepository extends JpaRepository<Perfume, Long> {
           + "GROUP BY p.perfumeId")
   Page<Perfume> findBySearchAndScentWithReviewJoin(
       @Param("search") String search, @Param("scent") String scent, Pageable pageable);
+
+  @Query("SELECT p FROM Perfume p WHERE p.scent IN :scents AND p.perfumeId NOT IN :excludeIds")
+  List<Perfume> findRecommendedPerfumes(
+      @Param("scents") Set<String> scents,
+      @Param("excludeIds") List<Long> excludeIds,
+      Pageable pageable);
 }

@@ -12,12 +12,19 @@
         .actions a:hover { text-decoration: underline; }
         .add-button { margin-bottom: 20px; padding: 10px 15px; background-color: #28a745; color: white; border: none; border-radius: 5px; cursor: pointer; text-decoration: none; }
         .add-button:hover { background-color: #218838; }
+        .delete-form { display: inline; }
+        .delete-button { background: none; border: none; color: #dc3545; cursor: pointer; padding: 0; font-size: inherit; }
+        .delete-button:hover { text-decoration: none; }
+        .role-form { display: inline; margin-left: 5px; }
+        .role-select { padding: 5px; border-radius: 4px; border: 1px solid #ccc; }
+        .role-submit { padding: 5px 10px; background-color: #007bff; color: white; border: none; border-radius: 4px; cursor: pointer; }
+        .role-submit:hover { background-color: #0056b3; }
     </style>
 </head>
 <body>
     <h1>회원 목록</h1>
 
-    <a th:href="@{/admin/dashboard}" class="add-button" style="background-color: #6c757d; margin-bottom: 20px; display: inline-block;">대시보드로 돌아가기</a>
+    <a th:href="@{/admin/dashboard}" class="add-button" style="background-color: #6c757d; margin-bottom: 20px; display: inline-block;">관리자 대시보드로 돌아가기</a>
 
     <table>
         <thead>
@@ -34,18 +41,31 @@
         <tbody>
             <tr th:each="user : ${users}">
                 <td th:text="${user.userId}"></td>
-                <td th:text="${user.loginId}"></td>
+                <td><a th:href="@{/admin/member/mypage/{userId}(userId=${user.userId})}" th:text="${user.loginId}"></a></td>
                 <td th:text="${user.name}"></td>
                 <td th:text="${user.email}"></td>
                 <td th:text="${user.phone}"></td>
-                <td th:text="${user.role}"></td>
+                <td>
+                    <form th:action="@{/admin/member/updateRole}" method="post" class="role-form">
+                        <input type="hidden" name="userId" th:value="${user.userId}">
+                        <select name="role" class="role-select">
+                            <option value="USER" th:selected="${user.role.name() == 'USER'}">USER</option>
+                            <option value="ADMIN" th:selected="${user.role.name() == 'ADMIN'}">ADMIN</option>
+                        </select>
+                        <button type="submit" class="role-submit">변경</button>
+                    </form>
+                </td>
                 <td class="actions">
-                    <!-- 권한 변경 및 삭제 기능은 백엔드 구현 필요 -->
-                    <a href="#">권한 변경</a>
-                    <a href="#" onclick="return confirm('정말로 이 회원을 삭제하시겠습니까?');">삭제</a>
+                    <form th:action="@{/admin/member/delete}" method="get" class="delete-form">
+                        <input type="hidden" name="userId" th:value="${user.userId}">
+                        <button type="submit" class="delete-button" onclick="return confirm('정말로 이 회원을 삭제하시겠습니까?');">삭제</button>
+                    </form>
                 </td>
             </tr>
         </tbody>
     </table>
+    <script th:if="${message}">
+        alert(decodeURIComponent('[[${message}]]'));
+    </script>
 </body>
 </html>

@@ -34,15 +34,14 @@
               </div>
               <div class="flex-1">
                 <div class="flex items-center space-x-3 mb-2">
-                  <h2 class="text-xl font-bold text-gray-800" th:unless="${#authentication.principal.nickname !=null}" th:text="${#authentication.principal.name} +'님'"></h2>
-                  <h2 class="text-xl font-bold text-gray-800" th:if="${#authentication.principal.nickname !=null}" th:text="${#authentication.principal.nickname} +'님'"></h2>
+                  <h2 class="text-xl font-bold text-gray-800" th:text="${mypage.name} +'님'"></h2>
                 </div>
                 <p class="text-gray-600 mb-3" th:text=" ${mypage.email}"></p>
                 <div class="flex items-center space-x-6 text-sm text-gray-500">
                   <span th:text="'가입날짜 : '+${#temporals.format(mypage.createdAt, 'yyyy-MM-dd')}"></span>
                 </div>
               </div>
-              <div class="flex space-x-3">
+              <div class="flex space-x-3" th:if="${mypage.userId == currentUserId}">
                 <a
                   href="/mypage/account"
                   class="px-4 py-2 border border-gray-300 rounded-md text-gray-700 hover:bg-gray-50 transition-colors text-sm"

@@ -1,8 +1,8 @@
 <!DOCTYPE html>
-<html lang="ko" xmlns:th="http://www.thymeleaf.org" xmlns="http://www.w3.org/1999/html">
+<html lang="ko" xmlns:th="http://www.thymeleaf.org">
   <head th:replace="~{fragments/header :: head(title='위시리스트 | Rêve')}">
   </head>
-  <body class="font-sans text-gray-800" th:data-error="${error}">
+  <body class="font-sans text-gray-800">
     <!-- Header Fragment -->
     <div th:replace="~{fragments/header :: header}"></div>
 
@@ -288,7 +288,6 @@
     <div th:replace="~{fragments/modal :: loginModal}"></div>
 
     <script src="/js/script.js"></script>
-
     <script>
       document.addEventListener("DOMContentLoaded", () => {
         const errorValue = document.body.getAttribute("data-error");

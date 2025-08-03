@@ -56,9 +56,10 @@ public class PerfumeService {
   }
 
   // 향수 등록 시 이미지 등록하는 로직
+  // 향수 등록 시 이미지 등록하는 로직
   public String storeImage(MultipartFile file) {
     if (file.isEmpty()) {
-      throw new IllegalArgumentException("빈 파일은 저장할 수 없습니다.");
+      return null; // 빈 파일이면 null 반환
     }
 
     try {
@@ -66,15 +67,17 @@ public class PerfumeService {
       String extension = originalFilename.substring(originalFilename.lastIndexOf("."));
       String uniqueFilename = UUID.randomUUID().toString() + extension;
 
-      File directory = new File(uploadDir);
+      // perfume 폴더 하위로 저장
+      File directory = new File(uploadDir + "/perfume/");
       if (!directory.exists()) {
-        directory.mkdirs();
+        directory.mkdirs(); // 디렉토리 없으면 생성
       }
 
-      File saveFile = new File(uploadDir, uniqueFilename);
+      File saveFile = new File(directory, uniqueFilename);
       file.transferTo(saveFile);
 
-      return imageUrlPrefix + uniqueFilename;
+      // 저장된 이미지 URL 반환 (perfume 하위 경로로 반환)
+      return imageUrlPrefix + "perfume/" + uniqueFilename;
     } catch (IOException e) {
       throw new RuntimeException("이미지 저장 실패", e);
     }
@@ -144,13 +147,17 @@ public class PerfumeService {
     if (imageFile != null && !imageFile.isEmpty()) {
       deleteImage(perfume.getImageUrl());
       String newImageUrl = storeImage(imageFile);
-      perfume.setImageUrl(newImageUrl);
+      if (newImageUrl != null) { // null 체크 추가
+        perfume.setImageUrl(newImageUrl);
+      }
     }
 
     if (hoverImageFile != null && !hoverImageFile.isEmpty()) {
       deleteImage(perfume.getHoverImageUrl());
       String newHoverImageUrl = storeImage(hoverImageFile);
-      perfume.setHoverImageUrl(newHoverImageUrl);
+      if (newHoverImageUrl != null) { // null 체크 추가
+        perfume.setHoverImageUrl(newHoverImageUrl);
+      }
     }
 
     // 향수 정보 수정

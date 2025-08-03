@@ -15,5 +15,6 @@ public interface CartRepository extends JpaRepository<Cart, Long> {
   // 유저 + 향수 조합으로 이미 담은 항목이 있는지 확인 (중복 방지용)
   Optional<Cart> findByUser_UserIdAndPerfume_PerfumeId(Long userId, Long perfumeId);
 
+  // 전체 삭제
   void deleteAllByUserLoginId(String loginId);
 }
