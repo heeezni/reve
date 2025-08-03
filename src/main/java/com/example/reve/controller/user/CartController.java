@@ -10,8 +10,15 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 
 import com.example.reve.domain.Cart;
+import com.example.reve.domain.CustomUserDetails;
+import com.example.reve.domain.Perfume;
+import com.example.reve.domain.User;
 import com.example.reve.dto.CartAddRequestDTO;
+import com.example.reve.dto.CartFormDTO;
+import com.example.reve.dto.CouponDTO;
 import com.example.reve.service.CartService;
+import com.example.reve.service.CouponService;
+import com.example.reve.service.UserService;
 
 import lombok.RequiredArgsConstructor;
 
@@ -24,6 +31,8 @@ import lombok.RequiredArgsConstructor;
 public class CartController {
 
   private final CartService cartService;
+  private final CouponService couponService;
+  private final UserService userService;
 
   @GetMapping
   public String showCartPage(Principal principal, Model model) {
@@ -35,6 +44,25 @@ public class CartController {
     int totalPrice =
         cartList.stream().mapToInt(item -> item.getQuantity() * item.getPerfume().getPrice()).sum();
     model.addAttribute("totalPrice", totalPrice);
+
+    List<Perfume> recommendedPerfumes = cartService.getRecommendedPerfumes(cartList);
+    model.addAttribute("recommendedPerfumes", recommendedPerfumes);
+
+    User user =
+        userService.loadUserByUsername(loginId) instanceof CustomUserDetails cud
+            ? cud.getUser()
+            : null;
+
+    if (user != null) {
+      Long userId = user.getUserId();
+      List<CouponDTO> coupons = couponService.getCoupon(userId);
+      model.addAttribute("coupons", coupons);
+    } else {
+      model.addAttribute("coupons", List.of());
+    }
+
+    CartFormDTO form = new CartFormDTO(); // DTO는 new 해도 됨
+    model.addAttribute("cartFormDTO", form);
 
     return "cart/cart";
   }

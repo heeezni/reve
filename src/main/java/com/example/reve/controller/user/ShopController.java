@@ -7,6 +7,7 @@ import java.util.List;
 import java.util.Map;
 
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -18,8 +19,10 @@ import com.example.reve.domain.Review;
 import com.example.reve.domain.User;
 import com.example.reve.dto.PerfumeDetailResponseDto;
 import com.example.reve.dto.PerfumeListResponseDto;
+import com.example.reve.dto.QnaResDTO;
 import com.example.reve.repository.UserRepository;
 import com.example.reve.service.PerfumeService;
+import com.example.reve.service.QnaService;
 import com.example.reve.service.ReviewService;
 import com.example.reve.service.WishListService;
 
@@ -37,6 +40,7 @@ public class ShopController {
   private final UserRepository userRepository;
   private final WishListService wishListService;
   private final ReviewService reviewService;
+  private final QnaService qnaService;
 
   // 향수 목록을 가져오는 매핑임.
   @GetMapping("/list")
@@ -121,6 +125,35 @@ public class ShopController {
     // 리뷰 리스트 불러와서 모델에 추가
     List<Review> reviews = reviewService.getReviewsWithUserByPerfumeId(perfumeId);
     model.addAttribute("reviews", reviews);
+
+    // QnA 개수
+    long qnaCount =
+        qnaService.selectAll(null, null, null, Pageable.unpaged(), principal).stream()
+            .filter(qna -> qna.getPerfumeId().equals(perfumeId)) // 향수 ID 기준 필터링
+            .count(); // QnA 개수 계산
+    model.addAttribute("qnaCount", qnaCount);
+
+    // isAdmin 추가: 로그인한 사용자가 'admin'인 경우에만 true
+    boolean isAdmin = principal != null && "admin".equals(principal.getName());
+    model.addAttribute("isAdmin", isAdmin);
+
+    // QnA 리스트 추가 (필요하면 페이지네이션 적용)
+    List<QnaResDTO> qnaList =
+        qnaService.selectAll(null, null, null, Pageable.unpaged(), principal).stream()
+            .filter(qna -> qna.getPerfumeId().equals(perfumeId)) // 향수 ID 기준으로 필터링
+            .filter(
+                qna -> {
+                  // 비밀글인 경우 본인 또는 관리자만 볼 수 있도록 처리
+                  if (qna.getIsSecret()) {
+                    return principal != null
+                        && (qna.getUserName().equals(principal.getName()) || isAdmin);
+                  }
+                  // 비밀글이 아니면 모두 볼 수 있음
+                  return true;
+                })
+            .toList();
+
+    model.addAttribute("qnaList", qnaList);
 
     return "shop/detail";
   }
