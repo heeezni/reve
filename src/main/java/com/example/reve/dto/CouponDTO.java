@@ -14,6 +14,8 @@ public class CouponDTO {
   private Long couponId;
   // 쿠폰명
   private CouponName couponName;
+  // 할인율
+  private int discountRate;
   // 만료일
   private LocalDateTime expiresAt;
   // 사용여부

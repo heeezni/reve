@@ -133,6 +133,8 @@ public class CouponService {
       couponDTO.setIsUsed(coupon.getIsUsed());
       // 쿠폰 유효 시작일
       couponDTO.setValidFrom(coupon.getValidFrom());
+      // 쿠폰 할인율
+      couponDTO.setDiscountRate(coupon.getDiscountRate());
       // 쿠폰들 담기
       result.add(couponDTO);
     }
