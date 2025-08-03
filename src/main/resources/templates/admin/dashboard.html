@@ -10,6 +10,8 @@
         .dashboard-section p { font-size: 1.1em; }
         .dashboard-section a { text-decoration: none; color: #007bff; }
         .dashboard-section a:hover { text-decoration: underline; }
+        .shop-home-button { display: inline-block; margin-top: 20px; padding: 10px 20px; background-color: #007bff; color: white; border: none; border-radius: 5px; text-decoration: none; font-size: 16px; }
+        .shop-home-button:hover { background-color: #0056b3; }
     </style>
 </head>
 <body>
@@ -32,6 +34,8 @@
         <p>총 주문 수: (현재는 표시되지 않음)</p>
         <p><a th:href="@{/admin/order/list}">주문 목록 보러가기</a></p>
     </div>
+
+    <a th:href="@{/}" class="shop-home-button">쇼핑몰 홈으로</a>
 
     <!-- 추가적인 대시보드 섹션 (예: 매출 통계, 최근 활동 등)은 여기에 추가할 수 있습니다. -->
 

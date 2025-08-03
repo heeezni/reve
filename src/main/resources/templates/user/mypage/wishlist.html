@@ -107,8 +107,7 @@
                             <span class="text-sm text-gray-500">(127)</span>
                           </div>
                         </div>
-                <!-- 상품 보기 -->
-
+                        <!-- 상품 보기 -->
                         <div class="flex items-center space-x-2">
                           <button
                             class="bg-gray-800 text-white px-4 py-2 rounded-md hover:bg-gray-700 transition-colors text-sm font-medium"
@@ -121,7 +120,6 @@
                             바로구매
                           </button>
                         </div>
-                      </div>
 
                       <button
                         class="remove-wishlist text-gray-400 hover:text-red-500 transition-colors ml-4"
@@ -130,6 +128,7 @@
                       </button>
                     </div>
                   </div>
+                </div>
                 </div>
 
             <!-- Empty State (Hidden by default) -->
@@ -252,8 +251,7 @@
                   />
                   <div class="absolute top-2 right-2">
                     <span
-                      class="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-blue-500 text-white"
-                    >
+                      class="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-blue-500 text-white" >
                       NEW
                     </span>
                   </div>
@@ -299,6 +297,7 @@
           </div>
         </div>
       </div>
+      </div>
     </main>
 
     <!-- Footer Fragment -->
@@ -311,7 +310,7 @@
     <script>
       // Wishlist functionality
       const wishlistItems = document.querySelectorAll('.wishlist-item');
-      const checkboxes = document.querySelectorAll('.wishlist-checkbox');
+      let checkboxes = document.querySelectorAll('.wishlist-checkbox');
       const selectAllBtn = document.getElementById('selectAll');
       const removeSelectedBtn = document.getElementById('removeSelected');
       const emptyWishlist = document.getElementById('emptyWishlist');

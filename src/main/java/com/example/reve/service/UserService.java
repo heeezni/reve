@@ -15,6 +15,7 @@ import org.springframework.web.multipart.MultipartFile;
 import com.example.reve.domain.CustomUserDetails;
 import com.example.reve.domain.User;
 import com.example.reve.dto.*;
+import com.example.reve.repository.CouponRepository;
 import com.example.reve.repository.UserRepository;
 
 import lombok.RequiredArgsConstructor;
@@ -31,6 +32,7 @@ public class UserService implements UserDetailsService { // UserDetailsService �
   private final PasswordEncoder passwordEncoder;
   private final CouponService couponService;
   private final ProfileUrlService profileUrlService;
+  private final CouponRepository couponRepository;
 
   /**
    * 회원 가입 서비스
@@ -194,5 +196,24 @@ public class UserService implements UserDetailsService { // UserDetailsService �
   // 모든 사용자 조회
   public java.util.List<User> getAllUsers() {
     return userRepository.findAll();
+  }
+
+  // 사용자 삭제
+  @Transactional
+  public void deleteUser(Long userId) {
+    // 해당 사용자의 모든 쿠폰 삭제
+    couponRepository.deleteAll(couponRepository.findByUser_UserId(userId));
+    userRepository.deleteById(userId);
+  }
+
+  // 사용자 권한 변경
+  @Transactional
+  public void updateUserRole(Long userId, com.example.reve.domain.Role newRole) {
+    User user =
+        userRepository
+            .findById(userId)
+            .orElseThrow(() -> new IllegalArgumentException("해당 사용자를 찾을 수 없습니다."));
+    user.setRole(newRole);
+    userRepository.save(user);
   }
 }

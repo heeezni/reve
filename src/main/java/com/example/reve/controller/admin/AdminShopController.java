@@ -45,7 +45,7 @@ public class AdminShopController {
 
     perfumeService.savePerfume(requestDto);
 
-    return "redirect:/shop/list";
+    return "redirect:/admin/product/list";
   }
 
   // 향수를 삭제하기 (개별 및 선택 삭제 가능)
@@ -58,7 +58,7 @@ public class AdminShopController {
     } else if (perfumeId != null) {
       perfumeService.deletePerfume(perfumeId);
     }
-    return "redirect:/shop/list";
+    return "redirect:/admin/product/list";
   }
 
   // 향수 수정폼 가져오기
@@ -73,12 +73,12 @@ public class AdminShopController {
   @PostMapping("/edit/{perfumeId}")
   public String updatePerfume(
       @PathVariable("perfumeId") Long perfumeId,
-      PerfumeSaveRequestDto requestDto,
+      @ModelAttribute PerfumeSaveRequestDto requestDto,
       @RequestParam(value = "imageFile", required = false) MultipartFile imageFile,
       @RequestParam(value = "hoverImageFile", required = false) MultipartFile hoverImageFile) {
 
     perfumeService.updatePerfume(perfumeId, requestDto, imageFile, hoverImageFile);
 
-    return "redirect:/shop/list";
+    return "redirect:/admin/product/list";
   }
 }
