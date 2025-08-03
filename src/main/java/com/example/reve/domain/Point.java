@@ -23,7 +23,7 @@ public class Point extends BaseEntity {
   // 적립금
   @Min(0)
   @Column(nullable = false)
-  private int pointAmount;
+  private Integer pointAmount;
 
   // 포인트랑 유저(N:1)
   @ManyToOne(fetch = FetchType.LAZY, optional = false)

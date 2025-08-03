@@ -23,17 +23,17 @@ public class PointService {
     User user = userRepository.findById(userId).orElseThrow();
     Point point = pointRepository.findByUser_UserId(userId).orElse(null);
     if (point == null) {
-            point = new Point();
-            point.setUser(user);
-            point.setPointAmount(pointAmount);
-            log.info("신규 회원 포인트 발급");
-        } else {
-            point.setPointAmount(point.getPointAmount() + pointAmount);
-            log.info("기존 회원 포인트 발급");
-        }
-
-        pointRepository.save(point);
+      point = new Point();
+      point.setUser(user);
+      point.setPointAmount(pointAmount);
+      log.info("신규 회원 포인트 발급");
+    } else {
+      point.setPointAmount(point.getPointAmount() + pointAmount);
+      log.info("기존 회원 포인트 발급");
     }
-    //포인트 조회
+
+    pointRepository.save(point);
+  }
+  // 포인트 조회
 
 }
