@@ -1,6 +1,7 @@
 package com.example.reve.controller.user;
 
 import java.security.Principal;
+import java.util.ArrayList;
 import java.util.List;
 
 import jakarta.servlet.ServletException;
@@ -64,6 +65,7 @@ public class MypageController {
   public String wishlist(Principal principal, Model model) {
     String loginId = principal.getName();
     List<WishListShowDTO> getWishlist = wishListService.getWishList(loginId);
+    if (getWishlist == null) getWishlist = new ArrayList<>();
     model.addAttribute("wishlist", getWishlist);
     return "user/mypage/wishlist";
   }
