@@ -76,14 +76,14 @@
                             <h3 class="text-lg font-medium text-gray-800 mb-1">
                               <a th:href="'/shop/detail?id=' + ${getWishList.perfumeId}"
                                  class="hover:text-gray-600"
-                                 th:text="${getWishList.perfumeName} + ' ' + ${getWishList.volume} + 'ml'"></a>
+                                 th:text="${getWishList.perfumeName} + ' ' + ${getWishList.volume}"></a>
                             </h3>
                             <p class="text-sm text-gray-600 mb-3" th:text="${getWishList.desciptionTitle}"></p>
 
                             <div class="flex items-center space-x-3 mb-3">
                               <div class="flex items-center space-x-2">
                                 <span class="text-xl font-bold text-gray-800"
-                                      th:text="${#numbers.formatDecimal(getWishList.discount, 0, 'COMMA', 0, 'POINT')}"></span>
+                                      th:text="${#numbers.formatDecimal(getWishList.price - getWishList.discount, 0, 'COMMA', 0, 'POINT')}"></span>
                                 <span class="text-sm text-gray-400 line-through"
                                       th:text="${#numbers.formatDecimal(getWishList.price, 0, 'COMMA', 0, 'POINT')}"></span>
                               </div>
