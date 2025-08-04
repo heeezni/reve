@@ -16,6 +16,7 @@ hs_err_pid*
 
 # === OS 시스템 파일 ===
 .DS_Store               # macOS
+**/.DS_Store
 Thumbs.db               # Windows
 ehthumbs.db
 ehthumbs_vista.db
