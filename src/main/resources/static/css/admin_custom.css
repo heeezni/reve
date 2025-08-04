@@ -1,0 +1,28 @@
+/* Custom styles for admin pages to restore button appearance */
+
+.actions a { margin-right: 5px; text-decoration: none; color: #007bff; }
+.actions a:hover { text-decoration: underline; }
+
+.add-button { padding: 10px 15px; background-color: #28a745; color: white; border: none; border-radius: 5px; cursor: pointer; text-decoration: none; }
+.add-button:hover { background-color: #218838; }
+
+.delete-form { display: inline; }
+.delete-button { background: none; border: none; color: #dc3545; cursor: pointer; padding: 0; font-size: inherit; }
+.delete-button:hover { text-decoration: none; }
+
+.role-form { display: inline; margin-left: 5px; }
+.role-select { padding: 5px; border-radius: 4px; border: 1px solid #ccc; }
+.role-submit { padding: 5px 10px; background-color: #007bff; color: white; border: none; border-radius: 4px; cursor: pointer; }
+.role-submit:hover { background-color: #0056b3; }
+
+.bulk-actions { margin-top: 10px; margin-bottom: 20px; }
+.bulk-actions button { padding: 8px 15px; background-color: #dc3545; color: white; border: none; border-radius: 5px; cursor: pointer; }
+.bulk-actions button:hover { background-color: #c82333; }
+
+.shop-list-button { display: inline-block; margin-left: 10px; padding: 10px 15px; background-color: #007bff; color: white; border: none; border-radius: 5px; text-decoration: none; }
+.shop-list-button:hover { background-color: #0056b3; }
+
+.user-panel .image img {
+    width: 60px; /* 원하는 너비 */
+    height: 60px; /* 원하는 높이 */
+}

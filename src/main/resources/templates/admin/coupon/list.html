@@ -1,8 +1,35 @@
 <!DOCTYPE html>
-<html lang="en">
-<head th:replace="~{fragments/header :: head(title='쿠폰 목록 | Rêve Admin')}">
+<html lang="en" xmlns:th="http://www.thymeleaf.org" xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout" layout:decorate="~{fragments/admin_layout}">
+<head>
+    <title>쿠폰 목록</title>
 </head>
 <body>
-관리자가 뿌린 쿠폰 목록 테이블
+<div layout:fragment="content">
+    <!-- Content Header (Page header) -->
+    <div class="content-header">
+        <div class="container-fluid">
+            <div class="row mb-2">
+                <div class="col-sm-6">
+                    <h1 class="m-0">쿠폰 목록</h1>
+                </div><!-- /.col -->
+                <div class="col-sm-6">
+                    <ol class="breadcrumb float-sm-right">
+                        <li class="breadcrumb-item"><a th:href="@{/admin/dashboard}">Home</a></li>
+                        <li class="breadcrumb-item active">쿠폰 목록</li>
+                    </ol>
+                </div><!-- /.col -->
+            </div><!-- /.row -->
+        </div><!-- /.container-fluid -->
+    </div>
+    <!-- /.content-header -->
+
+    <!-- Main content -->
+    <section class="content">
+        <div class="container-fluid">
+            관리자가 뿌린 쿠폰 목록 테이블
+        </div><!-- /.container-fluid -->
+    </section>
+    <!-- /.content -->
+</div>
 </body>
 </html>

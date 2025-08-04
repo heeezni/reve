@@ -32,6 +32,7 @@ dependencies {
     implementation 'org.thymeleaf.extras:thymeleaf-extras-springsecurity6'
     // Thymeleaf 관련
     implementation 'org.springframework.boot:spring-boot-starter-thymeleaf'
+    implementation 'nz.net.ultraq.thymeleaf:thymeleaf-layout-dialect'
     // 웹 MVC 기능
     implementation 'org.springframework.boot:spring-boot-starter-web'
     // 유효성 검사 (Validation)
