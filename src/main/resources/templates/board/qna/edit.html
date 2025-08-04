@@ -61,6 +61,26 @@
                         </div>
                     </div>
 
+                    <!-- 기존 첨부파일 미리보기 -->
+                    <div>
+                        <label class="block mb-1 font-semibold">기존 첨부 이미지</label>
+                        <div class="flex flex-wrap gap-4">
+                            <th:block th:if="${qna.attachmentFiles != null}">
+                                <div th:each="fileUrl : ${qna.attachmentFiles}" class="relative group" th:data-file-url="${fileUrl}">
+                                    <a th:href="@{${fileUrl}}" target="_blank">
+                                        <img th:src="@{${fileUrl}}" alt="첨부 이미지" class="w-32 h-32 object-cover border rounded-md shadow-sm hover:scale-105 transition-transform duration-200" />
+                                    </a>
+                                    <button type="button"
+                                            class="absolute top-1 right-1 bg-red-500 text-white rounded-full w-6 h-6 opacity-0 group-hover:opacity-100 transition-opacity"
+                                            onclick="removeExistingFile(this)"
+                                            aria-label="삭제">
+                                        &times;
+                                    </button>
+                                </div>
+                            </th:block>
+                        </div>
+                    </div>
+
                     <!-- File Upload -->
                     <div>
                         <label class="block text-sm font-medium text-gray-700 mb-3">첨부파일</label>
@@ -147,6 +167,29 @@
                     contentCharCountSpan.classList.remove('text-red-500');
                 }
             });
+        }
+
+        window.removeExistingFile = function(button) {
+            console.log('삭제 버튼 클릭됨');
+            const fileDiv = button.closest('div[data-file-url]');
+            if (!fileDiv) {
+                console.log('data-file-url을 가진 부모 div를 찾지 못함');
+                return;
+            }
+
+            const fileUrl = fileDiv.getAttribute('data-file-url');
+            console.log('삭제 대상 파일 URL:', fileUrl);
+
+            fileDiv.remove();
+            console.log('썸네일 제거 완료');
+
+            const deletedFilesContainer = document.getElementById('deleted-files-container');
+            const hiddenInput = document.createElement('input');
+            hiddenInput.type = 'hidden';
+            hiddenInput.name = 'deletedAttachments';
+            hiddenInput.value = fileUrl;
+            deletedFilesContainer.appendChild(hiddenInput);
+            console.log('삭제 파일 정보 hidden input 추가 완료');
         }
 
         // 기존 파일 목록 초기화
