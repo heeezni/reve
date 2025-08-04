@@ -1,49 +1,26 @@
 <!DOCTYPE html>
-<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<html lang="en" xmlns:th="http://www.thymeleaf.org" xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout" layout:decorate="~{fragments/admin_layout}">
 <head>
-    <meta charset="UTF-8">
     <title>관리자 대시보드</title>
-    <style>
-        body { font-family: Arial, sans-serif; margin: 20px; }
-        .dashboard-section { border: 1px solid #ccc; padding: 15px; margin-bottom: 20px; border-radius: 8px; }
-        .dashboard-section h2 { margin-top: 0; color: #333; }
-        .dashboard-section p { font-size: 1.1em; }
-        .dashboard-section a { text-decoration: none; color: #007bff; }
-        .dashboard-section a:hover { text-decoration: underline; }
-        .shop-home-button { display: inline-block; margin-top: 20px; padding: 10px 20px; background-color: #007bff; color: white; border: none; border-radius: 5px; text-decoration: none; font-size: 16px; }
-        .shop-home-button:hover { background-color: #0056b3; }
-    </style>
 </head>
 <body>
-    <h1>관리자 대시보드</h1>
-
-    <div class="dashboard-section">
-        <h2>상품 현황</h2>
-        <p>총 상품 수: <span th:text="${totalPerfumeCount}">0</span>개</p>
-        <p><a th:href="@{/admin/product/list}">상품 목록 보러가기</a></p>
+<div layout:fragment="content">
+    <!-- Content Header (Page header) -->
+    <div class="content-header">
+        <div class="container-fluid">
+            <div class="row mb-2">
+                <div class="col-sm-6">
+                    <h1 class="m-0">관리자 대시보드</h1>
+                </div><!-- /.col -->
+                <div class="col-sm-6">
+                    <ol class="breadcrumb float-sm-right">
+                        <li class="breadcrumb-item active">Dashboard</li>
+                    </ol>
+                </div><!-- /.col -->
+            </div><!-- /.row -->
+        </div><!-- /.container-fluid -->
     </div>
-
-    <div class="dashboard-section">
-        <h2>회원 현황</h2>
-        <p>총 회원 수: <span th:text="${totalUserCount}">0</span>명</p>
-        <p><a th:href="@{/admin/member/list}">회원 목록 보러가기</a></p>
-    </div>
-
-    <div class="dashboard-section">
-        <h2>주문 현황</h2>
-        <p>총 주문 수: <span th:text="${totalOrderCount}">0</span>개</p>
-        <p><a th:href="@{/admin/order/list}">주문 목록 보러가기</a></p>
-    </div>
-
-    <div class="dashboard-section">
-        <h2>쿠폰 현황</h2>
-        <p>총 발급 쿠폰 수: <span th:text="${totalCouponCount}">0</span>개</p>
-        <p><a th:href="@{/admin/coupon/list}">쿠폰 목록 보러가기</a></p>
-    </div>
-
-    <a th:href="@{/}" class="shop-home-button">쇼핑몰 홈으로</a>
-
-    <!-- 추가적인 대시보드 섹션 (예: 매출 통계, 최근 활동 등)은 여기에 추가할 수 있습니다. -->
-
+    <!-- /.content-header -->
+</div>
 </body>
 </html>

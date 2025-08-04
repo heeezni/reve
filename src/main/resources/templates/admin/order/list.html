@@ -1,10 +1,35 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" xmlns:th="http://www.thymeleaf.org" xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout" layout:decorate="~{fragments/admin_layout}">
 <head>
-    <meta charset="UTF-8">
-    <title>Title</title>
+    <title>주문 목록</title>
 </head>
 <body>
-주문 목록 페이지 (결제/배송 상태 확인 및 수정)
+<div layout:fragment="content">
+    <!-- Content Header (Page header) -->
+    <div class="content-header">
+        <div class="container-fluid">
+            <div class="row mb-2">
+                <div class="col-sm-6">
+                    <h1 class="m-0">주문 목록</h1>
+                </div><!-- /.col -->
+                <div class="col-sm-6">
+                    <ol class="breadcrumb float-sm-right">
+                        <li class="breadcrumb-item"><a th:href="@{/admin/dashboard}">Home</a></li>
+                        <li class="breadcrumb-item active">주문 목록</li>
+                    </ol>
+                </div><!-- /.col -->
+            </div><!-- /.row -->
+        </div><!-- /.container-fluid -->
+    </div>
+    <!-- /.content-header -->
+
+    <!-- Main content -->
+    <section class="content">
+        <div class="container-fluid">
+            주문 목록 페이지 (결제/배송 상태 확인 및 수정)
+        </div><!-- /.container-fluid -->
+    </section>
+    <!-- /.content -->
+</div>
 </body>
 </html>
