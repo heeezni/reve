@@ -31,8 +31,14 @@
 
     <div class="dashboard-section">
         <h2>주문 현황</h2>
-        <p>총 주문 수: (현재는 표시되지 않음)</p>
+        <p>총 주문 수: <span th:text="${totalOrderCount}">0</span>개</p>
         <p><a th:href="@{/admin/order/list}">주문 목록 보러가기</a></p>
+    </div>
+
+    <div class="dashboard-section">
+        <h2>쿠폰 현황</h2>
+        <p>총 발급 쿠폰 수: <span th:text="${totalCouponCount}">0</span>개</p>
+        <p><a th:href="@{/admin/coupon/list}">쿠폰 목록 보러가기</a></p>
     </div>
 
     <a th:href="@{/}" class="shop-home-button">쇼핑몰 홈으로</a>
