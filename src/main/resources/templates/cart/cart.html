@@ -65,11 +65,19 @@
 
                       <!-- 할인된 가격 -->
                       <span class="text-lg font-bold ml-2 price-per-item"
+                            th:if="${cartItem.perfume.discount > 0}"
                             th:data-price="${cartItem.perfume.price}"
                             th:data-discount="${cartItem.perfume.discount}"
                             th:text="${cartItem.perfume.price - cartItem.perfume.discount} + '원'">
                       </span>
-                      <span class="text-gray-400 line-through text-sm ml-2 original-price"
+
+                      <span class="text-gray-400 line-through text-sm ml-2"
+                            th:if="${cartItem.perfume.discount > 0}"
+                            th:data-originalPrice = "${cartItem.perfume.price}"
+                            th:text="|${#numbers.formatInteger(cartItem.perfume.price, 3, 'COMMA')}원|"></span>
+
+                      <span class="text-lg font-bold ml-2 price-per-item"
+                            th:if="${cartItem.perfume.discount == 0}"
                             th:data-originalPrice = "${cartItem.perfume.price}"
                             th:text="|${#numbers.formatInteger(cartItem.perfume.price, 3, 'COMMA')}원|"></span>
                     </div>
@@ -171,12 +179,13 @@
                             class="w-full border border-gray-300 rounded-md px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-gray-800 focus:border-transparent"
                             th:field="*{selectedCoupon}">
                       <option value="" disabled selected>쿠폰을 선택하세요</option>
-                      <option th:each="coupon : ${coupons}"
+                      <option
+                              th:each="coupon : ${coupons}"
                               th:value="${coupon.couponId}"
-                              th:text="${coupon.couponName + ' (' + #temporals.format(coupon.expiresAt, 'yyyy-MM-dd') + '까지)'}">
+                              th:text="${coupon.couponName + ' (' + coupon.discountRate + '% 할인, ' + #temporals.format(coupon.expiresAt, 'yyyy-MM-dd') + '까지)'}"
+                              th:attr="data-discount-rate=${coupon.discountRate}">
                       </option>
                     </select>
-                    <button type="submit">적용하기</button>
                   </form>
                 </label>
                 <label>
@@ -279,34 +288,36 @@
 
 <script src="/js/script.js"></script>
 <script>
-  document.querySelectorAll('.price-per-item').forEach(el => {
-    const price = parseInt(extractNumber(el.getAttribute('data-price')), 10);
-    const discount = parseInt(extractNumber(el.getAttribute('data-discount')), 10);
-
-    // 할인된 가격이 0이면 원가 그대로 표시
-    if (discount === 0) {
-      el.textContent = formatNumberWithComma(price) + '원';
-    } else {
-      el.textContent = formatNumberWithComma(price - discount) + '원';
+  // 전체 삭제 버튼
+  document.getElementById('deleteAllForm').addEventListener('submit', (e) => {
+    if (!confirm('정말 전체 삭제하시겠습니까?')) {
+      e.preventDefault(); // 취소하면 폼 제출 막기
     }
   });
 
-  document.querySelectorAll('.discount-rate').forEach(el => {
-    const discount = parseInt(el.getAttribute('data-discount'), 10);
+  // 휴지통으로 삭제 버튼(비동기 방식)
+  document.querySelectorAll('.delete-item-btn').forEach(button => {
+    button.addEventListener('click', async () => {
+      const cartId = button.getAttribute('data-cart-id');
 
-    // 할인율이 0이면 할인율 숨기기
-    if (discount === 0) {
-      el.style.display = 'none';
-    }
+      try {
+        const response = await fetch(`/cart/${cartId}`, {
+          method: 'DELETE'
+        });
 
-    // 원가 숨기기 (할인 없으면)
-    document.querySelectorAll('.original-price').forEach(el => {
-      const discount = parseInt(extractNumber(el.closest('.flex').querySelector('.price-per-item').getAttribute('data-discount')), 10);
+        if (response.ok) {
+          const itemElement = button.closest('.p-6');
+          if (itemElement) {
+            itemElement.remove();
+          }
+          updateOrderSummary();
 
-      if (discount === 0) {
-        el.style.display = 'none';  // 할인 없으면 원가 숨기기
-      } else {
-        el.style.display = 'inline';  // 할인 있으면 원가 표시
+          toggleEmptyCartState();
+        } else {
+          console.error('삭제 실패: 서버 응답 오류', response.status);
+        }
+      } catch (error) {
+        console.error('삭제 중 오류 발생:', error);
       }
     });
   });
@@ -392,73 +403,51 @@
 
   // 전체 주문 요약 업데이트
   function updateOrderSummary() {
-    let totalOriginalPrice = 0; // 할인 전 가격 총합
-    let totalDiscount = 0; // 할인 금액 총합
+    let totalOriginalPrice = 0;
+    let totalDiscount = 0;
 
-    document.querySelectorAll('.divide-y > div').forEach(item => {
+    const items = document.querySelectorAll('#cartItemsList > div');
+
+    items.forEach(item => {
       const checkbox = item.querySelector('input[type="checkbox"]');
       if (checkbox && checkbox.checked) {
         const qtyInput = item.querySelector('.qty-input');
         const quantity = parseInt(extractNumber(qtyInput.value), 10);
 
-        const originalPriceText = item.querySelector('.line-through').textContent;
-        const discountPriceText = item.querySelector('.price-per-item').textContent;
+        // 할인 전 가격은 line-through가 없으면 price-per-item 값 사용
+        const originalPriceText = item.querySelector('.line-through')?.textContent || item.querySelector('.price-per-item')?.textContent || '0';
+        const discountPriceText = item.querySelector('.price-per-item')?.textContent || '0';
 
         const originalPrice = parseInt(extractNumber(originalPriceText), 10);
         const discountPrice = parseInt(extractNumber(discountPriceText), 10);
-        const discountAmount = originalPrice - discountPrice;
+        const discountAmount = Math.max(0, originalPrice - discountPrice);
 
         totalOriginalPrice += originalPrice * quantity;
         totalDiscount += discountAmount * quantity;
       }
     });
 
-    // 전체 삭제 버튼
-    document.getElementById('deleteAllForm').addEventListener('submit', (e) => {
-      if (!confirm('정말 전체 삭제하시겠습니까?')) {
-        e.preventDefault(); // 취소하면 폼 제출 막기
-      }
-    });
-
-    // 휴지통으로 삭제 버튼(비동기 방식)
-    document.querySelectorAll('.delete-item-btn').forEach(button => {
-      button.addEventListener('click', async () => {
-        const cartId = button.getAttribute('data-cart-id');
-
-        try {
-          const response = await fetch(`/cart/${cartId}`, {
-            method: 'DELETE'
-          });
-
-          if (response.ok) {
-            const itemElement = button.closest('.p-6');
-            if (itemElement) {
-              itemElement.remove();
-            }
-            updateOrderSummary();
-
-            toggleEmptyCartState();
-          } else {
-            console.error('삭제 실패: 서버 응답 오류', response.status);
-          }
-        } catch (error) {
-          console.error('삭제 중 오류 발생:', error);
-        }
-      });
-    });
-
-    // 할인된 가격
     const totalPriceAfterDiscount = totalOriginalPrice - totalDiscount;
 
-    // 배송비 계산
-    const deliveryFee = totalPriceAfterDiscount >= 50000 ? 0 : 3000;
+    // 쿠폰 할인 적용
+    const couponSelect = document.querySelector('select[name="selectedCoupon"]');
+    let couponDiscountRate = 0;
+    if (couponSelect) {
+      const selectedOption = couponSelect.options[couponSelect.selectedIndex];
+      const discountRateStr = selectedOption?.getAttribute('data-discount-rate');
+      couponDiscountRate = discountRateStr ? parseFloat(discountRateStr) : 0;
+    }
 
-    // 최종 결제 금액
-    const totalPayment = totalOriginalPrice - totalDiscount + deliveryFee;
+    const couponDiscountAmount = totalPriceAfterDiscount * (couponDiscountRate / 100);
+    const totalDiscountCombined = totalDiscount + couponDiscountAmount;
+    const totalAfterCoupon = totalPriceAfterDiscount - couponDiscountAmount;
+
+    const deliveryFee = totalAfterCoupon >= 50000 ? 0 : 3000;
+    const totalPayment = totalAfterCoupon + deliveryFee;
 
     // DOM 업데이트
     document.getElementById('summaryTotalPrice').textContent = formatNumberWithComma(totalOriginalPrice) + '원';
-    document.getElementById('summaryDiscountAmount').textContent = '-' + formatNumberWithComma(totalDiscount) + '원';
+    document.getElementById('summaryDiscountAmount').textContent = '-' + formatNumberWithComma(totalDiscountCombined) + '원';
     document.getElementById('summaryDeliveryFee').textContent = deliveryFee === 0 ? '무료' : formatNumberWithComma(deliveryFee) + '원';
     document.getElementById('summaryTotalPayment').textContent = formatNumberWithComma(totalPayment) + '원';
   }

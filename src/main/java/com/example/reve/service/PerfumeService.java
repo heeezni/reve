@@ -10,15 +10,16 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
-import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.transaction.support.TransactionSynchronization;
+import org.springframework.transaction.support.TransactionSynchronizationManager;
 import org.springframework.web.multipart.MultipartFile;
 
 import com.example.reve.domain.Perfume;
-import com.example.reve.dto.PerfumeDetailResponseDto;
-import com.example.reve.dto.PerfumeListResponseDto;
-import com.example.reve.dto.PerfumeSaveRequestDto;
+import com.example.reve.dto.PerfumeDetailResponseDTO;
+import com.example.reve.dto.PerfumeListResponseDTO;
+import com.example.reve.dto.PerfumeSaveRequestDTO;
 import com.example.reve.repository.PerfumeRepository;
 
 import lombok.RequiredArgsConstructor;
@@ -38,7 +39,7 @@ public class PerfumeService {
   // ============================= 향수 등록 및 삭제하는 로직임(CRUD 중 C, D) ==================================
   // 관리자 향수 등록
   @Transactional
-  public void savePerfume(PerfumeSaveRequestDto requestDto) {
+  public void savePerfume(PerfumeSaveRequestDTO requestDto) {
     Perfume perfume =
         Perfume.builder()
             .perfumeName(requestDto.getPerfumeName())
@@ -91,12 +92,18 @@ public class PerfumeService {
             .findById(perfumeId)
             .orElseThrow(() -> new IllegalArgumentException("해당 향수가 존재하지 않습니다."));
 
-    // 1. 이미지 파일 삭제
-    deleteImage(perfume.getImageUrl());
-    deleteImage(perfume.getHoverImageUrl());
-
     // 2. 향수 DB에서 삭제
     perfumeRepository.delete(perfume);
+
+    // 트랜잭션 커밋 이후 이미지 삭제
+    TransactionSynchronizationManager.registerSynchronization(
+        new TransactionSynchronization() {
+          @Override
+          public void afterCommit() {
+            deleteImage(perfume.getImageUrl());
+            deleteImage(perfume.getHoverImageUrl());
+          }
+        });
   }
 
   private void deleteImage(String imageUrl) {
@@ -119,22 +126,35 @@ public class PerfumeService {
   public void deletePerfumes(List<Long> perfumeIdList) {
     List<Perfume> perfumes = perfumeRepository.findAllById(perfumeIdList);
 
-    // 이미지 파일 삭제
-    perfumes.forEach(
-        perfume -> {
-          deleteImage(perfume.getImageUrl());
-          deleteImage(perfume.getHoverImageUrl());
-        });
+    List<String> imageUrls =
+        perfumes.stream().map(Perfume::getImageUrl).collect(Collectors.toList());
 
-    // DB에서 향수 삭제
+    List<String> hoverImageUrls =
+        perfumes.stream().map(Perfume::getHoverImageUrl).collect(Collectors.toList());
+
     perfumeRepository.deleteAllByIdInBatch(perfumeIdList);
+
+    TransactionSynchronizationManager.registerSynchronization(
+        new TransactionSynchronization() {
+          @Override
+          public void afterCommit() {
+            imageUrls.forEach(this::safeDelete);
+            hoverImageUrls.forEach(this::safeDelete);
+          }
+
+          private void safeDelete(String url) {
+            if (url != null && !url.isBlank()) {
+              deleteImage(url);
+            }
+          }
+        });
   }
 
   // ============================= 향수 수정하는 로직임(CRUD 중 U) ==========================================
   @Transactional
   public void updatePerfume(
       Long perfumeId,
-      PerfumeSaveRequestDto requestDto,
+      PerfumeSaveRequestDTO requestDto,
       MultipartFile imageFile,
       MultipartFile hoverImageFile) {
 
@@ -175,9 +195,9 @@ public class PerfumeService {
 
   // ============================= 향수 조회하는 로직임(CRUD 중 R) ==========================================
   // 모든 향수
-  public List<PerfumeListResponseDto> getAllPerfumes() {
+  public List<PerfumeListResponseDTO> getAllPerfumes() {
     List<Perfume> perfumes = perfumeRepository.findAllByOrderByCreatedAtDesc();
-    return perfumes.stream().map(PerfumeListResponseDto::fromEntity).collect(Collectors.toList());
+    return perfumes.stream().map(PerfumeListResponseDTO::fromEntity).collect(Collectors.toList());
   }
 
   // 검색어로 향수를 검색
@@ -225,22 +245,22 @@ public class PerfumeService {
   }
 
   // 향수 한 건 조회
-  public PerfumeDetailResponseDto getPerfumeDetail(Long perfumeId) {
+  public PerfumeDetailResponseDTO getPerfumeDetail(Long perfumeId) {
     Perfume perfume =
         perfumeRepository
             .findByPerfumeId(perfumeId)
             .orElseThrow(() -> new RuntimeException("해당 향수를 찾을 수 없습니다."));
 
-    return PerfumeDetailResponseDto.fromEntity(perfume);
+    return PerfumeDetailResponseDTO.fromEntity(perfume);
   }
 
   // 같은 향 기준 관련 상품 최대 4개 조회
-  public List<PerfumeListResponseDto> getRelatedPerfumesByScent(String scent) {
+  public List<PerfumeListResponseDTO> getRelatedPerfumesByScent(String scent) {
     Pageable limit = PageRequest.of(0, 4); // 0번째 페이지, 4개 한정
     List<Perfume> relatedPerfumes = perfumeRepository.findByScent(scent, limit).getContent();
 
     return relatedPerfumes.stream()
-        .map(PerfumeListResponseDto::fromEntity)
+        .map(PerfumeListResponseDTO::fromEntity)
         .collect(Collectors.toList());
   }
 
@@ -252,29 +272,6 @@ public class PerfumeService {
   // 페이지 + 정렬 + 검색까지 적용된 필터링
   public Page<Perfume> getPerfumes(
       String search, String scent, String sortParam, int page, int size) {
-    Sort sort;
-
-    if (sortParam == null) { // 기본 정렬 기준 = 최신순
-      sortParam = "new";
-    }
-
-    // 필터링
-    switch (sortParam) {
-      // 가격 내림차순
-      case "price_asc":
-        sort = Sort.by("price").ascending();
-        break;
-      // 가격 오름차순
-      case "price_desc":
-        sort = Sort.by("price").descending();
-        break;
-      // 리뷰 많은 순 정렬
-      case "review":
-        sort = Sort.by("reviewCount").descending();
-        break;
-      default:
-        sort = Sort.by("createdAt").descending();
-    }
 
     if (search != null && search.isBlank()) {
       search = null;
@@ -284,13 +281,25 @@ public class PerfumeService {
       scent = null;
     }
 
-    // 페이지 0보다 작을 일 없게 함.
     if (page < 0) {
       page = 0;
     }
 
-    Pageable pageable = PageRequest.of(page, size, sort);
+    Pageable pageable = PageRequest.of(page, size); // 정렬 빼고 페이징만
 
-    return perfumeRepository.findBySearchAndScentWithReviewJoin(search, scent, pageable);
+    if (sortParam == null) {
+      sortParam = "new";
+    }
+
+    return switch (sortParam) {
+      case "price_asc" ->
+          perfumeRepository.findBySearchAndScentWithDiscountPriceAsc(search, scent, pageable);
+      case "price_desc" ->
+          perfumeRepository.findBySearchAndScentWithDiscountPriceDesc(search, scent, pageable);
+      case "review" ->
+          perfumeRepository.findBySearchAndScentWithReviewJoin(search, scent, pageable);
+      default ->
+          perfumeRepository.findBySearchAndScentOrderByCreatedAtDesc(search, scent, pageable);
+    };
   }
 }

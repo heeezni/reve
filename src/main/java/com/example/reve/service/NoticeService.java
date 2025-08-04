@@ -167,6 +167,7 @@ public class NoticeService {
         .collect(Collectors.toList());
   }
 
+  // 개별 삭제
   @Transactional
   public void deleteNotice(Long noticeId, Principal principal)
       throws AccessDeniedException, IOException {
@@ -244,5 +245,31 @@ public class NoticeService {
 
     Notice updatedNotice = noticeRepository.save(notice);
     return new NoticeResDTO(updatedNotice);
+  }
+
+  // 일괄 삭제
+  @Transactional
+  public void deleteNotices(List<Long> noticeIds, Principal principal)
+      throws AccessDeniedException, IOException {
+    User currentUser =
+        userRepository
+            .findByLoginId(principal.getName())
+            .orElseThrow(() -> new IllegalArgumentException("사용자를 찾을 수 없습니다."));
+
+    if (!currentUser.getRole().equals(Role.ADMIN)) {
+      throw new AccessDeniedException("공지사항을 삭제할 권한이 없습니다.");
+    }
+
+    for (Long noticeId : noticeIds) {
+      Notice notice =
+          noticeRepository
+              .findById(noticeId)
+              .orElseThrow(() -> new NoSuchElementException("공지사항을 찾을 수 없습니다: " + noticeId));
+
+      if (notice.getAttachmentFiles() != null && !notice.getAttachmentFiles().isEmpty()) {
+        fileUploadService.deleteDirectory("notice", String.valueOf(noticeId));
+      }
+      noticeRepository.delete(notice);
+    }
   }
 }

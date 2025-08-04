@@ -3,10 +3,12 @@ package com.example.reve.controller.user;
 import java.security.Principal;
 import java.util.List;
 
+import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import com.example.reve.domain.User;
@@ -87,11 +89,30 @@ public class WishListController {
     }
     String loginId = principal.getName();
     try {
-      int result = cartService.addToCart(loginId, perfumeId, 1);
+      cartService.addToCart(loginId, perfumeId, 1);
       wishListService.wishperfumeDelete(perfumeId, loginId);
     } catch (Exception e) {
-      redirectAttributes.addFlashAttribute("error", "이미 장바구니에 있는 상품 입니다");
+      redirectAttributes.addFlashAttribute("error", "이미 장바구니에 있는 상품입니다");
+      return "redirect:/mypage/wishlist";
     }
     return "redirect:/mypage/wishlist";
+  }
+
+  @PostMapping("/wishlist/toggle-ajax")
+  @ResponseBody
+  public ResponseEntity<String> toggleWishAjax(
+      @RequestParam("perfumeId") Long perfumeId, Principal principal) {
+    if (principal == null) {
+      return ResponseEntity.status(401).body("로그인이 필요합니다.");
+    }
+
+    String loginId = principal.getName();
+    User user =
+        userRepository
+            .findByLoginId(loginId)
+            .orElseThrow(() -> new UsernameNotFoundException("회원을 찾을 수 없습니다."));
+
+    boolean wished = wishListService.toggleWish(user, perfumeId);
+    return ResponseEntity.ok(wished ? "added" : "removed");
   }
 }

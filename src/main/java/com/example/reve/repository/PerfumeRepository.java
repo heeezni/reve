@@ -58,12 +58,22 @@ public interface PerfumeRepository extends JpaRepository<Perfume, Long> {
   // 같은 향의 향수를 페이징 처리하여 조회
   Page<Perfume> findByScent(String scent, Pageable pageable);
 
-  // 검색 + 페이징 + 정렬
+  // 향 + 페이징 + 최신순
+  @Query(
+      "SELECT p FROM Perfume p "
+          + "WHERE (:search IS NULL OR LOWER(p.perfumeName) LIKE LOWER(CONCAT('%', :search, '%'))) "
+          + "AND (:scent IS NULL OR p.scent = :scent) "
+          + "ORDER BY p.createdAt DESC")
+  Page<Perfume> findBySearchAndScentOrderByCreatedAtDesc(
+      @Param("search") String search, @Param("scent") String scent, Pageable pageable);
+
+  // 검색 + 페이징 + 리뷰순
   @Query(
       "SELECT p FROM Perfume p LEFT JOIN p.reviewList r "
           + "WHERE (:search IS NULL OR LOWER(p.perfumeName) LIKE LOWER(CONCAT('%', :search, '%'))) "
           + "AND (:scent IS NULL OR p.scent = :scent) "
-          + "GROUP BY p.perfumeId")
+          + "GROUP BY p.perfumeId "
+          + "ORDER BY COUNT(r) DESC")
   Page<Perfume> findBySearchAndScentWithReviewJoin(
       @Param("search") String search, @Param("scent") String scent, Pageable pageable);
 
@@ -72,4 +82,24 @@ public interface PerfumeRepository extends JpaRepository<Perfume, Long> {
       @Param("scents") Set<String> scents,
       @Param("excludeIds") List<Long> excludeIds,
       Pageable pageable);
+
+  // 향 + 페이징 + 가격오름차순
+  @Query(
+      "SELECT p FROM Perfume p LEFT JOIN p.reviewList r "
+          + "WHERE (:search IS NULL OR LOWER(p.perfumeName) LIKE LOWER(CONCAT('%', :search, '%'))) "
+          + "AND (:scent IS NULL OR p.scent = :scent) "
+          + "GROUP BY p.perfumeId "
+          + "ORDER BY (p.price - p.discount) ASC")
+  Page<Perfume> findBySearchAndScentWithDiscountPriceAsc(
+      @Param("search") String search, @Param("scent") String scent, Pageable pageable);
+
+  // 향 + 페이징 + 가격내림차순
+  @Query(
+      "SELECT p FROM Perfume p LEFT JOIN p.reviewList r "
+          + "WHERE (:search IS NULL OR LOWER(p.perfumeName) LIKE LOWER(CONCAT('%', :search, '%'))) "
+          + "AND (:scent IS NULL OR p.scent = :scent) "
+          + "GROUP BY p.perfumeId "
+          + "ORDER BY (p.price - p.discount) DESC")
+  Page<Perfume> findBySearchAndScentWithDiscountPriceDesc(
+      @Param("search") String search, @Param("scent") String scent, Pageable pageable);
 }
