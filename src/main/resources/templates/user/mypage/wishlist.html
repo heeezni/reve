@@ -380,6 +380,18 @@
 
           deleteModal.show(`${checked.length}개 상품을 삭제하시겠습니까?`, selectedForm);
         });
+        //개별 삭제
+        document.querySelectorAll(".remove-wishlist").forEach((btn) => {
+          btn.addEventListener("click", function (e) {
+            e.preventDefault(); // 기본 form 전송 막기
+
+            const form = this.closest("form");
+            const item = this.closest(".wishlist-item");
+            const productName = item?.querySelector("h3 a")?.textContent.trim() || "상품";
+
+            deleteModal.show(`"${productName}"을(를) 삭제하시겠습니까?`, form);
+          });
+        });
 
         // 장바구니 버튼
         document.querySelectorAll(".add-to-cart-btn").forEach(btn => {
@@ -394,9 +406,9 @@
               });
               const status = await res.text();
               if(status === "added"){
-                cartModal.show(`"${perfumeName}"을 장바구니에 추가했습니다<br>삭제할까요?`)
+                cartModal.show(`"${perfumeName}"을 장바구니에 추가했습니다<br>목록에서 삭제할까요?`)
               }else if(status === "exists"){
-                cartModal.show(`"${perfumeName}"가 이미 장바구니 안에 있습니다<br>삭제할까요?`)
+                cartModal.show(`"${perfumeName}"가 이미 장바구니 안에 있습니다<br>목록에서 삭제할까요?`)
               }else if(status === "unauthorized"){
                 cartModal.show("로그인이 필요합니다")
               }
