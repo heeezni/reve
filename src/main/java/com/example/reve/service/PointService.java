@@ -4,7 +4,7 @@ import org.springframework.stereotype.Service;
 
 import com.example.reve.domain.Point;
 import com.example.reve.domain.User;
-import com.example.reve.repository.PointRepositroy;
+import com.example.reve.repository.PointRepository;
 import com.example.reve.repository.UserRepository;
 
 import lombok.RequiredArgsConstructor;
@@ -14,7 +14,7 @@ import lombok.extern.slf4j.Slf4j;
 @RequiredArgsConstructor
 @Slf4j
 public class PointService {
-  private final PointRepositroy pointRepository;
+  private final PointRepository pointRepository;
   private final UserRepository userRepository;
 
   // 적립금 발급

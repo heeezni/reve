@@ -192,7 +192,11 @@
                 <label>
                   <input
                           type="text"
-                          placeholder="포인트 사용 (보유: 1,000P)"
+                          id="usedPointInput"
+                          name="usedPoint"
+                          th:placeholder="|포인트 사용 (보유: ${userPoint == 0 ? 0 : #numbers.formatInteger(userPoint, 3, 'COMMA')}P)|"
+                          th:attr="data-user-point=${userPoint}"
+                          oninput="updateOrderSummary()"
                           class="w-full border border-gray-300 rounded-md px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-gray-800 focus:border-transparent"
                   />
                 </label>
@@ -450,8 +454,32 @@
     const couponDiscountAmount = totalPriceAfterDiscount * (couponDiscountRate / 100);
     const totalDiscountCombined = totalDiscount + couponDiscountAmount;
     const totalAfterCoupon = totalPriceAfterDiscount - couponDiscountAmount;
-    const deliveryFee = totalAfterCoupon >= 50000 ? 0 : 3000;
-    const totalPayment = totalAfterCoupon + deliveryFee;
+
+    // === 포인트 입력 처리 ===
+    // 보유 포인트는 서버에서 전달받은 값으로 선언되어 있어야 합니다.
+    const pointInput = document.getElementById('usedPointInput');
+    const userPoint = parseInt(pointInput.getAttribute('data-user-point') || '0', 10);
+
+    let usedPoint = 0;
+    if (pointInput) {
+      usedPoint = parseInt(pointInput.value.replace(/[^0-9]/g, ''), 10) || 0;
+
+      // 입력 포인트가 보유 포인트보다 많으면 제한
+      if (usedPoint > userPoint) {
+        usedPoint = userPoint;
+        pointInput.value = usedPoint; // 자동 수정
+      }
+
+      // 포인트가 총 금액보다 많을 경우 제한
+      if (usedPoint > totalAfterCoupon) {
+        usedPoint = totalAfterCoupon;
+        pointInput.value = usedPoint;
+      }
+    }
+
+    const totalAfterPoint = totalAfterCoupon - usedPoint;
+    const deliveryFee = totalAfterPoint >= 50000 ? 0 : 3000;
+    const totalPayment = totalAfterPoint + deliveryFee;
 
     // DOM 업데이트
     document.getElementById('summaryTotalPrice').textContent = formatNumberWithComma(totalOriginalPrice) + '원';
