@@ -5,6 +5,8 @@ import java.util.List;
 
 import jakarta.persistence.*;
 
+import org.hibernate.annotations.OnDeleteAction;
+
 import lombok.*;
 
 @Entity
@@ -46,6 +48,7 @@ public class Qna extends BaseEntity {
   @CollectionTable(name = "qna_attachments", joinColumns = @JoinColumn(name = "qna_id"))
   @Column(name = "file_path")
   @Builder.Default // @Builder 사용 시 기본값 설정을 위해 추가
+  @org.hibernate.annotations.OnDelete(action = OnDeleteAction.CASCADE) // 하이버네이트 전용
   private List<String> attachmentFiles = new ArrayList<>();
 
   // 관계 설정

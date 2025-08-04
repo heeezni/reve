@@ -16,6 +16,7 @@ import com.example.reve.domain.CustomUserDetails;
 import com.example.reve.domain.User;
 import com.example.reve.dto.*;
 import com.example.reve.repository.CouponRepository;
+import com.example.reve.repository.PointRepository;
 import com.example.reve.repository.UserRepository;
 
 import lombok.RequiredArgsConstructor;
@@ -33,6 +34,7 @@ public class UserService implements UserDetailsService { // UserDetailsService �
   private final CouponService couponService;
   private final ProfileUrlService profileUrlService;
   private final CouponRepository couponRepository;
+  private final PointRepository pointRepository;
 
   /**
    * 회원 가입 서비스
@@ -215,5 +217,9 @@ public class UserService implements UserDetailsService { // UserDetailsService �
             .orElseThrow(() -> new IllegalArgumentException("해당 사용자를 찾을 수 없습니다."));
     user.setRole(newRole);
     userRepository.save(user);
+  }
+
+  public int getPointByUserId(Long userId) {
+    return pointRepository.getTotalPointByUserId(userId);
   }
 }
