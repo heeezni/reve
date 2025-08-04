@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<html lang="en" xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/thymeleaf-extras-springsecurity6">
 <body>
 <aside class="main-sidebar sidebar-dark-primary elevation-4" th:fragment="adminSidebar">
     <!-- Brand Logo -->
@@ -12,10 +12,10 @@
         <!-- Sidebar user panel (optional) -->
         <div class="user-panel mt-3 pb-3 mb-3 d-flex">
             <div class="image">
-                <img src="/dist/img/user2-160x160.jpg" class="img-circle elevation-2" alt="User Image">
+                <img src="/dist/img/logo.png" class="img-circle elevation-2" alt="User Image">
             </div>
             <div class="info">
-                <a href="#" class="d-block">Alexander Pierce</a>
+                <a th:href="@{/mypage}" class="d-block" sec:authentication="name">Alexander Pierce</a>
             </div>
         </div>
 
@@ -37,7 +37,7 @@
                 <!-- Add icons to the links using the .nav-icon class
                      with font-awesome or any other icon font library -->
                 <li class="nav-item">
-                    <a href="#" class="nav-link active">
+                    <a th:href="@{/admin/dashboard}" class="nav-link active">
                         <i class="nav-icon fas fa-tachometer-alt"></i>
                         <p>
                             Dashboard

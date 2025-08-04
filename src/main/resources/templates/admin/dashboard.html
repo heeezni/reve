@@ -6,11 +6,7 @@
     <title>관리자 대시보드</title>
 
     
-    <!-- Font Awesome -->
-    <link rel="stylesheet" href="/plugins/fontawesome-free/css/all.min.css">
-    <!-- Theme style -->
-    <link rel="stylesheet" href="/dist/css/adminlte.min.css">
-    
+    <th:block th:replace="fragments/admin_common_scripts :: adminCommonCss"></th:block>
 </head>
 <body class="hold-transition sidebar-mini layout-fixed">
 <div class="wrapper">
@@ -63,22 +59,12 @@
 
     </div>
     <!-- /.content-wrapper -->
-    <footer class="main-footer">
-        <strong>Copyright &copy; 2014-2021.</strong>
-        All rights reserved.
-        
-    </footer>
+    <div th:replace="fragments/admin_footer :: adminFooter"></div>
 
     
 </div>
 <!-- ./wrapper -->
 
-<!-- jQuery -->
-<script src="/plugins/jquery/jquery.min.js"></script>
-<!-- Bootstrap 4 -->
-<script src="/plugins/bootstrap/js/bootstrap.bundle.min.js"></script>
-<!-- AdminLTE App -->
-<script src="/dist/js/adminlte.js"></script>
-
+    <th:block th:replace="fragments/admin_common_scripts :: adminCommonJs"></th:block>
 </body>
 </html>
