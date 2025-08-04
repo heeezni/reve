@@ -55,7 +55,9 @@
                              th:value="${getWishList.perfumeId}" />
                         </label>
                         <div class="relative overflow-hidden rounded-lg">
-                          <img th:src="${getWishList.hoverImageUrl}" alt="상품 이미지" class="w-24 h-24 object-cover"/>
+                          <div th:if="${getWishList != null}">
+                            <img th:src="${getWishList.hoverImageUrl}" alt="상품 이미지" class="w-24 h-24 object-cover"/>
+                          </div>
                           <div class="absolute top-1 left-1">
                 <span class="inline-flex items-center px-1 py-0.5 rounded text-xs font-medium bg-red-500 text-white"
                       th:text="${(getWishList.discount * 100) / getWishList.price} + '% 할인'"></span>
@@ -80,8 +82,10 @@
 
                             <div class="flex items-center space-x-3 mb-3">
                               <div class="flex items-center space-x-2">
-                                <span class="text-xl font-bold text-gray-800" th:text="${getWishList.discount}"></span>
-                                <span class="text-sm text-gray-400 line-through" th:text="${getWishList.price}"></span>
+                                <span class="text-xl font-bold text-gray-800"
+                                      th:text="${#numbers.formatDecimal(getWishList.discount, 0, 'COMMA', 0, 'POINT')}"></span>
+                                <span class="text-sm text-gray-400 line-through"
+                                      th:text="${#numbers.formatDecimal(getWishList.price, 0, 'COMMA', 0, 'POINT')}"></span>
                               </div>
                               <div class="flex items-center space-x-1">
                                 <i class="fas fa-star text-yellow-400 text-sm"></i>
