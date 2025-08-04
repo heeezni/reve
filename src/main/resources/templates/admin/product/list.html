@@ -1,111 +1,177 @@
 <!DOCTYPE html>
 <html lang="en" xmlns:th="http://www.thymeleaf.org">
 <head>
-    <meta charset="UTF-8">
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>상품 목록</title>
-    <style>
-        body { font-family: Arial, sans-serif; margin: 20px; }
-        table { width: 100%; border-collapse: collapse; margin-top: 20px; }
-        th, td { border: 1px solid #ddd; padding: 8px; text-align: left; }
-        th { background-color: #f2f2f2; }
-        .actions a { margin-right: 5px; text-decoration: none; color: #007bff; }
-        .actions a:hover { text-decoration: underline; }
-        .add-button { padding: 10px 15px; background-color: #28a745; color: white; border: none; border-radius: 5px; cursor: pointer; text-decoration: none; }
-        .add-button:hover { background-color: #218838; }
-        .delete-form { display: inline; }
-        .delete-button { background: none; border: none; color: #dc3545; cursor: pointer; padding: 0; font-size: inherit; }
-        .delete-button:hover { text-decoration: none; }
-        .bulk-actions { margin-top: 10px; margin-bottom: 20px; }
-        .bulk-actions button { padding: 8px 15px; background-color: #dc3545; color: white; border: none; border-radius: 5px; cursor: pointer; }
-        .bulk-actions button:hover { background-color: #c82333; }
-        .shop-list-button { display: inline-block; margin-left: 10px; padding: 10px 15px; background-color: #007bff; color: white; border: none; border-radius: 5px; text-decoration: none; }
-        .shop-list-button:hover { background-color: #0056b3; }
-    </style>
-    <script>
-        function toggleAll(source) {
-            checkboxes = document.querySelectorAll('input[name="perfumeIdList"]');
-            for(var i=0, n=checkboxes.length;i<n;i++) {
-                checkboxes[i].checked = source.checked;
-            }
+
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="/plugins/fontawesome-free/css/all.min.css">
+    <!-- Theme style -->
+    <link rel="stylesheet" href="/dist/css/adminlte.min.css">
+</head>
+<body class="hold-transition sidebar-mini layout-fixed">
+<div class="wrapper">
+
+    <!-- Navbar -->
+    <nav class="main-header navbar navbar-expand navbar-white navbar-light">
+        <!-- Left navbar links -->
+        <ul class="navbar-nav">
+            <li class="nav-item">
+                <a class="nav-link" data-widget="pushmenu" href="#" role="button"><i class="fas fa-bars"></i></a>
+            </li>
+        </ul>
+
+        <!-- Right navbar links -->
+        <ul class="navbar-nav ml-auto">
+        </ul>
+    </nav>
+    <!-- /.navbar -->
+
+    <!-- Main Sidebar Container -->
+    <div th:replace="fragments/admin_sidebar :: adminSidebar"></div>
+
+    <!-- Content Wrapper. Contains page content -->
+    <div class="content-wrapper">
+        <!-- Content Header (Page header) -->
+        <div class="content-header">
+            <div class="container-fluid">
+                <div class="row mb-2">
+                    <div class="col-sm-6">
+                        <h1 class="m-0">상품 목록</h1>
+                    </div><!-- /.col -->
+                    <div class="col-sm-6">
+                        <ol class="breadcrumb float-sm-right">
+                            <li class="breadcrumb-item"><a th:href="@{/admin/dashboard}">Home</a></li>
+                            <li class="breadcrumb-item active">상품 목록</li>
+                        </ol>
+                    </div><!-- /.col -->
+                </div><!-- /.row -->
+            </div><!-- /.container-fluid -->
+        </div>
+        <!-- /.content-header -->
+
+        <!-- Main content -->
+        <section class="content">
+            <div class="container-fluid">
+                <div class="row">
+                    <div class="col-12">
+                        <div class="card">
+                            <div class="card-header">
+                                <h3 class="card-title">상품 정보</h3>
+                            </div>
+                            <!-- /.card-header -->
+                            <div class="card-body">
+                                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
+                                    <div>
+                                        <a th:href="@{/admin/dashboard}" class="add-button" style="background-color: #6c757d; margin-right: 10px;">관리자 대시보드로 돌아가기</a>
+                                        <a th:href="@{/shop/list}" class="shop-list-button">쇼핑몰 상품 목록보기</a>
+                                    </div>
+                                    <div>
+                                        <a th:href="@{/admin/shop/regist}" class="add-button">새 상품 추가</a>
+                                    </div>
+                                </div>
+
+                                <table id="example2" class="table table-bordered table-hover">
+                                    <thead>
+                                    <tr>
+                                        <th><input type="checkbox" onclick="toggleAll(this)" aria-label="모두 선택"></th>
+                                        <th>ID</th>
+                                        <th>상품명</th>
+                                        <th>향</th>
+                                        <th>재고</th>
+                                        <th>가격</th>
+                                        <th>할인율</th>
+                                        <th>이미지</th>
+                                        <th>액션</th>
+                                    </tr>
+                                    </thead>
+                                    <tbody>
+                                    <tr th:each="perfume : ${perfumes}">
+                                        <td><input type="checkbox" name="perfumeIdList" th:value="${perfume.perfumeId}" aria-label="상품 선택"></td>
+                                        <td th:text="${perfume.perfumeId}"></td>
+                                        <td th:text="${perfume.perfumeName}"></td>
+                                        <td th:text="${perfume.scent}"></td>
+                                        <td th:text="${perfume.stock}"></td>
+                                        <td th:text="${perfume.price}"></td>
+                                        <td th:text="${perfume.discount}"></td>
+                                        <td><img th:src="${perfume.imageUrl}" alt="상품 이미지" style="width: 50px; height: 50px; object-fit: cover;"></td>
+                                        <td class="actions">
+                                            <a th:href="@{/admin/shop/edit/{perfumeId}(perfumeId=${perfume.perfumeId})}">수정</a>
+                                            <form th:action="@{/admin/shop/delete}" method="post" class="delete-form" onsubmit="return confirm('정말로 삭제하시겠습니까?');">
+                                                <input type="hidden" name="id" th:value="${perfume.perfumeId}">
+                                                <button type="submit" class="delete-button">삭제</button>
+                                            </form>
+                                        </td>
+                                    </tr>
+                                    </tbody>
+                                </table>
+
+                                <div class="bulk-actions">
+                                    <button type="button" onclick="submitBulkDelete();">선택된 상품 삭제</button>
+                                </div>
+                            </div>
+                            <!-- /.card-body -->
+                        </div>
+                        <!-- /.card -->
+                    </div>
+                    <!-- /.col -->
+                </div>
+                <!-- /.row -->
+            </div><!-- /.container-fluid -->
+        </section>
+        <!-- /.content -->
+    </div>
+    <!-- /.content-wrapper -->
+
+    <footer class="main-footer">
+        <strong>Copyright &copy; 2014-2021.</strong>
+        All rights reserved.
+    </footer>
+
+</div>
+<!-- ./wrapper -->
+
+<!-- jQuery -->
+<script src="/plugins/jquery/jquery.min.js"></script>
+<!-- Bootstrap 4 -->
+<script src="/plugins/bootstrap/js/bootstrap.bundle.min.js"></script>
+<!-- AdminLTE App -->
+<script src="/dist/js/adminlte.js"></script>
+
+<script>
+    function toggleAll(source) {
+        checkboxes = document.querySelectorAll('input[name="perfumeIdList"]');
+        for(var i=0, n=checkboxes.length;i<n;i++) {
+            checkboxes[i].checked = source.checked;
         }
+    }
 
-        function submitBulkDelete() {
-            const checkedItems = document.querySelectorAll('input[name="perfumeIdList"]:checked');
-            if (checkedItems.length === 0) {
-                alert('삭제할 상품을 선택해주세요.');
-                return false;
-            }
-
-            if (confirm('선택된 상품들을 정말로 삭제하시겠습니까?')) {
-                const form = document.createElement('form');
-                form.method = 'post';
-                form.action = '/admin/shop/delete';
-
-                checkedItems.forEach(item => {
-                    const input = document.createElement('input');
-                    input.type = 'hidden';
-                    input.name = 'perfumeIdList';
-                    input.value = item.value;
-                    form.appendChild(input);
-                });
-
-                document.body.appendChild(form);
-                form.submit();
-            }
+    function submitBulkDelete() {
+        const checkedItems = document.querySelectorAll('input[name="perfumeIdList"]:checked');
+        if (checkedItems.length === 0) {
+            alert('삭제할 상품을 선택해주세요.');
             return false;
         }
-    </script>
-</head>
-<body>
-    <h1>상품 목록</h1>
 
-    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
-        <div>
-            <a th:href="@{/admin/dashboard}" class="add-button" style="background-color: #6c757d; margin-right: 10px;">관리자 대시보드로 돌아가기</a>
-            <a th:href="@{/shop/list}" class="shop-list-button">쇼핑몰 상품 목록보기</a>
-        </div>
-        <div>
-            <a th:href="@{/admin/shop/regist}" class="add-button">새 상품 추가</a>
-        </div>
-    </div>
+        if (confirm('선택된 상품들을 정말로 삭제하시겠습니까?')) {
+            const form = document.createElement('form');
+            form.method = 'post';
+            form.action = '/admin/shop/delete';
 
-    <table>
-        <thead>
-            <tr>
-                <th><input type="checkbox" onclick="toggleAll(this)" aria-label="모두 선택"></th>
-                <th>ID</th>
-                <th>상품명</th>
-                <th>향</th>
-                <th>재고</th>
-                <th>가격</th>
-                <th>할인율</th>
-                <th>이미지</th>
-                <th>액션</th>
-            </tr>
-        </thead>
-        <tbody>
-            <tr th:each="perfume : ${perfumes}">
-                <td><input type="checkbox" name="perfumeIdList" th:value="${perfume.perfumeId}" aria-label="상품 선택"></td>
-                <td th:text="${perfume.perfumeId}"></td>
-                <td th:text="${perfume.perfumeName}"></td>
-                <td th:text="${perfume.scent}"></td>
-                <td th:text="${perfume.stock}"></td>
-                <td th:text="${perfume.price}"></td>
-                <td th:text="${perfume.discount}"></td>
-                <td><img th:src="${perfume.imageUrl}" alt="상품 이미지" style="width: 50px; height: 50px; object-fit: cover;"></td>
-                <td class="actions">
-                    <a th:href="@{/admin/shop/edit/{perfumeId}(perfumeId=${perfume.perfumeId})}">수정</a>
-                    <form th:action="@{/admin/shop/delete}" method="post" class="delete-form" onsubmit="return confirm('정말로 삭제하시겠습니까?');">
-                        <input type="hidden" name="id" th:value="${perfume.perfumeId}">
-                        <button type="submit" class="delete-button">삭제</button>
-                    </form>
-                </td>
-            </tr>
-        </tbody>
-    </table>
+            checkedItems.forEach(item => {
+                const input = document.createElement('input');
+                input.type = 'hidden';
+                input.name = 'perfumeIdList';
+                input.value = item.value;
+                form.appendChild(input);
+            });
 
-    <div class="bulk-actions">
-        <button type="button" onclick="submitBulkDelete();">선택된 상품 삭제</button>
-    </div>
+            document.body.appendChild(form);
+            form.submit();
+        }
+        return false;
+    }
+</script>
 </body>
 </html>
