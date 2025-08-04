@@ -171,16 +171,6 @@ public class WishListController {
               .findById(perfumeId)
               .orElseThrow(() -> new RuntimeException("상품을 찾을 수 없습니다."));
 
-      // 디버깅: 향수 정보 출력
-      System.out.println("=== 향수 정보 디버깅 (buyNow) ===");
-      System.out.println("향수 ID: " + perfume.getPerfumeId());
-      System.out.println("향수명: " + perfume.getPerfumeName());
-      System.out.println("용량: " + perfume.getVolume());
-      System.out.println("원가: " + perfume.getPrice());
-      System.out.println("할인가: " + perfume.getDiscount());
-      System.out.println("수량: " + quantity);
-      System.out.println("========================");
-
       // CartItem 객체 생성
       CartItem cartItem = new CartItem();
       cartItem.setId(perfume.getPerfumeId());
@@ -241,31 +231,6 @@ public class WishListController {
               .findById(perfumeId)
               .orElseThrow(() -> new RuntimeException("상품을 찾을 수 없습니다."));
 
-      // 디버깅: 향수 정보 출력
-      System.out.println("=== 향수 정보 디버깅 (buyNowAjax) ===");
-      System.out.println("향수 ID: " + perfume.getPerfumeId());
-      System.out.println("향수명: " + perfume.getPerfumeName());
-      System.out.println("용량: " + perfume.getVolume());
-      System.out.println("원가: " + perfume.getPrice());
-      System.out.println("할인가: " + perfume.getDiscount());
-      System.out.println("수량: " + quantity);
-
-      // 다른 향수들의 가격도 확인
-      System.out.println("=== 다른 향수들 가격 확인 ===");
-      List<Perfume> allPerfumes = perfumeRepository.findAll();
-      for (Perfume p : allPerfumes) {
-        System.out.println(
-            "ID: "
-                + p.getPerfumeId()
-                + ", 이름: "
-                + p.getPerfumeName()
-                + ", 원가: "
-                + p.getPrice()
-                + ", 할인가: "
-                + p.getDiscount());
-      }
-      System.out.println("========================");
-
       // CartItem 객체 생성
       CartItem cartItem = new CartItem();
       cartItem.setId(perfume.getPerfumeId());
@@ -304,25 +269,6 @@ public class WishListController {
 
     } catch (Exception e) {
       return ResponseEntity.status(500).body("error:" + e.getMessage());
-    }
-  }
-
-  // 임시: 향수 가격 수정 (테스트용)
-  @GetMapping("/wishlist/fix-price")
-  @ResponseBody
-  public ResponseEntity<String> fixPrice() {
-    try {
-      // 향수 ID 2의 할인가를 8000원으로 수정 (더 현실적인 가격)
-      Perfume perfume = perfumeRepository.findById(2L).orElse(null);
-      if (perfume != null) {
-        perfume.setDiscount(8000);
-        perfumeRepository.save(perfume);
-        return ResponseEntity.ok("테스트향의 가격이 8,000원으로 수정되었습니다.");
-      } else {
-        return ResponseEntity.ok("향수를 찾을 수 없습니다.");
-      }
-    } catch (Exception e) {
-      return ResponseEntity.status(500).body("오류: " + e.getMessage());
     }
   }
 }
