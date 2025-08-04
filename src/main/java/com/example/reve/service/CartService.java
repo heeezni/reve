@@ -119,4 +119,9 @@ public class CartService {
   public void removeCartItem(Long cartId) {
     cartRepository.deleteById(cartId);
   }
+
+  // 장바구니에 중복 삼품이 있을 경우 반환값이 필요할 경우
+  public boolean getresultCart() {
+    return false;
+  }
 }
