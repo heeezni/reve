@@ -48,6 +48,8 @@ public class MypageController {
       model.addAttribute("point", pointService.getPointAmount(loginId));
       int result = couponService.countCoupon(loginId);
       model.addAttribute("countCoupon", result);
+      // mypage.userId == currentUserId 조건으로 수정/삭제 버튼 렌더링
+      model.addAttribute("currentUserId", customUserDetails.getUser().getUserId());
       return "user/mypage/index";
     } else {
       log.error("loginId is {}", loginId);
