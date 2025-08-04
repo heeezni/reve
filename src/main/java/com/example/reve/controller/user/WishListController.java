@@ -115,4 +115,19 @@ public class WishListController {
     boolean wished = wishListService.toggleWish(user, perfumeId);
     return ResponseEntity.ok(wished ? "added" : "removed");
   }
+
+  // 구매버튼 구현
+  @PostMapping("/wishlist/buy")
+  public String buyWish(@RequestParam Long perfumeId, Principal principal) {
+    if (principal == null) {
+      return "redirect:/login";
+    }
+    String loginId = principal.getName();
+    int result = cartService.addToCart(loginId, perfumeId, 1);
+    if (result == 1) {
+      return "redirect:/cart";
+    }
+    wishListService.wishperfumeDelete(perfumeId, loginId);
+    return "redirect:/cart";
+  }
 }
