@@ -390,4 +390,22 @@ public class QnaService {
       throw new AccessDeniedException("관리자 권한이 필요합니다.");
     }
   }
+
+  @Transactional
+  public void deleteQnas(List<Long> qnaIds, Principal principal)
+      throws AccessDeniedException, IOException {
+    validateAdminPermission(principal);
+
+    for (Long qnaId : qnaIds) {
+      Qna qna =
+          qnaRepository
+              .findById(qnaId)
+              .orElseThrow(() -> new NoSuchElementException("Q&A를 찾을 수 없습니다. ID: " + qnaId));
+
+      if (qna.getAttachmentFiles() != null && !qna.getAttachmentFiles().isEmpty()) {
+        fileUploadService.deleteDirectory("qna", String.valueOf(qna.getQnaId()));
+      }
+      qnaRepository.delete(qna);
+    }
+  }
 }
