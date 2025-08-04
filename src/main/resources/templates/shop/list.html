@@ -10,6 +10,7 @@
 <main class="pt-20">
   <div class="min-h-screen bg-gray-50 py-12">
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+
       <!-- Page Title -->
       <div class="mb-8 flex items-center justify-between">
         <div>
@@ -32,6 +33,74 @@
           >
             삭제 모드
           </button>
+        </div>
+      </div>
+
+      <!-- Category Quick Links -->
+      <div class="mt-12 bg-white rounded-lg shadow-sm p-6">
+        <h3 class="text-lg font-semibold text-gray-800 mb-6">
+          향기 카테고리
+        </h3>
+        <div class="grid md:grid-cols-4 gap-4">
+          <a
+                  href="#"
+                  class="flex items-center p-4 border border-gray-200 rounded-md hover:bg-gray-50 transition-colors"
+          >
+            <div
+                    class="w-12 h-12 bg-pink-100 rounded-full flex items-center justify-center mr-4"
+            >
+              <i class="fas fa-spa text-pink-500"></i>
+            </div>
+            <div>
+              <p class="font-medium text-gray-800">플로럴</p>
+              <p class="text-sm text-gray-600">꽃향의 로맨틱한 매력</p>
+            </div>
+          </a>
+
+          <a
+                  href="#"
+                  class="flex items-center p-4 border border-gray-200 rounded-md hover:bg-gray-50 transition-colors"
+          >
+            <div
+                    class="w-12 h-12 bg-green-100 rounded-full flex items-center justify-center mr-4"
+            >
+              <i class="fas fa-lemon text-green-500"></i>
+            </div>
+            <div>
+              <p class="font-medium text-gray-800">시트러스</p>
+              <p class="text-sm text-gray-600">상쾌한 과일향의 활기</p>
+            </div>
+          </a>
+
+          <a
+                  href="#"
+                  class="flex items-center p-4 border border-gray-200 rounded-md hover:bg-gray-50 transition-colors"
+          >
+            <div
+                    class="w-12 h-12 bg-purple-100 rounded-full flex items-center justify-center mr-4"
+            >
+              <i class="fas fa-tree text-purple-500"></i>
+            </div>
+            <div>
+              <p class="font-medium text-gray-800">우디</p>
+              <p class="text-sm text-gray-600">깊이 있는 나무향의 매력</p>
+            </div>
+          </a>
+
+          <a
+                  href="#"
+                  class="flex items-center p-4 border border-gray-200 rounded-md hover:bg-gray-50 transition-colors"
+          >
+            <div
+                    class="w-12 h-12 bg-yellow-100 rounded-full flex items-center justify-center mr-4"
+            >
+              <i class="fas fa-gem text-yellow-500"></i>
+            </div>
+            <div>
+              <p class="font-medium text-gray-800">머스크</p>
+              <p class="text-sm text-gray-600">신비로운 동물향의 우아함</p>
+            </div>
+          </a>
         </div>
       </div>
 
@@ -254,73 +323,6 @@
         </nav>
       </div>
 
-      <!-- Category Quick Links -->
-      <div class="mt-12 bg-white rounded-lg shadow-sm p-6">
-        <h3 class="text-lg font-semibold text-gray-800 mb-6">
-          향기 카테고리
-        </h3>
-        <div class="grid md:grid-cols-4 gap-4">
-          <a
-                  href="#"
-                  class="flex items-center p-4 border border-gray-200 rounded-md hover:bg-gray-50 transition-colors"
-          >
-            <div
-                    class="w-12 h-12 bg-pink-100 rounded-full flex items-center justify-center mr-4"
-            >
-              <i class="fas fa-spa text-pink-500"></i>
-            </div>
-            <div>
-              <p class="font-medium text-gray-800">플로럴</p>
-              <p class="text-sm text-gray-600">꽃향의 로맨틱한 매력</p>
-            </div>
-          </a>
-
-          <a
-                  href="#"
-                  class="flex items-center p-4 border border-gray-200 rounded-md hover:bg-gray-50 transition-colors"
-          >
-            <div
-                    class="w-12 h-12 bg-green-100 rounded-full flex items-center justify-center mr-4"
-            >
-              <i class="fas fa-lemon text-green-500"></i>
-            </div>
-            <div>
-              <p class="font-medium text-gray-800">시트러스</p>
-              <p class="text-sm text-gray-600">상쾌한 과일향의 활기</p>
-            </div>
-          </a>
-
-          <a
-                  href="#"
-                  class="flex items-center p-4 border border-gray-200 rounded-md hover:bg-gray-50 transition-colors"
-          >
-            <div
-                    class="w-12 h-12 bg-purple-100 rounded-full flex items-center justify-center mr-4"
-            >
-              <i class="fas fa-tree text-purple-500"></i>
-            </div>
-            <div>
-              <p class="font-medium text-gray-800">우디</p>
-              <p class="text-sm text-gray-600">깊이 있는 나무향의 매력</p>
-            </div>
-          </a>
-
-          <a
-                  href="#"
-                  class="flex items-center p-4 border border-gray-200 rounded-md hover:bg-gray-50 transition-colors"
-          >
-            <div
-                    class="w-12 h-12 bg-yellow-100 rounded-full flex items-center justify-center mr-4"
-            >
-              <i class="fas fa-gem text-yellow-500"></i>
-            </div>
-            <div>
-              <p class="font-medium text-gray-800">머스크</p>
-              <p class="text-sm text-gray-600">신비로운 동물향의 우아함</p>
-            </div>
-          </a>
-        </div>
-      </div>
     </div>
   </div>
   <input type="hidden" id="isLoggedIn" th:value="${isLoggedIn}" />
