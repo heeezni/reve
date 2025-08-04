@@ -11,6 +11,9 @@ import com.example.reve.domain.Order;
 @Repository
 public interface OrderRepository extends JpaRepository<Order, Long> {
 
+  // 모든 주문 목록 조회 (최신순)
+  List<Order> findAllByOrderByCreatedAtDesc();
+
   // 사용자 ID로 주문 목록 조회 (최신순)
   List<Order> findByUser_UserIdOrderByCreatedAtDesc(Long userId);
 
