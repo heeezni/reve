@@ -15,7 +15,9 @@
             <ol class="flex items-center space-x-2 text-sm text-gray-600">
               <li><a href="/" class="hover:text-gray-800">홈</a></li>
               <li><i class="fas fa-chevron-right text-xs"></i></li>
-              <li><a href="/mypage" class="hover:text-gray-800">마이페이지</a></li>
+              <li>
+                <a href="/mypage" class="hover:text-gray-800">마이페이지</a>
+              </li>
               <li><i class="fas fa-chevron-right text-xs"></i></li>
               <li class="text-gray-800">주문내역</li>
             </ol>
@@ -33,9 +35,16 @@
               <div class="flex items-center justify-between">
                 <div>
                   <p class="text-sm font-medium text-gray-600">전체 주문</p>
-                  <p class="text-2xl font-bold text-gray-800">18건</p>
+                  <p
+                    class="text-2xl font-bold text-gray-800"
+                    th:text="${#lists.size(orders)} + '건'"
+                  >
+                    0건
+                  </p>
                 </div>
-                <div class="w-12 h-12 bg-gray-100 rounded-full flex items-center justify-center">
+                <div
+                  class="w-12 h-12 bg-gray-100 rounded-full flex items-center justify-center"
+                >
                   <i class="fas fa-shopping-bag text-gray-600"></i>
                 </div>
               </div>
@@ -44,10 +53,17 @@
             <div class="bg-white rounded-lg shadow-sm p-6">
               <div class="flex items-center justify-between">
                 <div>
-                  <p class="text-sm font-medium text-gray-600">배송준비중</p>
-                  <p class="text-2xl font-bold text-gray-800">1건</p>
+                  <p class="text-sm font-medium text-gray-600">주문완료</p>
+                  <p
+                    class="text-2xl font-bold text-gray-800"
+                    th:text="${orderedCount} + '건'"
+                  >
+                    0건
+                  </p>
                 </div>
-                <div class="w-12 h-12 bg-blue-100 rounded-full flex items-center justify-center">
+                <div
+                  class="w-12 h-12 bg-blue-100 rounded-full flex items-center justify-center"
+                >
                   <i class="fas fa-box text-blue-600"></i>
                 </div>
               </div>
@@ -57,9 +73,16 @@
               <div class="flex items-center justify-between">
                 <div>
                   <p class="text-sm font-medium text-gray-600">배송중</p>
-                  <p class="text-2xl font-bold text-gray-800">2건</p>
+                  <p
+                    class="text-2xl font-bold text-gray-800"
+                    th:text="${shippingCount} + '건'"
+                  >
+                    0건
+                  </p>
                 </div>
-                <div class="w-12 h-12 bg-yellow-100 rounded-full flex items-center justify-center">
+                <div
+                  class="w-12 h-12 bg-yellow-100 rounded-full flex items-center justify-center"
+                >
                   <i class="fas fa-truck text-yellow-600"></i>
                 </div>
               </div>
@@ -69,9 +92,16 @@
               <div class="flex items-center justify-between">
                 <div>
                   <p class="text-sm font-medium text-gray-600">배송완료</p>
-                  <p class="text-2xl font-bold text-gray-800">15건</p>
+                  <p
+                    class="text-2xl font-bold text-gray-800"
+                    th:text="${deliveredCount} + '건'"
+                  >
+                    0건
+                  </p>
                 </div>
-                <div class="w-12 h-12 bg-green-100 rounded-full flex items-center justify-center">
+                <div
+                  class="w-12 h-12 bg-green-100 rounded-full flex items-center justify-center"
+                >
                   <i class="fas fa-check-circle text-green-600"></i>
                 </div>
               </div>
@@ -80,7 +110,9 @@
 
           <!-- Search and Filter -->
           <div class="bg-white rounded-lg shadow-sm p-6 mb-8">
-            <div class="flex flex-col md:flex-row md:items-center md:justify-between space-y-4 md:space-y-0">
+            <div
+              class="flex flex-col md:flex-row md:items-center md:justify-between space-y-4 md:space-y-0"
+            >
               <!-- Search -->
               <div class="flex-1 max-w-md">
                 <div class="relative">
@@ -91,14 +123,18 @@
                       class="w-full border border-gray-300 rounded-md pl-10 pr-4 py-3 focus:outline-none focus:ring-2 focus:ring-gray-800 focus:border-transparent"
                     />
                   </label>
-                  <i class="fas fa-search absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400"></i>
+                  <i
+                    class="fas fa-search absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400"
+                  ></i>
                 </div>
               </div>
 
               <!-- Filter -->
               <div class="flex items-center space-x-4">
                 <label>
-                  <select class="border border-gray-300 rounded-md px-4 py-3 focus:outline-none focus:ring-2 focus:ring-gray-800 focus:border-transparent">
+                  <select
+                    class="border border-gray-300 rounded-md px-4 py-3 focus:outline-none focus:ring-2 focus:ring-gray-800 focus:border-transparent"
+                  >
                     <option value="">전체 기간</option>
                     <option value="1">최근 1개월</option>
                     <option value="3">최근 3개월</option>
@@ -108,7 +144,9 @@
                 </label>
 
                 <label>
-                  <select class="border border-gray-300 rounded-md px-4 py-3 focus:outline-none focus:ring-2 focus:ring-gray-800 focus:border-transparent">
+                  <select
+                    class="border border-gray-300 rounded-md px-4 py-3 focus:outline-none focus:ring-2 focus:ring-gray-800 focus:border-transparent"
+                  >
                     <option value="">전체 상태</option>
                     <option value="preparing">배송준비중</option>
                     <option value="shipping">배송중</option>
@@ -121,232 +159,174 @@
           </div>
 
           <!-- Order List -->
-          <div class="space-y-6">
-            <!-- Order Item 1 -->
-            <div class="bg-white rounded-lg shadow-sm overflow-hidden">
-              <div class="p-6 border-b border-gray-200">
-                <div class="flex items-center justify-between">
-                  <div class="flex items-center space-x-4">
-                    <span class="text-sm text-gray-500">2024.01.18</span>
-                    <span class="text-sm font-medium text-gray-800">주문번호: 20240118001</span>
-                  </div>
-                  <span class="inline-flex items-center px-3 py-1 rounded-full text-xs font-medium bg-green-100 text-green-800">
-                    배송완료
-                  </span>
-                </div>
+          <div class="space-y-6" th:if="${#lists.isEmpty(orders)}">
+            <!-- 주문 내역이 없을 때 -->
+            <div class="bg-white rounded-lg shadow-sm p-12 text-center">
+              <div
+                class="w-16 h-16 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-4"
+              >
+                <i class="fas fa-shopping-bag text-2xl text-gray-400"></i>
               </div>
-              
-              <div class="p-6">
-                <div class="flex items-start space-x-4">
-                  <img src="/images/product/product1.jpg" alt="디어 무드 퍼퓸" class="w-20 h-20 object-cover rounded-md">
-                  <div class="flex-1">
-                    <h3 class="font-medium text-gray-800 mb-2">디어 무드 멀티 퍼퓸 70ml</h3>
-                    <p class="text-sm text-gray-600 mb-2">수량: 1개</p>
-                    <p class="text-sm text-gray-600">옵션: 기본</p>
-                  </div>
-                  <div class="text-right">
-                    <p class="font-medium text-gray-800 mb-2">24,600원</p>
-                    <div class="space-y-2">
-                      <button class="block w-full px-4 py-2 border border-gray-300 rounded-md text-gray-700 hover:bg-gray-50 transition-colors text-sm">
-                        리뷰작성
-                      </button>
-                      <button class="block w-full px-4 py-2 border border-gray-300 rounded-md text-gray-700 hover:bg-gray-50 transition-colors text-sm">
-                        주문상세
-                      </button>
-                    </div>
-                  </div>
-                </div>
-              </div>
+              <h3 class="text-lg font-medium text-gray-800 mb-2">
+                주문 내역이 없습니다
+              </h3>
+              <p class="text-gray-600 mb-6">
+                Rêve와 함께 첫 주문을 시작해보세요!
+              </p>
+              <a
+                href="/shop/list"
+                class="inline-flex items-center px-6 py-3 bg-gray-800 text-white rounded-md hover:bg-gray-700 transition-colors"
+              >
+                쇼핑하러 가기
+              </a>
             </div>
+          </div>
 
-            <!-- Order Item 2 -->
-            <div class="bg-white rounded-lg shadow-sm overflow-hidden">
+          <div class="space-y-6" th:if="${not #lists.isEmpty(orders)}">
+            <!-- 실제 주문 목록 -->
+            <div
+              th:each="order : ${orders}"
+              class="bg-white rounded-lg shadow-sm overflow-hidden"
+            >
               <div class="p-6 border-b border-gray-200">
                 <div class="flex items-center justify-between">
                   <div class="flex items-center space-x-4">
-                    <span class="text-sm text-gray-500">2024.01.17</span>
-                    <span class="text-sm font-medium text-gray-800">주문번호: 20240117002</span>
+                    <span
+                      class="text-sm text-gray-500"
+                      th:text="${#temporals.format(order.createdAt, 'yyyy.MM.dd')}"
+                      >2024.01.18</span
+                    >
+                    <span
+                      class="text-sm font-medium text-gray-800"
+                      th:text="'주문번호: ' + ${order.orderNumber}"
+                      >주문번호: 20240118001</span
+                    >
                   </div>
-                  <span class="inline-flex items-center px-3 py-1 rounded-full text-xs font-medium bg-yellow-100 text-yellow-800">
-                    배송중
+                  <span
+                    th:if="${order.orderStatus eq 'ORDERED'}"
+                    class="inline-flex items-center px-3 py-1 rounded-full text-xs font-medium bg-blue-100 text-blue-800"
+                  >
+                    주문완료
                   </span>
-                </div>
-              </div>
-              
-              <div class="p-6">
-                <div class="flex items-start space-x-4">
-                  <img src="/images/product/product2.jpg" alt="베스크 퍼퓸" class="w-20 h-20 object-cover rounded-md">
-                  <div class="flex-1">
-                    <h3 class="font-medium text-gray-800 mb-2">베스크 멀티 퍼퓸 70ml</h3>
-                    <p class="text-sm text-gray-600 mb-2">수량: 1개</p>
-                    <p class="text-sm text-gray-600">옵션: 기본</p>
-                  </div>
-                  <div class="text-right">
-                    <p class="font-medium text-gray-800 mb-2">29,250원</p>
-                    <div class="space-y-2">
-                      <button class="block w-full px-4 py-2 border border-gray-300 rounded-md text-gray-700 hover:bg-gray-50 transition-colors text-sm">
-                        배송조회
-                      </button>
-                      <button class="block w-full px-4 py-2 border border-gray-300 rounded-md text-gray-700 hover:bg-gray-50 transition-colors text-sm">
-                        주문상세
-                      </button>
-                    </div>
-                  </div>
-                </div>
-              </div>
-            </div>
-
-            <!-- Order Item 3 -->
-            <div class="bg-white rounded-lg shadow-sm overflow-hidden">
-              <div class="p-6 border-b border-gray-200">
-                <div class="flex items-center justify-between">
-                  <div class="flex items-center space-x-4">
-                    <span class="text-sm text-gray-500">2024.01.16</span>
-                    <span class="text-sm font-medium text-gray-800">주문번호: 20240116003</span>
-                  </div>
-                  <span class="inline-flex items-center px-3 py-1 rounded-full text-xs font-medium bg-blue-100 text-blue-800">
+                  <span
+                    th:if="${order.orderStatus eq 'PREPARING'}"
+                    class="inline-flex items-center px-3 py-1 rounded-full text-xs font-medium bg-yellow-100 text-yellow-800"
+                  >
                     배송준비중
                   </span>
-                </div>
-              </div>
-              
-              <div class="p-6">
-                <div class="flex items-start space-x-4">
-                  <img src="/images/product/product1.jpg" alt="두벨라 퍼퓸" class="w-20 h-20 object-cover rounded-md">
-                  <div class="flex-1">
-                    <h3 class="font-medium text-gray-800 mb-2">두벨라 멀티 퍼퓸 70ml</h3>
-                    <p class="text-sm text-gray-600 mb-2">수량: 1개</p>
-                    <p class="text-sm text-gray-600">옵션: 기본</p>
-                  </div>
-                  <div class="text-right">
-                    <p class="font-medium text-gray-800 mb-2">39,000원</p>
-                    <div class="space-y-2">
-                      <button class="block w-full px-4 py-2 border border-gray-300 rounded-md text-gray-700 hover:bg-gray-50 transition-colors text-sm">
-                        주문취소
-                      </button>
-                      <button class="block w-full px-4 py-2 border border-gray-300 rounded-md text-gray-700 hover:bg-gray-50 transition-colors text-sm">
-                        주문상세
-                      </button>
-                    </div>
-                  </div>
-                </div>
-              </div>
-            </div>
-
-            <!-- Order Item 4 -->
-            <div class="bg-white rounded-lg shadow-sm overflow-hidden">
-              <div class="p-6 border-b border-gray-200">
-                <div class="flex items-center justify-between">
-                  <div class="flex items-center space-x-4">
-                    <span class="text-sm text-gray-500">2024.01.15</span>
-                    <span class="text-sm font-medium text-gray-800">주문번호: 20240115004</span>
-                  </div>
-                  <span class="inline-flex items-center px-3 py-1 rounded-full text-xs font-medium bg-green-100 text-green-800">
+                  <span
+                    th:if="${order.orderStatus eq 'SHIPPING'}"
+                    class="inline-flex items-center px-3 py-1 rounded-full text-xs font-medium bg-orange-100 text-orange-800"
+                  >
+                    배송중
+                  </span>
+                  <span
+                    th:if="${order.orderStatus eq 'DELIVERED'}"
+                    class="inline-flex items-center px-3 py-1 rounded-full text-xs font-medium bg-green-100 text-green-800"
+                  >
                     배송완료
                   </span>
-                </div>
-              </div>
-              
-              <div class="p-6">
-                <div class="flex items-start space-x-4">
-                  <img src="/images/product/product2.jpg" alt="시크릿 가든 퍼퓸" class="w-20 h-20 object-cover rounded-md">
-                  <div class="flex-1">
-                    <h3 class="font-medium text-gray-800 mb-2">시크릿 가든 미니 퍼퓸 30ml</h3>
-                    <p class="text-sm text-gray-600 mb-2">수량: 2개</p>
-                    <p class="text-sm text-gray-600">옵션: 기본</p>
-                  </div>
-                  <div class="text-right">
-                    <p class="font-medium text-gray-800 mb-2">38,400원</p>
-                    <div class="space-y-2">
-                      <button class="block w-full px-4 py-2 border border-gray-300 rounded-md text-gray-700 hover:bg-gray-50 transition-colors text-sm">
-                        리뷰작성
-                      </button>
-                      <button class="block w-full px-4 py-2 border border-gray-300 rounded-md text-gray-700 hover:bg-gray-50 transition-colors text-sm">
-                        주문상세
-                      </button>
-                    </div>
-                  </div>
-                </div>
-              </div>
-            </div>
-
-            <!-- Order Item 5 -->
-            <div class="bg-white rounded-lg shadow-sm overflow-hidden">
-              <div class="p-6 border-b border-gray-200">
-                <div class="flex items-center justify-between">
-                  <div class="flex items-center space-x-4">
-                    <span class="text-sm text-gray-500">2024.01.14</span>
-                    <span class="text-sm font-medium text-gray-800">주문번호: 20240114005</span>
-                  </div>
-                  <span class="inline-flex items-center px-3 py-1 rounded-full text-xs font-medium bg-red-100 text-red-800">
+                  <span
+                    th:if="${order.orderStatus eq 'CANCELLED'}"
+                    class="inline-flex items-center px-3 py-1 rounded-full text-xs font-medium bg-red-100 text-red-800"
+                  >
                     주문취소
                   </span>
                 </div>
               </div>
-              
+
               <div class="p-6">
                 <div class="flex items-start space-x-4">
-                  <img src="/images/product/product1.jpg" alt="로맨틱 가든 퍼퓸" class="w-20 h-20 object-cover rounded-md opacity-50">
+                  <img
+                    th:src="${order.orderItems != null and #lists.size(order.orderItems) > 0 ? order.orderItems[0].productImage : '/images/product/product1.jpg'}"
+                    th:alt="${order.orderItems != null and #lists.size(order.orderItems) > 0 ? order.orderItems[0].productName : '상품 이미지'}"
+                    class="w-20 h-20 object-cover rounded-md"
+                  />
                   <div class="flex-1">
-                    <h3 class="font-medium text-gray-800 mb-2 line-through">로맨틱 가든 퍼퓸 50ml</h3>
-                    <p class="text-sm text-gray-600 mb-2">수량: 1개</p>
-                    <p class="text-sm text-gray-600">옵션: 기본</p>
-                    <p class="text-sm text-red-600 mt-2">취소사유: 고객 요청</p>
+                    <h3
+                      class="font-medium text-gray-800 mb-2"
+                      th:text="${order.orderItems != null and #lists.size(order.orderItems) > 0 ? order.orderItems[0].productName : '상품명'}"
+                    >
+                      상품명
+                    </h3>
+                    <p
+                      class="text-sm text-gray-600 mb-2"
+                      th:text="'총 금액: ' + ${#numbers.formatInteger(order.totalPrice, 3, 'COMMA')} + '원'"
+                    >
+                      총 금액: 24,600원
+                    </p>
+                    <p
+                      class="text-sm text-gray-600"
+                      th:text="'결제수단: ' + ${order.paymentMethod}"
+                    >
+                      결제수단: TOSS
+                    </p>
                   </div>
                   <div class="text-right">
-                    <p class="font-medium text-gray-800 mb-2 line-through">32,000원</p>
+                    <p
+                      class="font-medium text-gray-800 mb-2"
+                      th:text="${#numbers.formatInteger(order.totalPrice, 3, 'COMMA')} + '원'"
+                    >
+                      24,600원
+                    </p>
                     <div class="space-y-2">
-                      <button class="block w-full px-4 py-2 border border-gray-300 rounded-md text-gray-700 hover:bg-gray-50 transition-colors text-sm">
-                        주문상세
+                      <button
+                        class="block w-full px-4 py-2 border border-gray-300 rounded-md text-gray-700 hover:bg-gray-50 transition-colors text-sm"
+                        th:if="${order.orderStatus eq 'DELIVERED'}"
+                      >
+                        리뷰작성
                       </button>
+                      <a
+                        th:href="@{'/mypage/order-detail/' + ${order.orderId}}"
+                        class="block w-full px-4 py-2 border border-gray-300 rounded-md text-gray-700 hover:bg-gray-50 transition-colors text-sm text-center"
+                      >
+                        주문상세
+                      </a>
                     </div>
                   </div>
                 </div>
               </div>
             </div>
-          </div>
 
-          <!-- Pagination -->
-          <div class="mt-8 flex items-center justify-center">
-            <nav class="flex items-center space-x-2">
-              <button class="px-3 py-2 border border-gray-300 rounded-md text-gray-500 hover:bg-gray-50 transition-colors">
-                <i class="fas fa-chevron-left"></i>
-              </button>
-              <button class="px-3 py-2 border border-gray-800 bg-gray-800 text-white rounded-md">1</button>
-              <button class="px-3 py-2 border border-gray-300 rounded-md text-gray-700 hover:bg-gray-50 transition-colors">2</button>
-              <button class="px-3 py-2 border border-gray-300 rounded-md text-gray-700 hover:bg-gray-50 transition-colors">3</button>
-              <button class="px-3 py-2 border border-gray-300 rounded-md text-gray-500 hover:bg-gray-50 transition-colors">
-                <i class="fas fa-chevron-right"></i>
-              </button>
-            </nav>
-          </div>
-
-          <!-- Order Help -->
-          <div class="mt-12 bg-white rounded-lg shadow-sm p-6">
-            <h3 class="text-lg font-semibold text-gray-800 mb-4">주문 관련 도움말</h3>
-            <div class="grid md:grid-cols-3 gap-6">
-              <div class="text-center">
-                <div class="w-12 h-12 bg-blue-100 rounded-full flex items-center justify-center mx-auto mb-3">
-                  <i class="fas fa-question-circle text-blue-600"></i>
+            <!-- Order Help -->
+            <div class="mt-12 bg-white rounded-lg shadow-sm p-6">
+              <h3 class="text-lg font-semibold text-gray-800 mb-4">
+                주문 관련 도움말
+              </h3>
+              <div class="grid md:grid-cols-3 gap-6">
+                <div class="text-center">
+                  <div
+                    class="w-12 h-12 bg-blue-100 rounded-full flex items-center justify-center mx-auto mb-3"
+                  >
+                    <i class="fas fa-question-circle text-blue-600"></i>
+                  </div>
+                  <h4 class="font-medium text-gray-800 mb-2">주문 취소</h4>
+                  <p class="text-sm text-gray-600">
+                    배송준비중인 주문만 취소 가능합니다
+                  </p>
                 </div>
-                <h4 class="font-medium text-gray-800 mb-2">주문 취소</h4>
-                <p class="text-sm text-gray-600">배송준비중인 주문만 취소 가능합니다</p>
-              </div>
-              
-              <div class="text-center">
-                <div class="w-12 h-12 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-3">
-                  <i class="fas fa-truck text-green-600"></i>
+                <div class="text-center">
+                  <div
+                    class="w-12 h-12 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-3"
+                  >
+                    <i class="fas fa-truck text-green-600"></i>
+                  </div>
+                  <h4 class="font-medium text-gray-800 mb-2">배송 조회</h4>
+                  <p class="text-sm text-gray-600">
+                    배송중인 상품의 실시간 위치를 확인하세요
+                  </p>
                 </div>
-                <h4 class="font-medium text-gray-800 mb-2">배송 조회</h4>
-                <p class="text-sm text-gray-600">배송중인 상품의 실시간 위치를 확인하세요</p>
-              </div>
-              
-              <div class="text-center">
-                <div class="w-12 h-12 bg-purple-100 rounded-full flex items-center justify-center mx-auto mb-3">
-                  <i class="fas fa-star text-purple-600"></i>
+                <div class="text-center">
+                  <div
+                    class="w-12 h-12 bg-purple-100 rounded-full flex items-center justify-center mx-auto mb-3"
+                  >
+                    <i class="fas fa-star text-purple-600"></i>
+                  </div>
+                  <h4 class="font-medium text-gray-800 mb-2">리뷰 작성</h4>
+                  <p class="text-sm text-gray-600">
+                    배송완료된 상품에 리뷰를 남겨주세요
+                  </p>
                 </div>
-                <h4 class="font-medium text-gray-800 mb-2">리뷰 작성</h4>
-                <p class="text-sm text-gray-600">배송완료된 상품에 리뷰를 남겨주세요</p>
               </div>
             </div>
           </div>
@@ -364,15 +344,24 @@
     <script>
       // Search functionality
       const searchInput = document.querySelector('input[placeholder*="검색"]');
-      searchInput.addEventListener('input', function() {
+      searchInput.addEventListener('input', function () {
         const searchTerm = this.value.toLowerCase();
-        const orderItems = document.querySelectorAll('.bg-white.rounded-lg.shadow-sm.overflow-hidden');
-        
-        orderItems.forEach(item => {
-          const orderNumber = item.querySelector('.text-sm.font-medium').textContent.toLowerCase();
-          const productName = item.querySelector('h3').textContent.toLowerCase();
-          
-          if (orderNumber.includes(searchTerm) || productName.includes(searchTerm)) {
+        const orderItems = document.querySelectorAll(
+          '.bg-white.rounded-lg.shadow-sm.overflow-hidden'
+        );
+
+        orderItems.forEach((item) => {
+          const orderNumber = item
+            .querySelector('.text-sm.font-medium')
+            .textContent.toLowerCase();
+          const productName = item
+            .querySelector('h3')
+            .textContent.toLowerCase();
+
+          if (
+            orderNumber.includes(searchTerm) ||
+            productName.includes(searchTerm)
+          ) {
             item.style.display = 'block';
           } else {
             item.style.display = 'none';
@@ -383,25 +372,32 @@
       // Filter functionality
       const periodSelect = document.querySelector('select:first-of-type');
       const statusSelect = document.querySelector('select:last-of-type');
-      
+
       function applyFilters() {
         const selectedPeriod = periodSelect.value;
         const selectedStatus = statusSelect.value;
-        
+
         // Add filter logic here
-        console.log('Filtering by period:', selectedPeriod, 'status:', selectedStatus);
+        console.log(
+          'Filtering by period:',
+          selectedPeriod,
+          'status:',
+          selectedStatus
+        );
       }
-      
+
       periodSelect.addEventListener('change', applyFilters);
       statusSelect.addEventListener('change', applyFilters);
 
       // Order action buttons
-      document.querySelectorAll('button').forEach(btn => {
-        btn.addEventListener('click', function() {
+      document.querySelectorAll('button').forEach((btn) => {
+        btn.addEventListener('click', function () {
           const action = this.textContent.trim();
-          const orderNumber = this.closest('.bg-white').querySelector('.text-sm.font-medium').textContent;
-          
-          switch(action) {
+          const orderNumber = this.closest('.bg-white').querySelector(
+            '.text-sm.font-medium'
+          ).textContent;
+
+          switch (action) {
             case '리뷰작성':
               alert(`"${orderNumber}" 리뷰 작성 페이지로 이동합니다.`);
               break;
@@ -421,21 +417,22 @@
       });
 
       // Pagination
-      document.querySelectorAll('nav button').forEach(btn => {
-        btn.addEventListener('click', function() {
+      document.querySelectorAll('nav button').forEach((btn) => {
+        btn.addEventListener('click', function () {
           if (!this.classList.contains('bg-gray-800')) {
             // Remove active class from all buttons
-            document.querySelectorAll('nav button').forEach(b => {
-              b.classList.remove('bg-gray-800', 'text-white', 'border-gray-800');
+            document.querySelectorAll('nav button').forEach((b) => {
+              b.classList.remove(
+                'bg-gray-800',
+                'text-white',
+                'border-gray-800'
+              );
               b.classList.add('border-gray-300', 'text-gray-700');
             });
-            
+
             // Add active class to clicked button
             this.classList.remove('border-gray-300', 'text-gray-700');
             this.classList.add('bg-gray-800', 'text-white', 'border-gray-800');
-            
-            // Add pagination logic here
-            console.log('Navigating to page:', this.textContent);
           }
         });
       });

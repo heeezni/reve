@@ -1,0 +1,187 @@
+<!DOCTYPE html>
+<html lang="ko" xmlns:th="http://www.thymeleaf.org">
+  <head
+    th:replace="~{fragments/header :: head(title='결제 실패 | Rêve')}"
+  ></head>
+  <body class="font-sans text-gray-800">
+    <!-- Header Fragment -->
+    <div th:replace="~{fragments/header :: header}"></div>
+
+    <!-- Main Content -->
+    <main class="pt-20">
+      <div class="min-h-screen bg-gray-50 py-12">
+        <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
+          <!-- Error Message -->
+          <div class="text-center mb-12">
+            <div
+              class="w-20 h-20 bg-red-100 rounded-full flex items-center justify-center mx-auto mb-6"
+            >
+              <i class="fas fa-exclamation-triangle text-3xl text-red-600"></i>
+            </div>
+            <h1 class="text-3xl font-bold text-gray-800 mb-4">
+              결제에 실패했습니다
+            </h1>
+            <p class="text-lg text-gray-600">
+              결제 처리 중 문제가 발생했습니다.
+            </p>
+          </div>
+
+          <!-- Error Details -->
+          <div class="bg-white rounded-lg shadow-sm p-8 mb-8">
+            <h2 class="text-xl font-semibold text-gray-800 mb-6">오류 정보</h2>
+
+            <div class="space-y-4">
+              <div class="flex justify-between">
+                <span class="text-gray-600">오류 코드</span>
+                <span class="font-medium text-red-600" th:text="${errorCode}"
+                  >PAYMENT_FAILED</span
+                >
+              </div>
+              <div class="flex justify-between">
+                <span class="text-gray-600">오류 메시지</span>
+                <span class="font-medium text-red-600" th:text="${errorMessage}"
+                  >결제 처리 중 오류가 발생했습니다</span
+                >
+              </div>
+              <div class="flex justify-between">
+                <span class="text-gray-600">발생 시간</span>
+                <span class="font-medium" th:text="${errorTime}"
+                  >2024-01-15 14:30:25</span
+                >
+              </div>
+            </div>
+          </div>
+
+          <!-- Common Error Solutions -->
+          <div class="bg-yellow-50 rounded-lg p-6 mb-8">
+            <h3 class="text-lg font-semibold text-yellow-800 mb-4">
+              일반적인 해결 방법
+            </h3>
+            <div class="space-y-3">
+              <div class="flex items-start space-x-3">
+                <i class="fas fa-credit-card text-yellow-600 mt-1"></i>
+                <div>
+                  <p class="font-medium text-yellow-800">카드 정보 확인</p>
+                  <p class="text-sm text-yellow-700">
+                    카드 번호, 유효기간, CVC 번호를 정확히 입력했는지
+                    확인해주세요
+                  </p>
+                </div>
+              </div>
+              <div class="flex items-start space-x-3">
+                <i class="fas fa-wallet text-yellow-600 mt-1"></i>
+                <div>
+                  <p class="font-medium text-yellow-800">잔액 확인</p>
+                  <p class="text-sm text-yellow-700">
+                    카드나 계좌에 충분한 잔액이 있는지 확인해주세요
+                  </p>
+                </div>
+              </div>
+              <div class="flex items-start space-x-3">
+                <i class="fas fa-mobile-alt text-yellow-600 mt-1"></i>
+                <div>
+                  <p class="font-medium text-yellow-800">휴대폰 인증</p>
+                  <p class="text-sm text-yellow-700">
+                    휴대폰 인증이 필요한 경우 인증을 완료해주세요
+                  </p>
+                </div>
+              </div>
+              <div class="flex items-start space-x-3">
+                <i class="fas fa-shield-alt text-yellow-600 mt-1"></i>
+                <div>
+                  <p class="font-medium text-yellow-800">보안 프로그램</p>
+                  <p class="text-sm text-yellow-700">
+                    보안 프로그램이 결제를 차단하고 있는지 확인해주세요
+                  </p>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Action Buttons -->
+          <div class="flex flex-col sm:flex-row gap-4 justify-center mb-8">
+            <a
+              href="/order/checkout"
+              class="bg-gray-800 text-white py-3 px-8 rounded-md hover:bg-gray-700 transition-colors font-medium text-center"
+            >
+              다시 결제하기
+            </a>
+            <a
+              href="/cart"
+              class="border border-gray-300 text-gray-700 py-3 px-8 rounded-md hover:bg-gray-50 transition-colors font-medium text-center"
+            >
+              장바구니로 돌아가기
+            </a>
+            <a
+              href="/shop/list"
+              class="border border-gray-300 text-gray-700 py-3 px-8 rounded-md hover:bg-gray-50 transition-colors font-medium text-center"
+            >
+              쇼핑 계속하기
+            </a>
+          </div>
+
+          <!-- Customer Service -->
+          <div class="bg-white rounded-lg shadow-sm p-8">
+            <h3 class="text-lg font-semibold text-gray-800 mb-4">
+              고객센터 문의
+            </h3>
+            <p class="text-gray-600 mb-4">
+              문제가 지속되면 고객센터로 문의해주세요.
+            </p>
+
+            <div class="grid md:grid-cols-2 gap-6">
+              <div class="text-center p-4 bg-gray-50 rounded-lg">
+                <i class="fas fa-phone text-2xl text-gray-600 mb-2"></i>
+                <p class="font-medium text-gray-800">전화 문의</p>
+                <p class="text-lg font-bold text-gray-800">1588-1234</p>
+                <p class="text-sm text-gray-500">평일 09:00 - 18:00</p>
+              </div>
+
+              <div class="text-center p-4 bg-gray-50 rounded-lg">
+                <i class="fas fa-envelope text-2xl text-gray-600 mb-2"></i>
+                <p class="font-medium text-gray-800">이메일 문의</p>
+                <p class="text-lg font-bold text-gray-800">
+                  support@reve.co.kr
+                </p>
+                <p class="text-sm text-gray-500">24시간 접수 가능</p>
+              </div>
+            </div>
+
+            <div class="mt-6 p-4 bg-blue-50 rounded-lg">
+              <p class="text-sm text-blue-800">
+                <i class="fas fa-info-circle mr-2"></i>
+                문의 시 주문번호와 오류 코드를 함께 알려주시면 더 빠른 도움을
+                드릴 수 있습니다.
+              </p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </main>
+
+    <!-- Footer Fragment -->
+    <div th:replace="~{fragments/footer :: footer}"></div>
+
+    <script>
+      // 페이지 로드 시 오류 로깅
+      document.addEventListener('DOMContentLoaded', function () {
+        console.log('결제 실패 페이지 로드됨');
+
+        // 오류 정보가 있으면 콘솔에 출력
+        const errorCode = document.querySelector(
+          '[th\\:text*="errorCode"]'
+        )?.textContent;
+        const errorMessage = document.querySelector(
+          '[th\\:text*="errorMessage"]'
+        )?.textContent;
+
+        if (errorCode || errorMessage) {
+          console.error('결제 오류:', {
+            code: errorCode,
+            message: errorMessage,
+          });
+        }
+      });
+    </script>
+  </body>
+</html>

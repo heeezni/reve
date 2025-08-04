@@ -1,0 +1,503 @@
+<!DOCTYPE html>
+<html lang="ko" xmlns:th="http://www.thymeleaf.org">
+  <head
+    th:replace="~{fragments/header :: head(title='주문/결제 | Rêve')}"
+  ></head>
+  <body class="font-sans text-gray-800">
+    <!-- Header Fragment -->
+    <div th:replace="~{fragments/header :: header}"></div>
+
+    <!-- Main Content -->
+    <main class="pt-20">
+      <div class="min-h-screen bg-gray-50 py-12">
+        <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
+          <!-- Page Title -->
+          <div class="mb-8">
+            <h1 class="text-3xl font-bold text-gray-800 mb-2">주문/결제</h1>
+            <p class="text-gray-600">
+              주문 정보를 확인하고 결제를 진행해주세요
+            </p>
+          </div>
+
+          <!-- Progress Steps -->
+          <div class="mb-8">
+            <div class="flex items-center justify-center space-x-4">
+              <div class="flex items-center">
+                <div
+                  class="w-8 h-8 bg-gray-800 text-white rounded-full flex items-center justify-center text-sm font-medium"
+                >
+                  1
+                </div>
+                <span class="ml-2 text-sm font-medium text-gray-800"
+                  >장바구니</span
+                >
+              </div>
+              <div class="w-12 h-0.5 bg-gray-300"></div>
+              <div class="flex items-center">
+                <div
+                  class="w-8 h-8 bg-gray-800 text-white rounded-full flex items-center justify-center text-sm font-medium"
+                >
+                  2
+                </div>
+                <span class="ml-2 text-sm font-medium text-gray-800"
+                  >주문/결제</span
+                >
+              </div>
+              <div class="w-12 h-0.5 bg-gray-300"></div>
+              <div class="flex items-center">
+                <div
+                  class="w-8 h-8 bg-gray-300 text-gray-600 rounded-full flex items-center justify-center text-sm font-medium"
+                >
+                  3
+                </div>
+                <span class="ml-2 text-sm font-medium text-gray-400"
+                  >주문완료</span
+                >
+              </div>
+            </div>
+          </div>
+
+          <div class="grid lg:grid-cols-3 gap-8">
+            <!-- Order Form -->
+            <div class="lg:col-span-2 space-y-6">
+              <!-- Delivery Information -->
+              <div class="bg-white rounded-lg shadow-sm p-6">
+                <h2 class="text-lg font-semibold text-gray-800 mb-4">
+                  배송 정보
+                </h2>
+
+                <!-- Default Address Selection -->
+                <div class="mb-4">
+                  <label class="flex items-center">
+                    <input
+                      type="radio"
+                      name="addressType"
+                      value="default"
+                      checked
+                      class="w-4 h-4 text-gray-800 border-gray-300 focus:ring-gray-800"
+                    />
+                    <span class="ml-2 text-sm font-medium">기본 배송지</span>
+                  </label>
+                  <div class="mt-2 ml-6 p-3 bg-gray-50 rounded-md">
+                    <p class="text-sm text-gray-800">홍길동 (010-1234-5678)</p>
+                    <p class="text-sm text-gray-600">
+                      서울특별시 강남구 테헤란로 123
+                    </p>
+                    <p class="text-sm text-gray-600">우편번호: 06123</p>
+                  </div>
+                </div>
+
+                <!-- New Address Input -->
+                <div class="mb-4">
+                  <label class="flex items-center">
+                    <input
+                      type="radio"
+                      name="addressType"
+                      value="new"
+                      class="w-4 h-4 text-gray-800 border-gray-300 focus:ring-gray-800"
+                    />
+                    <span class="ml-2 text-sm font-medium">새 배송지</span>
+                  </label>
+
+                  <div
+                    id="newAddressForm"
+                    class="mt-2 ml-6 space-y-3"
+                    style="display: none"
+                  >
+                    <div class="grid grid-cols-2 gap-3">
+                      <label>
+                        <input
+                          type="text"
+                          placeholder="받는 분"
+                          class="border border-gray-300 rounded-md px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-gray-800 focus:border-transparent"
+                        />
+                      </label>
+                      <label>
+                        <input
+                          type="text"
+                          placeholder="연락처"
+                          class="border border-gray-300 rounded-md px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-gray-800 focus:border-transparent"
+                        />
+                      </label>
+                    </div>
+                    <div class="grid grid-cols-3 gap-2">
+                      <label>
+                        <input
+                          type="text"
+                          placeholder="우편번호"
+                          class="border border-gray-300 rounded-md px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-gray-800 focus:border-transparent"
+                        />
+                      </label>
+                      <button
+                        type="button"
+                        class="bg-gray-800 text-white px-3 py-2 rounded-md text-sm hover:bg-gray-700 transition-colors"
+                      >
+                        주소검색
+                      </button>
+                    </div>
+                    <label>
+                      <input
+                        type="text"
+                        placeholder="기본주소"
+                        class="w-full border border-gray-300 rounded-md px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-gray-800 focus:border-transparent"
+                      />
+                    </label>
+                    <label>
+                      <input
+                        type="text"
+                        placeholder="상세주소"
+                        class="w-full border border-gray-300 rounded-md px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-gray-800 focus:border-transparent"
+                      />
+                    </label>
+                  </div>
+                </div>
+
+                <!-- Delivery Request -->
+                <div>
+                  <label class="block text-sm font-medium text-gray-700 mb-2"
+                    >배송 요청사항</label
+                  >
+                  <label>
+                    <select
+                      class="w-full border border-gray-300 rounded-md px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-gray-800 focus:border-transparent"
+                    >
+                      <option value="">배송 요청사항을 선택하세요</option>
+                      <option value="door">문 앞에 놓아주세요</option>
+                      <option value="security">경비실에 맡겨주세요</option>
+                      <option value="call">배송 전 연락주세요</option>
+                      <option value="custom">직접 입력</option>
+                    </select>
+                  </label>
+                </div>
+              </div>
+
+              <!-- Orderer Information -->
+              <div class="bg-white rounded-lg shadow-sm p-6">
+                <h2 class="text-lg font-semibold text-gray-800 mb-4">
+                  주문자 정보
+                </h2>
+                <div class="grid grid-cols-2 gap-4">
+                  <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-2"
+                      >주문자명</label
+                    >
+                    <label>
+                      <input
+                        type="text"
+                        value="홍길동"
+                        class="w-full border border-gray-300 rounded-md px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-gray-800 focus:border-transparent"
+                      />
+                    </label>
+                  </div>
+                  <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-2"
+                      >연락처</label
+                    >
+                    <label>
+                      <input
+                        type="text"
+                        value="010-1234-5678"
+                        class="w-full border border-gray-300 rounded-md px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-gray-800 focus:border-transparent"
+                      />
+                    </label>
+                  </div>
+                  <div class="col-span-2">
+                    <label class="block text-sm font-medium text-gray-700 mb-2"
+                      >이메일</label
+                    >
+                    <label>
+                      <input
+                        type="email"
+                        value="hong@example.com"
+                        class="w-full border border-gray-300 rounded-md px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-gray-800 focus:border-transparent"
+                      />
+                    </label>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Payment Method -->
+              <div class="bg-white rounded-lg shadow-sm p-6">
+                <h2 class="text-lg font-semibold text-gray-800 mb-4">
+                  결제 수단
+                </h2>
+                <div class="space-y-3">
+                  <label
+                    class="flex items-center p-3 border border-gray-300 rounded-md hover:bg-gray-50 cursor-pointer"
+                  >
+                    <input
+                      type="radio"
+                      name="paymentMethod"
+                      value="toss"
+                      checked
+                      class="w-4 h-4 text-gray-800 border-gray-300 focus:ring-gray-800"
+                    />
+                    <div class="ml-3">
+                      <div class="flex items-center">
+                        <img
+                          src="https://static.toss.im/assets/payments/toss-logo.png"
+                          alt="Toss"
+                          class="w-8 h-8 mr-2"
+                        />
+                        <span class="font-medium">Toss 간편결제</span>
+                      </div>
+                      <p class="text-sm text-gray-600">
+                        카드, 계좌이체, 간편결제 등
+                      </p>
+                    </div>
+                  </label>
+                </div>
+              </div>
+            </div>
+
+            <!-- Order Summary -->
+            <div class="lg:col-span-1">
+              <div class="bg-white rounded-lg shadow-sm p-6 sticky top-8">
+                <h2 class="text-lg font-semibold text-gray-800 mb-4">
+                  주문 요약
+                </h2>
+
+                <!-- Selected Items -->
+                <div class="space-y-3 mb-6" id="selectedItemsContainer">
+                  <!-- 동적으로 생성될 상품 목록 -->
+                </div>
+
+                <!-- Price Breakdown -->
+                <div class="space-y-3 mb-6">
+                  <div class="flex justify-between text-sm">
+                    <span class="text-gray-600">상품 금액</span>
+                    <span id="summaryProductPrice"
+                      >[[${#numbers.formatInteger(totalProductPrice, 3,
+                      'COMMA')}]]원</span
+                    >
+                  </div>
+                  <div class="flex justify-between text-sm">
+                    <span class="text-red-500">할인 금액</span>
+                    <span class="text-red-500" id="summaryDiscountPrice"
+                      >[[${discountAmount == 0 ? '0' : '-' +
+                      #numbers.formatInteger(discountAmount, 3,
+                      'COMMA')}]]원</span
+                    >
+                  </div>
+                  <div class="flex justify-between text-sm">
+                    <span class="text-gray-600">배송비</span>
+                    <span id="summaryDeliveryPrice"
+                      >[[${deliveryFee == 0 ? '무료' :
+                      #numbers.formatInteger(deliveryFee, 3, 'COMMA') +
+                      '원'}]]</span
+                    >
+                  </div>
+                  <div class="border-t pt-3">
+                    <div class="flex justify-between text-lg font-bold">
+                      <span>총 결제금액</span>
+                      <span id="totalAmount" class="text-gray-800"
+                        >[[${#numbers.formatInteger(totalAmount, 3,
+                        'COMMA')}]]원</span
+                      >
+                    </div>
+                  </div>
+                </div>
+
+                <!-- Payment Button -->
+                <button
+                  id="paymentButton"
+                  class="w-full bg-gray-800 text-white py-3 px-6 rounded-md hover:bg-gray-700 transition-colors font-medium"
+                >
+                  결제하기
+                </button>
+
+                <!-- Additional Info -->
+                <div class="mt-6 pt-6 border-t border-gray-200">
+                  <div class="text-xs text-gray-500 space-y-1">
+                    <p>• 결제 완료 후 주문 내역에서 확인 가능합니다</p>
+                    <p>• 배송 예정일: 결제 완료 후 1-2일 내</p>
+                    <p>• 반품/교환: 배송 완료 후 7일 이내</p>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </main>
+
+    <!-- Footer Fragment -->
+    <div th:replace="~{fragments/footer :: footer}"></div>
+
+    <!-- Toss Payments SDK -->
+    <script src="https://js.tosspayments.com/v1/payment"></script>
+
+    <script>
+      // Toss Payments 초기화
+      const clientKey = 'test_ck_D5GePWvyJnrK0W0k6q8gLzN97Eoq';
+      const tossPayments = TossPayments(clientKey);
+
+      // 주소 타입 변경 이벤트
+      document
+        .querySelectorAll('input[name="addressType"]')
+        .forEach((radio) => {
+          radio.addEventListener('change', function () {
+            const newAddressForm = document.getElementById('newAddressForm');
+            if (this.value === 'new') {
+              newAddressForm.style.display = 'block';
+            } else {
+              newAddressForm.style.display = 'none';
+            }
+          });
+        });
+
+      // 상품 정보 표시 함수
+      function displayCartItems() {
+        // Thymeleaf에서 데이터를 직접 가져오기
+        const cartItemsJson = '[[${cartItems}]]';
+        const container = document.getElementById('selectedItemsContainer');
+
+        try {
+          // HTML 엔티티를 원래 문자로 변환
+          let cleanJson = cartItemsJson;
+          if (cleanJson.includes('&quot;')) {
+            cleanJson = cleanJson.replace(/&quot;/g, '"');
+          }
+          if (cleanJson.includes('&amp;')) {
+            cleanJson = cleanJson.replace(/&amp;/g, '&');
+          }
+
+          const items = JSON.parse(cleanJson);
+
+          if (items && items.length > 0) {
+            items.forEach((item) => {
+              const itemElement = document.createElement('div');
+              itemElement.className =
+                'flex items-center space-x-3 p-3 bg-gray-50 rounded-md';
+              itemElement.innerHTML = `
+                  <img src="${
+                    item.image || '/images/product/product1.jpg'
+                  }" alt="상품" class="w-12 h-12 object-cover rounded-md" />
+                  <div class="flex-1">
+                    <h3 class="text-sm font-medium text-gray-800">${
+                      item.name
+                    }</h3>
+                    <p class="text-sm text-gray-600">수량: ${
+                      item.quantity
+                    }개</p>
+                  </div>
+                  <div class="text-right">
+                    <p class="text-sm font-bold text-gray-800">${parseInt(
+                      item.totalPrice
+                    ).toLocaleString()}원</p>
+                  </div>
+                `;
+              container.appendChild(itemElement);
+            });
+          } else {
+            // 기본 상품 표시
+            container.innerHTML = `
+                <div class="flex items-center space-x-3 p-3 bg-gray-50 rounded-md">
+                  <img src="/images/product/product1.jpg" alt="상품" class="w-12 h-12 object-cover rounded-md" />
+                  <div class="flex-1">
+                    <h3 class="text-sm font-medium text-gray-800">디어 무드 멀티 퍼퓸 70ml</h3>
+                    <p class="text-sm text-gray-600">수량: 1개</p>
+                  </div>
+                  <div class="text-right">
+                    <p class="text-sm font-bold text-gray-800">24,600원</p>
+                  </div>
+                </div>
+              `;
+          }
+        } catch (error) {
+          // 기본 상품 표시
+          container.innerHTML = `
+              <div class="flex items-center space-x-3 p-3 bg-gray-50 rounded-md">
+                <img src="/images/product/product1.jpg" alt="상품" class="w-12 h-12 object-cover rounded-md" />
+                <div class="flex-1">
+                  <h3 class="text-sm font-medium text-gray-800">디어 무드 멀티 퍼퓸 70ml</h3>
+                  <p class="text-sm text-gray-600">수량: 1개</p>
+                </div>
+                <div class="text-right">
+                  <p class="text-sm font-bold text-gray-800">24,600원</p>
+                </div>
+              </div>
+            `;
+        }
+      }
+
+      // 결제 버튼 클릭 이벤트
+      document
+        .getElementById('paymentButton')
+        .addEventListener('click', function () {
+          // 로딩 상태로 변경
+          this.disabled = true;
+          this.textContent = '결제 처리 중...';
+
+          // 실제 총 금액 가져오기
+          const actualTotalAmount =
+            parseInt('[[${actualTotalAmount}]]') || 34600;
+
+          // 상품 정보 가져오기
+          const cartItemsJson = '[[${cartItems}]]';
+          const deliveryFee = '[[${deliveryFee}]]';
+          const discountAmount = '[[${discountAmount}]]';
+
+          // HTML 엔티티를 원래 문자로 변환
+          let cleanCartItemsJson = cartItemsJson;
+          if (cleanCartItemsJson.includes('&quot;')) {
+            cleanCartItemsJson = cleanCartItemsJson.replace(/&quot;/g, '"');
+          }
+          if (cleanCartItemsJson.includes('&amp;')) {
+            cleanCartItemsJson = cleanCartItemsJson.replace(/&amp;/g, '&');
+          }
+
+          // 결제 데이터를 세션 스토리지에 저장
+          sessionStorage.setItem(
+            'orderData',
+            JSON.stringify({
+              items: cleanCartItemsJson,
+              amount: actualTotalAmount,
+              deliveryFee: deliveryFee,
+              discountAmount: discountAmount,
+            })
+          );
+
+          // 결제 요청 (페이지 이동 방식)
+          tossPayments
+            .requestPayment(
+              '카드',
+              {
+                amount: actualTotalAmount,
+                orderId: 'order_' + new Date().getTime(),
+                orderName: 'Rêve 향수 구매',
+                customerName: '홍길동',
+                customerEmail: 'hong@example.com',
+                successUrl:
+                  window.location.origin +
+                  '/order/success?items=' +
+                  encodeURIComponent(cleanCartItemsJson) +
+                  '&amount=' +
+                  actualTotalAmount +
+                  '&deliveryFee=' +
+                  deliveryFee +
+                  '&discountAmount=' +
+                  discountAmount,
+                failUrl: window.location.origin + '/order/fail',
+              },
+              {
+                windowTarget: 'self', // 현재 창에서 결제 진행
+              }
+            )
+            .catch(function (error) {
+              console.error('결제 요청 실패:', error);
+              alert('결제 요청에 실패했습니다. 다시 시도해주세요.');
+
+              // 버튼 상태 복원
+              document.getElementById('paymentButton').disabled = false;
+              document.getElementById('paymentButton').textContent = '결제하기';
+            });
+        });
+
+      // 페이지 로드 시 초기화
+      document.addEventListener('DOMContentLoaded', function () {
+        displayCartItems(); // 상품 정보 표시
+      });
+    </script>
+  </body>
+</html>

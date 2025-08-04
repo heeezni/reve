@@ -13,15 +13,13 @@ import org.springframework.transaction.annotation.Transactional;
 import com.example.reve.domain.Cart;
 import com.example.reve.domain.Perfume;
 import com.example.reve.domain.User;
+import com.example.reve.dto.CartItem;
 import com.example.reve.repository.CartRepository;
 import com.example.reve.repository.PerfumeRepository;
 import com.example.reve.repository.UserRepository;
 
 import lombok.RequiredArgsConstructor;
 
-/*
-장바구니 관련 로직을 처리하는 서비스임.
- */
 @Service
 @RequiredArgsConstructor
 @Transactional
@@ -120,8 +118,46 @@ public class CartService {
     cartRepository.deleteById(cartId);
   }
 
-  // 장바구니에 중복 삼품이 있을 경우 반환값이 필요할 경우
-  public boolean getresultCart() {
-    return false;
+  /** 사용자의 장바구니에서 구매한 상품들을 삭제 (새로운 기능) */
+  public void removePurchasedItems(String userId, List<CartItem> purchasedItems) {
+    try {
+      // 사용자 ID로 Long 타입 변환
+      Long userLongId = Long.parseLong(userId);
+
+      // 사용자의 장바구니 목록 조회
+      List<Cart> userCartItems = cartRepository.findByUser_UserId(userLongId);
+
+      // 구매한 상품들을 장바구니에서 제거
+      for (CartItem purchasedItem : purchasedItems) {
+        // 상품명으로 해당 상품을 장바구니에서 찾아서 삭제
+        userCartItems.removeIf(
+            cartItem -> {
+              if (cartItem.getPerfume() != null && cartItem.getPerfume().getPerfumeName() != null) {
+                return cartItem.getPerfume().getPerfumeName().equals(purchasedItem.getName())
+                    && cartItem.getQuantity().equals(purchasedItem.getQuantity());
+              }
+              return false;
+            });
+      }
+
+      // DB에서 해당 상품들 삭제
+      for (CartItem purchasedItem : purchasedItems) {
+        // 상품명으로 해당 상품을 찾아서 삭제
+        List<Cart> itemsToRemove = cartRepository.findByUser_UserId(userLongId);
+        for (Cart cartItem : itemsToRemove) {
+          if (cartItem.getPerfume() != null
+              && cartItem.getPerfume().getPerfumeName() != null
+              && cartItem.getPerfume().getPerfumeName().equals(purchasedItem.getName())
+              && cartItem.getQuantity().equals(purchasedItem.getQuantity())) {
+            cartRepository.delete(cartItem);
+            break; // 첫 번째 일치하는 항목만 삭제
+          }
+        }
+      }
+
+    } catch (Exception e) {
+      // 로그 출력
+      System.out.println("장바구니에서 상품 제거 중 오류: " + e.getMessage());
+    }
   }
 }
