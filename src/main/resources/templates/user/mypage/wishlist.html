@@ -20,124 +20,205 @@
           <div class="bg-white rounded-lg shadow-sm">
             <!-- Wishlist Header -->
             <!-- 선택 삭제 전체 form 시작 -->
-            <form th:action="@{/wishlist/deleteList}" method="post" id="selectedDeleteForm">
-
+            <form
+              th:action="@{/wishlist/deleteList}"
+              method="post"
+              id="selectedDeleteForm"
+            >
               <!-- Wishlist Header -->
               <div class="p-6 border-b border-gray-200">
                 <div class="flex items-center justify-between">
                   <div class="flex items-center space-x-4">
-                    <h2 class="text-lg font-semibold text-gray-800">관심 상품</h2>
-                    <span class="text-sm text-gray-500" th:text="'총 ' + ${wishlist.size()} + '개 상품'"></span>
+                    <h2 class="text-lg font-semibold text-gray-800">
+                      관심 상품
+                    </h2>
+                    <span
+                      class="text-sm text-gray-500"
+                      th:text="'총 ' + ${wishlist.size()} + '개 상품'"
+                    ></span>
                   </div>
                   <div class="flex items-center space-x-3">
-                    <button type="button" id="selectAll" class="text-sm text-gray-600 hover:text-gray-800">전체 선택</button>
-                    <button type="button" id="removeSelected" class="text-sm text-red-600 hover:text-red-700">선택 삭제</button>
+                    <button
+                      type="button"
+                      id="selectAll"
+                      class="text-sm text-gray-600 hover:text-gray-800"
+                    >
+                      전체 선택
+                    </button>
+                    <button
+                      type="button"
+                      id="removeSelected"
+                      class="text-sm text-red-600 hover:text-red-700"
+                    >
+                      선택 삭제
+                    </button>
                   </div>
                 </div>
               </div>
             </form>
-              <!-- 오류 메시지 출력 -->
-              <div th:if="${error}"class="opacity-100 transition-opacity duration-500 text-red-700 text-base font-semibold bg-red-100 border border-red-400 rounded px-4 py-3 mb-4">
-                <strong class="font-bold"></strong>
-                <span th:text="${error}"></span>
-              </div>
-              <!-- Wishlist Items -->
-              <div class="p-6" th:if="${wishlist.size() > 0}">
-                <div class="space-y-6">
-                  <div th:each="getWishList : ${wishlist}">
-                    <div class="wishlist-item flex items-start space-x-4 p-4 border border-gray-200 rounded-lg hover:shadow-md transition-shadow"  data-perfume-id="[[${perfume.perfumeId}]]">
-
-                      <!-- 체크박스 및 이미지 -->
-                      <div class="flex items-start space-x-4">
-                        <label>
-                          <input type="checkbox" name="perfumeIds"
-                             class="wishlist-checkbox mt-2 w-4 h-4 text-gray-800 border-gray-300 rounded focus:ring-gray-800"
-                             th:value="${getWishList.perfumeId}" />
-                        </label>
-                        <div class="relative overflow-hidden rounded-lg">
-                          <div th:if="${getWishList != null}">
-                            <img th:src="${getWishList.hoverImageUrl}" alt="상품 이미지" class="w-24 h-24 object-cover"/>
-                          </div>
-                          <div class="absolute top-1 left-1">
-                <span class="inline-flex items-center px-1 py-0.5 rounded text-xs font-medium bg-red-500 text-white"
-                      th:text="${(getWishList.discount * 100) / getWishList.price} + '% 할인'"></span>
-                          </div>
+            <!-- 오류 메시지 출력 -->
+            <div
+              th:if="${error}"
+              class="opacity-100 transition-opacity duration-500 text-red-700 text-base font-semibold bg-red-100 border border-red-400 rounded px-4 py-3 mb-4"
+            >
+              <strong class="font-bold"></strong>
+              <span th:text="${error}"></span>
+            </div>
+            <!-- Wishlist Items -->
+            <div class="p-6" th:if="${wishlist.size() > 0}">
+              <div class="space-y-6">
+                <div th:each="getWishList : ${wishlist}">
+                  <div
+                    class="wishlist-item flex items-start space-x-4 p-4 border border-gray-200 rounded-lg hover:shadow-md transition-shadow"
+                    data-perfume-id="[[${perfume.perfumeId}]]"
+                  >
+                    <!-- 체크박스 및 이미지 -->
+                    <div class="flex items-start space-x-4">
+                      <label>
+                        <input
+                          type="checkbox"
+                          name="perfumeIds"
+                          class="wishlist-checkbox mt-2 w-4 h-4 text-gray-800 border-gray-300 rounded focus:ring-gray-800"
+                          th:value="${getWishList.perfumeId}"
+                        />
+                      </label>
+                      <div class="relative overflow-hidden rounded-lg">
+                        <div th:if="${getWishList != null}">
+                          <img
+                            th:src="${getWishList.hoverImageUrl}"
+                            alt="상품 이미지"
+                            class="w-24 h-24 object-cover"
+                          />
+                        </div>
+                        <div class="absolute top-1 left-1">
+                          <span
+                            class="inline-flex items-center px-1 py-0.5 rounded text-xs font-medium bg-red-500 text-white"
+                            th:text="${(getWishList.discount * 100) / getWishList.price} + '% 할인'"
+                          ></span>
                         </div>
                       </div>
+                    </div>
 
-                      <!-- 상품 설명 -->
-                      <div class="flex-1 min-w-0">
-                        <div class="flex items-start justify-between">
-                          <div class="flex-1">
-                            <div class="flex items-center space-x-2 mb-2">
-                  <span class="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-blue-100 text-blue-800"
-                        th:text="${getWishList.scent}"></span>
-                            </div>
-                            <h3 class="text-lg font-medium text-gray-800 mb-1">
-                              <a th:href="'/shop/detail?id=' + ${getWishList.perfumeId}"
-                                 class="hover:text-gray-600"
-                                 th:text="${getWishList.perfumeName} + ' ' + ${getWishList.volume} + 'ml'"></a>
-                            </h3>
-                            <p class="text-sm text-gray-600 mb-3" th:text="${getWishList.desciptionTitle}"></p>
+                    <!-- 상품 설명 -->
+                    <div class="flex-1 min-w-0">
+                      <div class="flex items-start justify-between">
+                        <div class="flex-1">
+                          <div class="flex items-center space-x-2 mb-2">
+                            <span
+                              class="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-blue-100 text-blue-800"
+                              th:text="${getWishList.scent}"
+                            ></span>
+                          </div>
+                          <h3 class="text-lg font-medium text-gray-800 mb-1">
+                            <a
+                              th:href="'/shop/detail?id=' + ${getWishList.perfumeId}"
+                              class="hover:text-gray-600"
+                              th:text="${getWishList.perfumeName} + ' ' + ${getWishList.volume} + 'ml'"
+                            ></a>
+                          </h3>
+                          <p
+                            class="text-sm text-gray-600 mb-3"
+                            th:text="${getWishList.desciptionTitle}"
+                          ></p>
 
-                            <div class="flex items-center space-x-3 mb-3">
-                              <div class="flex items-center space-x-2">
-                                <span class="text-xl font-bold text-gray-800"
-                                      th:text="${#numbers.formatDecimal(getWishList.discount, 0, 'COMMA', 0, 'POINT')}"></span>
-                                <span class="text-sm text-gray-400 line-through"
-                                      th:text="${#numbers.formatDecimal(getWishList.price, 0, 'COMMA', 0, 'POINT')}"></span>
-                              </div>
-                              <div class="flex items-center space-x-1">
-                                <i class="fas fa-star text-yellow-400 text-sm"></i>
-                                <span class="text-sm text-gray-600" th:text="${getWishList.ratingAvg}"></span>
-                                <span class="text-sm text-gray-500" th:text="'(' + ${getWishList.countReview} + ')'"></span>
-                              </div>
-                            </div>
-
-                            <!-- 장바구니/바로구매 -->
+                          <div class="flex items-center space-x-3 mb-3">
                             <div class="flex items-center space-x-2">
-                                <button class="add-to-cart-btn bg-gray-800 text-white px-4 py-2 rounded-md hover:bg-gray-700 transition-colors text-sm font-medium"
-                                        type="button"
-                                        th:data-perfume-id="${getWishList.perfumeId}"
-                                        th:data-perfume-name="${getWishList.perfumeName}"
-                                >
-                                  장바구니 담기
-                                </button>
-                              <button class="border border-gray-300 text-gray-700 px-4 py-2 rounded-md hover:bg-gray-50 transition-colors text-sm font-medium">
-                                바로구매
-                              </button>
+                              <span
+                                class="text-xl font-bold text-gray-800"
+                                th:text="${#numbers.formatDecimal(getWishList.discount, 0, 'COMMA', 0, 'POINT')}"
+                              ></span>
+                              <span
+                                class="text-sm text-gray-400 line-through"
+                                th:text="${#numbers.formatDecimal(getWishList.price, 0, 'COMMA', 0, 'POINT')}"
+                              ></span>
+                            </div>
+                            <div class="flex items-center space-x-1">
+                              <i
+                                class="fas fa-star text-yellow-400 text-sm"
+                              ></i>
+                              <span
+                                class="text-sm text-gray-600"
+                                th:text="${getWishList.ratingAvg}"
+                              ></span>
+                              <span
+                                class="text-sm text-gray-500"
+                                th:text="'(' + ${getWishList.countReview} + ')'"
+                              ></span>
                             </div>
                           </div>
 
-                          <!-- 개별 삭제 버튼 -->
-                          <form th:action="@{/wishlist/delete}" method="post" onsubmit="return confirm('이 상품을 삭제하시겠습니까?')">
-                            <input type="hidden" name="perfumeId" th:value="${getWishList.perfumeId}" />
-                            <button class="remove-wishlist text-gray-400 hover:text-red-500 transition-colors ml-4" type="submit">
-                              <i class="fas fa-times text-lg"></i>
+                          <!-- 장바구니/바로구매 -->
+                          <div class="flex items-center space-x-2">
+                            <button
+                              class="add-to-cart-btn bg-gray-800 text-white px-4 py-2 rounded-md hover:bg-gray-700 transition-colors text-sm font-medium"
+                              type="button"
+                              th:data-perfume-id="${getWishList.perfumeId}"
+                              th:data-perfume-name="${getWishList.perfumeName}"
+                            >
+                              장바구니 담기
                             </button>
-                          </form>
+                            <button
+                              class="buy-now-btn border border-gray-300 text-gray-700 px-4 py-2 rounded-md hover:bg-gray-50 transition-colors text-sm font-medium"
+                              type="button"
+                              th:data-perfume-id="${getWishList.perfumeId}"
+                              th:data-perfume-name="${getWishList.perfumeName}"
+                            >
+                              바로구매
+                            </button>
+                          </div>
                         </div>
+
+                        <!-- 개별 삭제 버튼 -->
+                        <form
+                          th:action="@{/wishlist/delete}"
+                          method="post"
+                          onsubmit="return confirm('이 상품을 삭제하시겠습니까?')"
+                        >
+                          <input
+                            type="hidden"
+                            name="perfumeId"
+                            th:value="${getWishList.perfumeId}"
+                          />
+                          <button
+                            class="remove-wishlist text-gray-400 hover:text-red-500 transition-colors ml-4"
+                            type="submit"
+                          >
+                            <i class="fas fa-times text-lg"></i>
+                          </button>
+                        </form>
                       </div>
-
-                    </div> <!-- wishlist-item -->
-                  </div> <!-- th:each -->
+                    </div>
+                  </div>
+                  <!-- wishlist-item -->
                 </div>
+                <!-- th:each -->
               </div>
-
+            </div>
 
             <!-- 위시리스트 비어있을 때 -->
-            <div id="emptyWishlist" th:if="${wishlist.size() == 0}" class="p-12 text-center">
-              <div class="w-24 h-24 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-4">
+            <div
+              id="emptyWishlist"
+              th:if="${wishlist.size() == 0}"
+              class="p-12 text-center"
+            >
+              <div
+                class="w-24 h-24 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-4"
+              >
                 <i class="far fa-heart text-3xl text-gray-400"></i>
               </div>
-              <h3 class="text-lg font-medium text-gray-800 mb-2">위시리스트가 비어있습니다</h3>
-              <p class="text-gray-600 mb-6">관심 있는 상품을 위시리스트에 추가해보세요</p>
-              <a href="/shop/list" class="inline-flex items-center px-6 py-3 bg-gray-800 text-white rounded-md hover:bg-gray-700 transition-colors font-medium">
+              <h3 class="text-lg font-medium text-gray-800 mb-2">
+                위시리스트가 비어있습니다
+              </h3>
+              <p class="text-gray-600 mb-6">
+                관심 있는 상품을 위시리스트에 추가해보세요
+              </p>
+              <a
+                href="/shop/list"
+                class="inline-flex items-center px-6 py-3 bg-gray-800 text-white rounded-md hover:bg-gray-700 transition-colors font-medium"
+              >
                 <i class="fas fa-shopping-bag mr-2"></i> 쇼핑하러 가기
               </a>
             </div>
-
-
           </div>
 
           <!-- Quick Actions -->
@@ -294,22 +375,36 @@
 
     <script src="/js/script.js"></script>
     <script>
-      document.addEventListener("DOMContentLoaded", () => {
-        const checkboxes = document.querySelectorAll(".wishlist-checkbox");
-        const selectAllBtn = document.getElementById("selectAll");
-        const removeSelectedBtn = document.getElementById("removeSelected");
-        const emptyWishlist = document.getElementById("emptyWishlist");
-        const wishlistContent = document.querySelector(".p-6");
-        const selectedForm = document.getElementById("selectedDeleteForm");
+      document.addEventListener('DOMContentLoaded', () => {
+        const checkboxes = document.querySelectorAll('.wishlist-checkbox');
+        const selectAllBtn = document.getElementById('selectAll');
+        const removeSelectedBtn = document.getElementById('removeSelected');
+        const emptyWishlist = document.getElementById('emptyWishlist');
+        const wishlistContent = document.querySelector('.p-6');
+        const selectedForm = document.getElementById('selectedDeleteForm');
 
         // 서버 에러 감지
-        const errorValue = document.body.getAttribute("data-error");
+        const errorValue = document.body.getAttribute('data-error');
         const hasServerError = errorValue && errorValue.trim().length > 0;
 
         // 모달 객체 생성
-        const alertModal = setupModal("alertModal", "alertMessage", "alertOkBtn");
-        const deleteModal = setupModal("deleteConfirmModal", "deleteConfirmMessage", "confirmDeleteBtn", "cancelDeleteBtn");
-        const cartModal = setupModal("confirmCartModal", "confirmCartMessage", "confirmCartBtn", "cancelCartBtn");
+        const alertModal = setupModal(
+          'alertModal',
+          'alertMessage',
+          'alertOkBtn'
+        );
+        const deleteModal = setupModal(
+          'deleteConfirmModal',
+          'deleteConfirmMessage',
+          'confirmDeleteBtn',
+          'cancelDeleteBtn'
+        );
+        const cartModal = setupModal(
+          'confirmCartModal',
+          'confirmCartMessage',
+          'confirmCartBtn',
+          'cancelCartBtn'
+        );
 
         // 페이지 로드 시 서버 에러 있으면 alert 표시
         if (hasServerError) {
@@ -324,16 +419,16 @@
           let form = null;
 
           if (okBtn) {
-            okBtn.addEventListener("click", () => {
+            okBtn.addEventListener('click', () => {
               if (form && !hasServerError) form.submit();
-              modal.classList.add("hidden");
+              modal.classList.add('hidden');
               form = null;
             });
           }
 
           if (cancelBtn) {
-            cancelBtn.addEventListener("click", () => {
-              modal.classList.add("hidden");
+            cancelBtn.addEventListener('click', () => {
+              modal.classList.add('hidden');
               form = null;
             });
           }
@@ -342,99 +437,156 @@
             show(msg, targetForm = null) {
               message.innerHTML = msg;
               form = targetForm;
-              modal.classList.remove("hidden");
-            }
+              modal.classList.remove('hidden');
+            },
           };
         }
 
         // 전체 선택 토글
-        selectAllBtn?.addEventListener("click", () => {
+        selectAllBtn?.addEventListener('click', () => {
           if (hasServerError) {
             alertModal.show(errorValue);
             return;
           }
 
-          const allChecked = Array.from(checkboxes).every(cb => cb.checked);
-          checkboxes.forEach(cb => cb.checked = !allChecked);
-          selectAllBtn.textContent = allChecked ? "전체 선택" : "선택 해제";
+          const allChecked = Array.from(checkboxes).every((cb) => cb.checked);
+          checkboxes.forEach((cb) => (cb.checked = !allChecked));
+          selectAllBtn.textContent = allChecked ? '전체 선택' : '선택 해제';
         });
 
         // 선택 삭제
-        removeSelectedBtn?.addEventListener("click", () => {
+        removeSelectedBtn?.addEventListener('click', () => {
           if (hasServerError) {
             alertModal.show(errorValue);
             return;
           }
 
-          const checked = document.querySelectorAll(".wishlist-checkbox:checked");
+          const checked = document.querySelectorAll(
+            '.wishlist-checkbox:checked'
+          );
           if (checked.length === 0) {
-            alertModal.show("삭제할 상품을 선택해주세요.");
+            alertModal.show('삭제할 상품을 선택해주세요.');
             return;
           }
 
-          selectedForm.querySelectorAll("input[type='hidden'][name='perfumeIds']").forEach(e => e.remove());
+          selectedForm
+            .querySelectorAll("input[type='hidden'][name='perfumeIds']")
+            .forEach((e) => e.remove());
 
-          checked.forEach(cb => {
-            const hidden = document.createElement("input");
-            hidden.type = "hidden";
-            hidden.name = "perfumeIds";
+          checked.forEach((cb) => {
+            const hidden = document.createElement('input');
+            hidden.type = 'hidden';
+            hidden.name = 'perfumeIds';
             hidden.value = cb.value;
             selectedForm.appendChild(hidden);
           });
 
-          deleteModal.show(`${checked.length}개 상품을 삭제하시겠습니까?`, selectedForm);
+          deleteModal.show(
+            `${checked.length}개 상품을 삭제하시겠습니까?`,
+            selectedForm
+          );
         });
         //개별 삭제
-        document.querySelectorAll(".remove-wishlist").forEach((btn) => {
-          btn.addEventListener("click", function (e) {
+        document.querySelectorAll('.remove-wishlist').forEach((btn) => {
+          btn.addEventListener('click', function (e) {
             e.preventDefault(); // 기본 form 전송 막기
 
-            const form = this.closest("form");
-            const item = this.closest(".wishlist-item");
-            const productName = item?.querySelector("h3 a")?.textContent.trim() || "상품";
+            const form = this.closest('form');
+            const item = this.closest('.wishlist-item');
+            const productName =
+              item?.querySelector('h3 a')?.textContent.trim() || '상품';
 
             deleteModal.show(`"${productName}"을(를) 삭제하시겠습니까?`, form);
           });
         });
 
         // 장바구니 버튼
-        document.querySelectorAll(".add-to-cart-btn").forEach(btn => {
-          btn.addEventListener("click", async  e => {
+        document.querySelectorAll('.add-to-cart-btn').forEach((btn) => {
+          btn.addEventListener('click', async (e) => {
             const perfumeId = btn.dataset.perfumeId;
             const perfumeName = btn.dataset.perfumeName;
             try {
-              const res = await fetch("/wishlist/addCart-ajax", {
-                method: "post",
-                headers: {"Content-Type": "application/x-www-form-urlencoded"},
-                body: new URLSearchParams({perfumeId})
+              const res = await fetch('/wishlist/addCart-ajax', {
+                method: 'post',
+                headers: {
+                  'Content-Type': 'application/x-www-form-urlencoded',
+                },
+                body: new URLSearchParams({ perfumeId }),
               });
               const status = await res.text();
-              if(status === "added"){
-                cartModal.show(`"${perfumeName}"을 장바구니에 추가했습니다<br>목록에서 삭제할까요?`)
-              }else if(status === "exists"){
-                cartModal.show(`"${perfumeName}"가 이미 장바구니 안에 있습니다<br>목록에서 삭제할까요?`)
-              }else if(status === "unauthorized"){
-                cartModal.show("로그인이 필요합니다")
+              if (status === 'added') {
+                cartModal.show(
+                  `"${perfumeName}"을 장바구니에 추가했습니다<br>목록에서 삭제할까요?`
+                );
+              } else if (status === 'exists') {
+                cartModal.show(
+                  `"${perfumeName}"가 이미 장바구니 안에 있습니다<br>목록에서 삭제할까요?`
+                );
+              } else if (status === 'unauthorized') {
+                cartModal.show('로그인이 필요합니다');
               }
               //삭제 여부
-              const confirmBtn  = document.getElementById("confirmCartBtn");
-              confirmBtn.onclick= async () =>{
-                const deleteRes = await fetch("/wishlist/delete-ajax", {
-                  method: "POST",
-                  headers: { "Content-Type": "application/x-www-form-urlencoded" },
-                  body: new URLSearchParams({ perfumeId })
+              const confirmBtn = document.getElementById('confirmCartBtn');
+              confirmBtn.onclick = async () => {
+                const deleteRes = await fetch('/wishlist/delete-ajax', {
+                  method: 'POST',
+                  headers: {
+                    'Content-Type': 'application/x-www-form-urlencoded',
+                  },
+                  body: new URLSearchParams({ perfumeId }),
                 });
                 const deleteStatus = await deleteRes.text();
-                if (deleteStatus === "deleted") {
+                if (deleteStatus === 'deleted') {
                   location.reload(); // 새로고침으로 위시리스트 반영
                 } else {
-                  alertModal.show("삭제에 실패했습니다.");
+                  alertModal.show('삭제에 실패했습니다.');
                 }
               };
-            }catch (err){
+            } catch (err) {
               console.error();
             }
-          })
+          });
+        });
+
+        // 바로구매 버튼
+        document.querySelectorAll('.buy-now-btn').forEach((btn) => {
+          btn.addEventListener('click', async (e) => {
+            const perfumeId = btn.dataset.perfumeId;
+            const perfumeName = btn.dataset.perfumeName;
+
+            try {
+              // 바로구매 처리
+              const res = await fetch('/wishlist/buyNow-ajax', {
+                method: 'POST',
+                headers: {
+                  'Content-Type': 'application/x-www-form-urlencoded',
+                },
+                body: new URLSearchParams({ perfumeId, quantity: 1 }),
+              });
+
+              const response = await res.text();
+
+              if (response.startsWith('success:')) {
+                // 성공 시 결제 페이지로 이동
+                const parts = response.split(':');
+                const itemsJson = parts[1];
+                const totalAmount = parts[2];
+                const deliveryFee = parts[3];
+                const discountAmount = parts[4];
+                const quantity = parts[5];
+
+                // 결제 페이지로 리다이렉트
+                window.location.href = `/order/checkout?items=${itemsJson}&totalAmount=${totalAmount}&deliveryFee=${deliveryFee}&discountAmount=${discountAmount}&itemCount=${quantity}`;
+              } else if (response === 'unauthorized') {
+                alertModal.show('로그인이 필요합니다');
+              } else {
+                alertModal.show('구매 처리 중 오류가 발생했습니다.');
+              }
+            } catch (err) {
+              console.error('바로구매 오류:', err);
+              alertModal.show('구매 처리 중 오류가 발생했습니다.');
+            }
+          });
         });
 
         // 페이지 상태 초기화
@@ -442,63 +594,105 @@
         checkEmptyState();
 
         function updateWishlistCount() {
-          const countEl = document.querySelector(".text-sm.text-gray-500");
-          const count = document.querySelectorAll(".wishlist-item").length;
+          const countEl = document.querySelector('.text-sm.text-gray-500');
+          const count = document.querySelectorAll('.wishlist-item').length;
           if (countEl) countEl.textContent = `총 ${count}개 상품`;
         }
 
         function checkEmptyState() {
-          const hasItems = document.querySelectorAll(".wishlist-item").length > 0;
-          if (wishlistContent) wishlistContent.style.display = hasItems ? "block" : "none";
-          if (emptyWishlist) emptyWishlist.classList.toggle("hidden", hasItems);
+          const hasItems =
+            document.querySelectorAll('.wishlist-item').length > 0;
+          if (wishlistContent)
+            wishlistContent.style.display = hasItems ? 'block' : 'none';
+          if (emptyWishlist) emptyWishlist.classList.toggle('hidden', hasItems);
         }
       });
     </script>
     <script>
-      document.addEventListener("DOMContentLoaded", () => {
-        const errorBox = document.getElementById("errorBox");
+      document.addEventListener('DOMContentLoaded', () => {
+        const errorBox = document.getElementById('errorBox');
         if (errorBox) {
           setTimeout(() => {
-            errorBox.classList.add("opacity-0");
+            errorBox.classList.add('opacity-0');
             setTimeout(() => errorBox.remove(), 500); // CSS transition 이후 제거
           }, 3000); // 3초 후 사라지기
         }
       });
     </script>
     <!-- 삭제 확인 모달 -->
-    <div id="deleteConfirmModal" class="modal hidden fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-      <div class="modal-content bg-white rounded-lg p-6 w-80 text-center relative">
+    <div
+      id="deleteConfirmModal"
+      class="modal hidden fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50"
+    >
+      <div
+        class="modal-content bg-white rounded-lg p-6 w-80 text-center relative"
+      >
         <h2 class="text-xl font-semibold mb-4">삭제 확인</h2>
-        <p class="mb-6" id="deleteConfirmMessage">선택한 상품을 삭제하시겠습니까?</p>
+        <p class="mb-6" id="deleteConfirmMessage">
+          선택한 상품을 삭제하시겠습니까?
+        </p>
         <div class="flex justify-center gap-4">
-          <button id="cancelDeleteBtn" class="px-4 py-2 bg-gray-400 text-white rounded hover:bg-gray-500">취소</button>
-          <button id="confirmDeleteBtn" class="px-4 py-2 bg-red-600 text-white rounded hover:bg-red-700">삭제</button>
+          <button
+            id="cancelDeleteBtn"
+            class="px-4 py-2 bg-gray-400 text-white rounded hover:bg-gray-500"
+          >
+            취소
+          </button>
+          <button
+            id="confirmDeleteBtn"
+            class="px-4 py-2 bg-red-600 text-white rounded hover:bg-red-700"
+          >
+            삭제
+          </button>
         </div>
       </div>
     </div>
-  <!--알람 모달-->
-    <div id="alertModal" class="modal hidden fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-      <div class="modal-content bg-white rounded-lg p-6 w-80 text-center relative">
+    <!--알람 모달-->
+    <div
+      id="alertModal"
+      class="modal hidden fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50"
+    >
+      <div
+        class="modal-content bg-white rounded-lg p-6 w-80 text-center relative"
+      >
         <h2 class="text-xl font-semibold mb-4">알림</h2>
         <p class="mb-6" id="alertMessage">기본 메시지</p>
         <div class="flex justify-center">
-          <button id="alertOkBtn" class="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700">확인</button>
+          <button
+            id="alertOkBtn"
+            class="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700"
+          >
+            확인
+          </button>
         </div>
       </div>
     </div>
 
     <!-- 장바구니 확인 모달 -->
-    <div id="confirmCartModal" class="hidden fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center">
+    <div
+      id="confirmCartModal"
+      class="hidden fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center"
+    >
       <div class="bg-white rounded-lg p-6 w-80 text-center">
         <h2 class="text-xl font-semibold mb-4">장바구니 확인</h2>
-        <p id="confirmCartMessage" class="mb-6 text-gray-800">이 상품을 장바구니에 추가하시겠습니까?</p>
+        <p id="confirmCartMessage" class="mb-6 text-gray-800">
+          이 상품을 장바구니에 추가하시겠습니까?
+        </p>
         <div class="flex justify-center gap-4">
-          <button id="cancelCartBtn" class="px-4 py-2 bg-gray-400 text-white rounded hover:bg-gray-500">취소</button>
-          <button id="confirmCartBtn" class="px-4 py-2 bg-green-600 text-white rounded hover:bg-green-700">확인</button>
+          <button
+            id="cancelCartBtn"
+            class="px-4 py-2 bg-gray-400 text-white rounded hover:bg-gray-500"
+          >
+            취소
+          </button>
+          <button
+            id="confirmCartBtn"
+            class="px-4 py-2 bg-green-600 text-white rounded hover:bg-green-700"
+          >
+            확인
+          </button>
         </div>
       </div>
     </div>
-
-
   </body>
 </html>

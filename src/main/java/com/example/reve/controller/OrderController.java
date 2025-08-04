@@ -18,6 +18,7 @@ import com.example.reve.domain.OrderItem;
 import com.example.reve.dto.CartItem;
 import com.example.reve.service.CartService;
 import com.example.reve.service.OrderService;
+import com.example.reve.service.WishListService;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
@@ -30,6 +31,7 @@ public class OrderController {
 
   private final OrderService orderService;
   private final CartService cartService;
+  private final WishListService wishListService;
   private final ObjectMapper objectMapper = new ObjectMapper();
 
   /** 주문/결제 페이지 */
@@ -287,6 +289,26 @@ public class OrderController {
                   ? customUserDetails.getUser().getUserId().toString()
                   : "user1"; // 임시 사용자 ID
           cartService.removePurchasedItems(userId, cartItems);
+
+          // 위시리스트에서 구매한 상품들 삭제
+          if (customUserDetails != null && customUserDetails.getUser() != null) {
+            String loginId = customUserDetails.getUser().getLoginId();
+            for (CartItem cartItem : cartItems) {
+              try {
+                if (cartItem.getId() != null) {
+                  wishListService.wishperfumeDelete(cartItem.getId(), loginId);
+                  System.out.println(
+                      "위시리스트에서 상품 삭제 완료: "
+                          + cartItem.getName()
+                          + " (ID: "
+                          + cartItem.getId()
+                          + ")");
+                }
+              } catch (Exception e) {
+                System.out.println("위시리스트 삭제 중 오류: " + e.getMessage());
+              }
+            }
+          }
 
           model.addAttribute("cartItems", decodedItems);
         } catch (Exception e) {

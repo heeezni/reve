@@ -1,605 +1,804 @@
 <!DOCTYPE html>
 <html lang="ko" xmlns:th="http://www.thymeleaf.org">
-<head th:replace="~{fragments/header :: head(title='SHOP | Rêve')}">
-</head>
-<body class="font-sans text-gray-800">
-<!-- Header Fragment -->
-<div th:replace="~{fragments/header :: header}"></div>
+  <head th:replace="~{fragments/header :: head(title='SHOP | Rêve')}"> </head>
+  <body class="font-sans text-gray-800">
+    <!-- Header Fragment -->
+    <div th:replace="~{fragments/header :: header}"></div>
 
-<!-- Main Content -->
-<main class="pt-20">
-  <div class="min-h-screen bg-gray-50 py-12">
-    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-
-      <!-- Page Title -->
-      <div class="mb-8 flex items-center justify-between">
-        <div>
-          <h1 class="text-3xl font-bold text-gray-800 mb-2">상품 목록</h1>
-          <p class="text-gray-600">Rêve의 프리미엄 향수를 만나보세요</p>
-        </div>
-
-        <!-- 관리자용 버튼 영역 -->
-        <div class="space-x-2" th:if="${#authentication != null and #authorization.expression('hasRole(''ADMIN'')')}">
-          <a
-                  href="/admin/shop/regist"
-                  class="px-4 py-2 bg-blue-600 text-white text-sm rounded-md hover:bg-blue-700 transition"
-          >
-            등록
-          </a>
-          <button
-                  type="button"
-                  id="toggleDeleteModeBtn"
-                  class="px-4 py-2 bg-red-500 text-white text-sm rounded-md hover:bg-red-600 transition"
-          >
-            삭제 모드
-          </button>
-        </div>
-      </div>
-
-      <!-- Category Quick Links -->
-      <div class="mt-12 bg-white rounded-lg shadow-sm p-6">
-        <h3 class="text-lg font-semibold text-gray-800 mb-6">
-          향기 카테고리
-        </h3>
-        <div class="grid md:grid-cols-4 gap-4">
-          <a
-                  href="#"
-                  class="flex items-center p-4 border border-gray-200 rounded-md hover:bg-gray-50 transition-colors"
-          >
-            <div
-                    class="w-12 h-12 bg-pink-100 rounded-full flex items-center justify-center mr-4"
-            >
-              <i class="fas fa-spa text-pink-500"></i>
-            </div>
+    <!-- Main Content -->
+    <main class="pt-20">
+      <div class="min-h-screen bg-gray-50 py-12">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <!-- Page Title -->
+          <div class="mb-8 flex items-center justify-between">
             <div>
-              <p class="font-medium text-gray-800">플로럴</p>
-              <p class="text-sm text-gray-600">꽃향의 로맨틱한 매력</p>
+              <h1 class="text-3xl font-bold text-gray-800 mb-2">상품 목록</h1>
+              <p class="text-gray-600">Rêve의 프리미엄 향수를 만나보세요</p>
             </div>
-          </a>
 
-          <a
-                  href="#"
-                  class="flex items-center p-4 border border-gray-200 rounded-md hover:bg-gray-50 transition-colors"
-          >
+            <!-- 관리자용 버튼 영역 -->
             <div
-                    class="w-12 h-12 bg-green-100 rounded-full flex items-center justify-center mr-4"
+              class="space-x-2"
+              th:if="${#authentication != null and #authorization.expression('hasRole(''ADMIN'')')}"
             >
-              <i class="fas fa-lemon text-green-500"></i>
+              <a
+                href="/admin/shop/regist"
+                class="px-4 py-2 bg-blue-600 text-white text-sm rounded-md hover:bg-blue-700 transition"
+              >
+                등록
+              </a>
+              <button
+                type="button"
+                id="toggleDeleteModeBtn"
+                class="px-4 py-2 bg-red-500 text-white text-sm rounded-md hover:bg-red-600 transition"
+              >
+                삭제 모드
+              </button>
             </div>
-            <div>
-              <p class="font-medium text-gray-800">시트러스</p>
-              <p class="text-sm text-gray-600">상쾌한 과일향의 활기</p>
-            </div>
-          </a>
+          </div>
 
-          <a
-                  href="#"
-                  class="flex items-center p-4 border border-gray-200 rounded-md hover:bg-gray-50 transition-colors"
-          >
-            <div
-                    class="w-12 h-12 bg-purple-100 rounded-full flex items-center justify-center mr-4"
-            >
-              <i class="fas fa-tree text-purple-500"></i>
-            </div>
-            <div>
-              <p class="font-medium text-gray-800">우디</p>
-              <p class="text-sm text-gray-600">깊이 있는 나무향의 매력</p>
-            </div>
-          </a>
-
-          <a
-                  href="#"
-                  class="flex items-center p-4 border border-gray-200 rounded-md hover:bg-gray-50 transition-colors"
-          >
-            <div
-                    class="w-12 h-12 bg-yellow-100 rounded-full flex items-center justify-center mr-4"
-            >
-              <i class="fas fa-gem text-yellow-500"></i>
-            </div>
-            <div>
-              <p class="font-medium text-gray-800">머스크</p>
-              <p class="text-sm text-gray-600">신비로운 동물향의 우아함</p>
-            </div>
-          </a>
-        </div>
-      </div>
-
-      <!-- Search and Filter Section -->
-      <div class="bg-white rounded-lg shadow-sm p-6 mb-6">
-        <div
-                class="flex flex-col lg:flex-row lg:items-center lg:justify-between space-y-4 lg:space-y-0"
-        >
-          <!-- Search Bar -->
-          <div class="flex-1 max-w-md">
-            <form id="searchForm" method="get" th:action="@{/shop/list}">
-              <div class="relative">
-                <label>
-                  <input
-                          type="text"
-                          name="search"
-                          placeholder="상품명을 검색하세요..."
-                          th:value="${search}"
-                          class="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-gray-800 focus:border-transparent"
-                  />
-                </label>
+          <!-- Category Quick Links -->
+          <div class="mt-12 bg-white rounded-lg shadow-sm p-6">
+            <h3 class="text-lg font-semibold text-gray-800 mb-6">
+              향기 카테고리
+            </h3>
+            <div class="grid md:grid-cols-4 gap-4">
+              <a
+                href="#"
+                class="flex items-center p-4 border border-gray-200 rounded-md hover:bg-gray-50 transition-colors"
+              >
                 <div
-                        class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none"
+                  class="w-12 h-12 bg-pink-100 rounded-full flex items-center justify-center mr-4"
                 >
-                  <i class="fas fa-search text-gray-400"></i>
+                  <i class="fas fa-spa text-pink-500"></i>
                 </div>
-              </div>
-            </form>
+                <div>
+                  <p class="font-medium text-gray-800">플로럴</p>
+                  <p class="text-sm text-gray-600">꽃향의 로맨틱한 매력</p>
+                </div>
+              </a>
+
+              <a
+                href="#"
+                class="flex items-center p-4 border border-gray-200 rounded-md hover:bg-gray-50 transition-colors"
+              >
+                <div
+                  class="w-12 h-12 bg-green-100 rounded-full flex items-center justify-center mr-4"
+                >
+                  <i class="fas fa-lemon text-green-500"></i>
+                </div>
+                <div>
+                  <p class="font-medium text-gray-800">시트러스</p>
+                  <p class="text-sm text-gray-600">상쾌한 과일향의 활기</p>
+                </div>
+              </a>
+
+              <a
+                href="#"
+                class="flex items-center p-4 border border-gray-200 rounded-md hover:bg-gray-50 transition-colors"
+              >
+                <div
+                  class="w-12 h-12 bg-purple-100 rounded-full flex items-center justify-center mr-4"
+                >
+                  <i class="fas fa-tree text-purple-500"></i>
+                </div>
+                <div>
+                  <p class="font-medium text-gray-800">우디</p>
+                  <p class="text-sm text-gray-600">깊이 있는 나무향의 매력</p>
+                </div>
+              </a>
+
+              <a
+                href="#"
+                class="flex items-center p-4 border border-gray-200 rounded-md hover:bg-gray-50 transition-colors"
+              >
+                <div
+                  class="w-12 h-12 bg-yellow-100 rounded-full flex items-center justify-center mr-4"
+                >
+                  <i class="fas fa-gem text-yellow-500"></i>
+                </div>
+                <div>
+                  <p class="font-medium text-gray-800">머스크</p>
+                  <p class="text-sm text-gray-600">신비로운 동물향의 우아함</p>
+                </div>
+              </a>
+            </div>
           </div>
 
-          <!-- Filter Options -->
-          <div class="flex items-center space-x-4">
-            <form id="filterForm" method="get" th:action="@{/shop/list}" class="flex items-center space-x-4">
-              <!-- 향 필터 -->
-              <label>
-                <select name="scent" onchange="document.getElementById('filterForm').submit();"
-                        class="border border-gray-300 rounded-md px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-gray-800 focus:border-transparent">
-                  <option value="" th:selected="${scent == null or scent == ''}">전체</option>
-                  <option value="플로럴" th:selected="${scent == '플로럴'}">플로럴</option>
-                  <option value="시트러스" th:selected="${scent == '시트러스'}">시트러스</option>
-                  <option value="우디" th:selected="${scent == '우디'}">우디</option>
-                  <option value="머스크" th:selected="${scent == '머스크'}">머스크</option>
-                </select>
-              </label>
-
-              <!-- 정렬 -->
-              <label>
-                <select name="sort" onchange="document.getElementById('filterForm').submit();"
-                        class="border border-gray-300 rounded-md px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-gray-800 focus:border-transparent">
-                  <option value="new" th:selected="${sort == 'new' or sort == null}">최신순</option>
-                  <option value="review" th:selected="${sort == 'review'}">인기순</option>
-                  <option value="price_asc" th:selected="${sort == 'price_asc'}">가격낮은순</option>
-                  <option value="price_desc" th:selected="${sort == 'price_desc'}">가격높은순</option>
-                </select>
-              </label>
-            </form>
-          </div>
-        </div>
-      </div>
-
-      <form id="deleteForm" method="post" action="/admin/shop/delete">
-        <!-- 삭제 모드 버튼 영역 여기 넣기 -->
-        <div id="deleteModeButtons" class="hidden space-x-2 mb-6">
-          <button
-                  id="deleteSelectedBtn"
-                  type="submit"
-                  class="px-4 py-2 bg-red-600 text-white rounded-md hover:bg-red-700"
-          >
-            선택 삭제
-          </button>
-          <button
-                  id="cancelDeleteBtn"
-                  type="button"
-                  class="px-4 py-2 bg-gray-300 rounded-md hover:bg-gray-400"
-          >
-            삭제 취소
-          </button>
-        </div>
-
-        <!-- Product Grid -->
-        <div class="grid md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
-          <div th:each="perfume : ${perfumePage.content}" class="bg-white rounded-lg shadow-sm overflow-hidden group relative">
-            <!-- 체크박스 : 오른쪽 위에 위치, 기본 숨김 -->
-            <input type="checkbox" name="perfumeIdList" th:value="${perfume.perfumeId}"
-                   class="delete-checkbox absolute top-2 right-2 w-5 h-5 hidden z-10" />
-            <div class="relative overflow-hidden">
-              <img
-                      th:src="@{${perfume.imageUrl}}"
-                      th:alt="${perfume.perfumeName}"
-                      class="mainImage w-full h-80 object-cover group-hover:scale-105 transition-transform duration-300"
-              />
-              <img
-                      th:src="@{${perfume.hoverImageUrl}}"
-                      th:alt="${perfume.perfumeName}"
-                      class="absolute inset-0 w-full h-80 object-cover opacity-0 transition-opacity duration-300 group-hover:opacity-100"
-              />
-
-              <!-- Sale Badge -->
-              <div class="absolute top-4 left-4" th:if="${perfume.discount > 0}">
-                  <span class="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-red-500 text-white">
-                    <span th:text="${(perfume.discount * 100) / perfume.price}">0</span>% 할인
-                  </span>
+          <!-- Search and Filter Section -->
+          <div class="bg-white rounded-lg shadow-sm p-6 mb-6">
+            <div
+              class="flex flex-col lg:flex-row lg:items-center lg:justify-between space-y-4 lg:space-y-0"
+            >
+              <!-- Search Bar -->
+              <div class="flex-1 max-w-md">
+                <form id="searchForm" method="get" th:action="@{/shop/list}">
+                  <div class="relative">
+                    <label>
+                      <input
+                        type="text"
+                        name="search"
+                        placeholder="상품명을 검색하세요..."
+                        th:value="${search}"
+                        class="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-gray-800 focus:border-transparent"
+                      />
+                    </label>
+                    <div
+                      class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none"
+                    >
+                      <i class="fas fa-search text-gray-400"></i>
+                    </div>
+                  </div>
+                </form>
               </div>
 
-              <!-- 찜 버튼 -->
-              <div class="absolute top-4 right-4 space-y-2 opacity-0 group-hover:opacity-100 transition-opacity duration-300">
-                <button
-                        type="button"
-                        class="wishlist-btn w-8 h-8 bg-white rounded-full flex items-center justify-center shadow-md hover:bg-gray-50 transition-colors"
-                        th:data-perfume-id="${perfume.perfumeId}">
-                  <i class="text-lg"
-                     th:class="${wishedIds != null and wishedIds.contains(perfume.perfumeId)} ? 'fas fa-heart text-red-500' : 'far fa-heart text-gray-400'"></i>
-                </button>
+              <!-- Filter Options -->
+              <div class="flex items-center space-x-4">
+                <form
+                  id="filterForm"
+                  method="get"
+                  th:action="@{/shop/list}"
+                  class="flex items-center space-x-4"
+                >
+                  <!-- 향 필터 -->
+                  <label>
+                    <select
+                      name="scent"
+                      onchange="document.getElementById('filterForm').submit();"
+                      class="border border-gray-300 rounded-md px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-gray-800 focus:border-transparent"
+                    >
+                      <option
+                        value=""
+                        th:selected="${scent == null or scent == ''}"
+                      >
+                        전체
+                      </option>
+                      <option value="플로럴" th:selected="${scent == '플로럴'}">
+                        플로럴
+                      </option>
+                      <option
+                        value="시트러스"
+                        th:selected="${scent == '시트러스'}"
+                      >
+                        시트러스
+                      </option>
+                      <option value="우디" th:selected="${scent == '우디'}">
+                        우디
+                      </option>
+                      <option value="머스크" th:selected="${scent == '머스크'}">
+                        머스크
+                      </option>
+                    </select>
+                  </label>
+
+                  <!-- 정렬 -->
+                  <label>
+                    <select
+                      name="sort"
+                      onchange="document.getElementById('filterForm').submit();"
+                      class="border border-gray-300 rounded-md px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-gray-800 focus:border-transparent"
+                    >
+                      <option
+                        value="new"
+                        th:selected="${sort == 'new' or sort == null}"
+                      >
+                        최신순
+                      </option>
+                      <option value="review" th:selected="${sort == 'review'}">
+                        인기순
+                      </option>
+                      <option
+                        value="price_asc"
+                        th:selected="${sort == 'price_asc'}"
+                      >
+                        가격낮은순
+                      </option>
+                      <option
+                        value="price_desc"
+                        th:selected="${sort == 'price_desc'}"
+                      >
+                        가격높은순
+                      </option>
+                    </select>
+                  </label>
+                </form>
               </div>
             </div>
+          </div>
 
-            <div class="p-4">
-              <div class="mb-2">
-                <!-- 카테고리 필드가 없으므로 임시 텍스트로 대체 -->
-                <span class="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-blue-100 text-blue-800">
-                    향수
-                  </span>
-                <span
-                        class="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium"
-                        th:classappend="
+          <form id="deleteForm" method="post" action="/admin/shop/delete">
+            <!-- 삭제 모드 버튼 영역 여기 넣기 -->
+            <div id="deleteModeButtons" class="hidden space-x-2 mb-6">
+              <button
+                id="deleteSelectedBtn"
+                type="submit"
+                class="px-4 py-2 bg-red-600 text-white rounded-md hover:bg-red-700"
+              >
+                선택 삭제
+              </button>
+              <button
+                id="cancelDeleteBtn"
+                type="button"
+                class="px-4 py-2 bg-gray-300 rounded-md hover:bg-gray-400"
+              >
+                삭제 취소
+              </button>
+            </div>
+
+            <!-- Product Grid -->
+            <div
+              class="grid md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6"
+            >
+              <div
+                th:each="perfume : ${perfumePage.content}"
+                class="bg-white rounded-lg shadow-sm overflow-hidden group relative"
+              >
+                <!-- 체크박스 : 오른쪽 위에 위치, 기본 숨김 -->
+                <input
+                  type="checkbox"
+                  name="perfumeIdList"
+                  th:value="${perfume.perfumeId}"
+                  class="delete-checkbox absolute top-2 right-2 w-5 h-5 hidden z-10"
+                />
+                <div class="relative overflow-hidden">
+                  <img
+                    th:src="@{${perfume.imageUrl}}"
+                    th:alt="${perfume.perfumeName}"
+                    class="mainImage w-full h-80 object-cover group-hover:scale-105 transition-transform duration-300"
+                  />
+                  <img
+                    th:src="@{${perfume.hoverImageUrl}}"
+                    th:alt="${perfume.perfumeName}"
+                    class="absolute inset-0 w-full h-80 object-cover opacity-0 transition-opacity duration-300 group-hover:opacity-100"
+                  />
+
+                  <!-- Sale Badge -->
+                  <div
+                    class="absolute top-4 left-4"
+                    th:if="${perfume.discount > 0}"
+                  >
+                    <span
+                      class="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-red-500 text-white"
+                    >
+                      <span
+                        th:text="${(perfume.discount * 100) / perfume.price}"
+                        >0</span
+                      >% 할인
+                    </span>
+                  </div>
+
+                  <!-- 찜 버튼 -->
+                  <div
+                    class="absolute top-4 right-4 space-y-2 opacity-0 group-hover:opacity-100 transition-opacity duration-300"
+                  >
+                    <button
+                      type="button"
+                      class="wishlist-btn w-8 h-8 bg-white rounded-full flex items-center justify-center shadow-md hover:bg-gray-50 transition-colors"
+                      th:data-perfume-id="${perfume.perfumeId}"
+                    >
+                      <i
+                        class="text-lg"
+                        th:class="${wishedIds != null and wishedIds.contains(perfume.perfumeId)} ? 'fas fa-heart text-red-500' : 'far fa-heart text-gray-400'"
+                      ></i>
+                    </button>
+                  </div>
+                </div>
+
+                <div class="p-4">
+                  <div class="mb-2">
+                    <!-- 카테고리 필드가 없으므로 임시 텍스트로 대체 -->
+                    <span
+                      class="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-blue-100 text-blue-800"
+                    >
+                      향수
+                    </span>
+                    <span
+                      class="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium"
+                      th:classappend="
                             ${perfume.scent} == '플로럴' ? ' bg-pink-100 text-pink-800' :
                             (${perfume.scent} == '시트러스' ? ' bg-green-100 text-green-800' :
                             (${perfume.scent} == '우디' ? ' bg-purple-100 text-purple-800' :
                             (${perfume.scent} == '머스크' ? ' bg-yellow-100 text-yellow-800' : ' bg-gray-100 text-gray-800')))
                           "
-                        th:text="${perfume.scent}">
-                    향
-                  </span>
-
-              </div>
-
-              <h3 class="text-lg font-medium text-gray-800 mb-2 group-hover:text-gray-600 transition-colors">
-                <a th:href="@{'/shop/detail?id=' + ${perfume.perfumeId}}" th:text="${perfume.perfumeName}">상품명</a>
-              </h3>
-
-              <p class="text-sm text-gray-600 mb-3" th:text="${perfume.descriptionTitle}">
-                향 설명
-              </p>
-
-              <div class="flex items-center justify-between mb-3">
-                <div class="flex items-center space-x-2">
-                  <!-- 할인 가격 계산은 없으니 그냥 price 사용 -->
-                  <span class="text-xl font-bold text-gray-800" th:text="${#numbers.formatInteger(perfume.price - perfume.discount, 3, 'COMMA')} + '원'">
-                      할인 가격
+                      th:text="${perfume.scent}"
+                    >
+                      향
                     </span>
-                  <span class="text-sm text-gray-400 line-through" th:text="${#numbers.formatInteger(perfume.price, 3, 'COMMA')} + '원'"
-                        th:if="${perfume.discount > 0}">
-                      원래 가격
-                    </span>
-                </div>
-                <div class="flex items-center space-x-1">
-                  <i class="fas fa-star text-yellow-400 text-sm"></i>
-                  <span class="text-sm text-gray-600" th:text="${perfume.averageRating}">4.8</span>
-                  <span class="text-sm text-gray-500" th:text="'(' + ${perfume.reviewCount} + ')'">(127)</span>
-                </div>
-              </div>
+                  </div>
 
-              <div class="flex space-x-2">
-                <button
-                        type="button"
-                        class="addToCartBtn flex-1 bg-gray-800 text-white py-2 px-4 rounded-md hover:bg-gray-700 transition-colors text-sm font-medium"
-                        th:attr="data-product-id=${perfume.perfumeId}">
-                  장바구니
-                </button>
-                <button
-                        type="button"
-                        class="flex-1 border border-gray-300 text-gray-700 py-2 px-4 rounded-md hover:bg-gray-50 transition-colors text-sm font-medium">
-                  구매하기
-                </button>
+                  <h3
+                    class="text-lg font-medium text-gray-800 mb-2 group-hover:text-gray-600 transition-colors"
+                  >
+                    <a
+                      th:href="@{'/shop/detail?id=' + ${perfume.perfumeId}}"
+                      th:text="${perfume.perfumeName}"
+                      >상품명</a
+                    >
+                  </h3>
+
+                  <p
+                    class="text-sm text-gray-600 mb-3"
+                    th:text="${perfume.descriptionTitle}"
+                  >
+                    향 설명
+                  </p>
+
+                  <div class="flex items-center justify-between mb-3">
+                    <div class="flex items-center space-x-2">
+                      <!-- 할인 가격 계산은 없으니 그냥 price 사용 -->
+                      <span
+                        class="text-xl font-bold text-gray-800"
+                        th:text="${#numbers.formatInteger(perfume.price - perfume.discount, 3, 'COMMA')} + '원'"
+                      >
+                        할인 가격
+                      </span>
+                      <span
+                        class="text-sm text-gray-400 line-through"
+                        th:text="${#numbers.formatInteger(perfume.price, 3, 'COMMA')} + '원'"
+                        th:if="${perfume.discount > 0}"
+                      >
+                        원래 가격
+                      </span>
+                    </div>
+                    <div class="flex items-center space-x-1">
+                      <i class="fas fa-star text-yellow-400 text-sm"></i>
+                      <span
+                        class="text-sm text-gray-600"
+                        th:text="${perfume.averageRating}"
+                        >4.8</span
+                      >
+                      <span
+                        class="text-sm text-gray-500"
+                        th:text="'(' + ${perfume.reviewCount} + ')'"
+                        >(127)</span
+                      >
+                    </div>
+                  </div>
+
+                  <div class="flex space-x-2">
+                    <button
+                      type="button"
+                      class="addToCartBtn flex-1 bg-gray-800 text-white py-2 px-4 rounded-md hover:bg-gray-700 transition-colors text-sm font-medium"
+                      th:attr="data-product-id=${perfume.perfumeId}"
+                    >
+                      장바구니
+                    </button>
+                    <button
+                      type="button"
+                      class="buy-now-btn flex-1 border border-gray-300 text-gray-700 py-2 px-4 rounded-md hover:bg-gray-50 transition-colors text-sm font-medium"
+                      th:data-perfume-id="${perfume.perfumeId}"
+                      th:data-perfume-name="${perfume.perfumeName}"
+                    >
+                      바로구매
+                    </button>
+                  </div>
+                </div>
               </div>
             </div>
+          </form>
+
+          <!-- Pagination -->
+          <div class="mt-12 flex items-center justify-center">
+            <nav class="flex items-center space-x-2" aria-label="Pagination">
+              <!-- 이전 페이지 버튼 -->
+              <a
+                th:if="${perfumePage.hasPrevious()}"
+                th:href="@{/shop/list(page=${perfumePage.number - 1}, size=${perfumePage.size}, sort=${sort}, scent=${scent}, search=${search})}"
+                class="px-3 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-md hover:bg-gray-50"
+              >
+                <i class="fas fa-chevron-left"></i>
+              </a>
+              <span
+                th:unless="${perfumePage.hasPrevious()}"
+                class="px-3 py-2 text-sm font-medium text-gray-400 bg-gray-100 border border-gray-300 rounded-md cursor-not-allowed"
+              >
+                <i class="fas fa-chevron-left"></i>
+              </span>
+
+              <!-- 페이지 번호 버튼들 -->
+              <span
+                th:each="pageNum : ${#numbers.sequence(0, perfumePage.totalPages > 0 ? perfumePage.totalPages - 1 : 0)}"
+              >
+                <a
+                  th:if="${pageNum != perfumePage.number}"
+                  th:href="@{/shop/list(page=${pageNum}, size=${perfumePage.size}, sort=${sort}, scent=${scent}, search=${search})}"
+                  th:text="${pageNum + 1}"
+                  class="px-3 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-md hover:bg-gray-50"
+                >
+                </a>
+                <span
+                  th:if="${pageNum == perfumePage.number}"
+                  th:text="${pageNum + 1}"
+                  class="px-3 py-2 text-sm font-medium text-white bg-gray-800 border border-gray-800 rounded-md cursor-default"
+                >
+                </span>
+              </span>
+
+              <!-- 다음 페이지 버튼 -->
+              <a
+                th:if="${perfumePage.hasNext()}"
+                th:href="@{/shop/list(page=${perfumePage.number + 1}, size=${perfumePage.size}, sort=${sort}, scent=${scent}, search=${search})}"
+                class="px-3 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-md hover:bg-gray-50"
+              >
+                <i class="fas fa-chevron-right"></i>
+              </a>
+              <span
+                th:unless="${perfumePage.hasNext()}"
+                class="px-3 py-2 text-sm font-medium text-gray-400 bg-gray-100 border border-gray-300 rounded-md cursor-not-allowed"
+              >
+                <i class="fas fa-chevron-right"></i>
+              </span>
+            </nav>
           </div>
         </div>
-      </form>
-
-      <!-- Pagination -->
-      <div class="mt-12 flex items-center justify-center">
-        <nav class="flex items-center space-x-2" aria-label="Pagination">
-
-          <!-- 이전 페이지 버튼 -->
-          <a th:if="${perfumePage.hasPrevious()}"
-             th:href="@{/shop/list(page=${perfumePage.number - 1}, size=${perfumePage.size}, sort=${sort}, scent=${scent}, search=${search})}"
-             class="px-3 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-md hover:bg-gray-50">
-            <i class="fas fa-chevron-left"></i>
-          </a>
-          <span th:unless="${perfumePage.hasPrevious()}"
-                class="px-3 py-2 text-sm font-medium text-gray-400 bg-gray-100 border border-gray-300 rounded-md cursor-not-allowed">
-      <i class="fas fa-chevron-left"></i>
-    </span>
-
-          <!-- 페이지 번호 버튼들 -->
-          <span th:each="pageNum : ${#numbers.sequence(0, perfumePage.totalPages > 0 ? perfumePage.totalPages - 1 : 0)}">
-            <a th:if="${pageNum != perfumePage.number}"
-               th:href="@{/shop/list(page=${pageNum}, size=${perfumePage.size}, sort=${sort}, scent=${scent}, search=${search})}"
-               th:text="${pageNum + 1}"
-               class="px-3 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-md hover:bg-gray-50">
-            </a>
-            <span th:if="${pageNum == perfumePage.number}"
-                  th:text="${pageNum + 1}"
-                  class="px-3 py-2 text-sm font-medium text-white bg-gray-800 border border-gray-800 rounded-md cursor-default">
-            </span>
-          </span>
-
-          <!-- 다음 페이지 버튼 -->
-          <a th:if="${perfumePage.hasNext()}"
-             th:href="@{/shop/list(page=${perfumePage.number + 1}, size=${perfumePage.size}, sort=${sort}, scent=${scent}, search=${search})}"
-             class="px-3 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-md hover:bg-gray-50">
-            <i class="fas fa-chevron-right"></i>
-          </a>
-          <span th:unless="${perfumePage.hasNext()}"
-                class="px-3 py-2 text-sm font-medium text-gray-400 bg-gray-100 border border-gray-300 rounded-md cursor-not-allowed">
-      <i class="fas fa-chevron-right"></i>
-    </span>
-
-        </nav>
       </div>
+      <input type="hidden" id="isLoggedIn" th:value="${isLoggedIn}" />
+      <input
+        type="hidden"
+        id="isAdmin"
+        th:value="${#authentication != null and #authorization.expression('hasRole(''ADMIN'')')}"
+      />
+    </main>
 
-    </div>
-  </div>
-  <input type="hidden" id="isLoggedIn" th:value="${isLoggedIn}" />
-  <input type="hidden" id="isAdmin" th:value="${#authentication != null and #authorization.expression('hasRole(''ADMIN'')')}" />
-</main>
+    <!-- Footer Fragment -->
+    <div th:replace="~{fragments/footer :: footer}"></div>
 
-<!-- Footer Fragment -->
-<div th:replace="~{fragments/footer :: footer}"></div>
+    <!-- Login Modal Fragment -->
+    <div th:replace="~{fragments/modal :: loginModal}"></div>
 
-<!-- Login Modal Fragment -->
-<div th:replace="~{fragments/modal :: loginModal}"></div>
+    <script src="/js/script.js"></script>
+    <script>
+      document.addEventListener('DOMContentLoaded', function () {
+        const isAdmin = document.getElementById('isAdmin').value === 'true'; // isAdmin 값을 확인
 
-<script src="/js/script.js"></script>
-<script>
-  document.addEventListener("DOMContentLoaded", function() {
-    const isAdmin = document.getElementById('isAdmin').value === 'true'; // isAdmin 값을 확인
+        if (!isAdmin) {
+          // 관리자가 아니면 삭제 모드 버튼 및 체크박스를 숨김
+          const toggleDeleteModeBtn = document.getElementById(
+            'toggleDeleteModeBtn'
+          );
+          const deleteCheckboxes =
+            document.querySelectorAll('.delete-checkbox');
+          const deleteModeButtons =
+            document.getElementById('deleteModeButtons');
 
-    if (!isAdmin) {
-      // 관리자가 아니면 삭제 모드 버튼 및 체크박스를 숨김
-      const toggleDeleteModeBtn = document.getElementById('toggleDeleteModeBtn');
-      const deleteCheckboxes = document.querySelectorAll('.delete-checkbox');
-      const deleteModeButtons = document.getElementById('deleteModeButtons');
-
-      if (toggleDeleteModeBtn) toggleDeleteModeBtn.classList.add('hidden');
-      if (deleteModeButtons) deleteModeButtons.classList.add('hidden');
-      deleteCheckboxes.forEach(cb => {
-        cb.classList.add('hidden');
-      });
-    } else {
-      // 관리자일 경우 삭제 모드 기능 활성화
-      const toggleDeleteModeBtn = document.getElementById('toggleDeleteModeBtn');
-      const cancelDeleteBtn = document.getElementById('cancelDeleteBtn');
-      const deleteCheckboxes = document.querySelectorAll('.delete-checkbox');
-      const deleteModeButtons = document.getElementById('deleteModeButtons');
-      const deleteForm = document.getElementById('deleteForm');
-
-      toggleDeleteModeBtn.addEventListener('click', function (e) {
-
-        e.stopPropagation();
-
-        // 삭제 모드 활성화
-        deleteModeButtons.classList.toggle('hidden'); // 삭제 버튼 영역 보이기/숨기기
-
-        // 체크박스를 보이거나 숨기기
-        deleteCheckboxes.forEach(cb => {
-          cb.classList.toggle('hidden'); // hidden 클래스를 토글하여 보이기/숨기기
-        });
-
-        if (deleteModeButtons.classList.contains('hidden')) {
-          toggleDeleteModeBtn.textContent = '삭제 모드'; // 버튼 텍스트 초기화
+          if (toggleDeleteModeBtn) toggleDeleteModeBtn.classList.add('hidden');
+          if (deleteModeButtons) deleteModeButtons.classList.add('hidden');
+          deleteCheckboxes.forEach((cb) => {
+            cb.classList.add('hidden');
+          });
         } else {
-          toggleDeleteModeBtn.textContent = '취소 모드'; // 버튼 텍스트 변경
+          // 관리자일 경우 삭제 모드 기능 활성화
+          const toggleDeleteModeBtn = document.getElementById(
+            'toggleDeleteModeBtn'
+          );
+          const cancelDeleteBtn = document.getElementById('cancelDeleteBtn');
+          const deleteCheckboxes =
+            document.querySelectorAll('.delete-checkbox');
+          const deleteModeButtons =
+            document.getElementById('deleteModeButtons');
+          const deleteForm = document.getElementById('deleteForm');
+
+          toggleDeleteModeBtn.addEventListener('click', function (e) {
+            e.stopPropagation();
+
+            // 삭제 모드 활성화
+            deleteModeButtons.classList.toggle('hidden'); // 삭제 버튼 영역 보이기/숨기기
+
+            // 체크박스를 보이거나 숨기기
+            deleteCheckboxes.forEach((cb) => {
+              cb.classList.toggle('hidden'); // hidden 클래스를 토글하여 보이기/숨기기
+            });
+
+            if (deleteModeButtons.classList.contains('hidden')) {
+              toggleDeleteModeBtn.textContent = '삭제 모드'; // 버튼 텍스트 초기화
+            } else {
+              toggleDeleteModeBtn.textContent = '취소 모드'; // 버튼 텍스트 변경
+            }
+          });
+
+          deleteForm.addEventListener('submit', (e) => {
+            // 체크된 항목이 없으면 제출 막기
+            const checked = document.querySelectorAll(
+              '.delete-checkbox:checked'
+            );
+            if (checked.length === 0) {
+              e.preventDefault();
+              alert('삭제할 상품을 선택해주세요.');
+              return;
+            }
+
+            if (!confirm('정말 삭제하시겠습니까?')) {
+              e.preventDefault();
+            }
+          });
+
+          cancelDeleteBtn.addEventListener('click', () => {
+            // 체크박스 숨기고 선택 해제
+            deleteCheckboxes.forEach((cb) => {
+              cb.classList.add('hidden');
+              cb.checked = false;
+            });
+
+            // 삭제/취소 버튼 숨기기
+            deleteModeButtons.classList.add('hidden');
+
+            // 삭제 모드 버튼 텍스트 초기화
+            toggleDeleteModeBtn.textContent = '삭제 모드';
+          });
         }
       });
 
-      deleteForm.addEventListener('submit', (e) => {
-        // 체크된 항목이 없으면 제출 막기
-        const checked = document.querySelectorAll('.delete-checkbox:checked');
-        if (checked.length === 0) {
-          e.preventDefault();
-          alert('삭제할 상품을 선택해주세요.');
+      // Category filter functionality
+      const categoryFilter = document.querySelector('select:first-of-type');
+      categoryFilter.addEventListener('change', function () {
+        const selectedCategory = this.value;
+        const productItems = document.querySelectorAll(
+          '.bg-white.rounded-lg.shadow-sm'
+        );
+
+        productItems.forEach((item) => {
+          const category = item.querySelector(
+            '.inline-flex.items-center.px-2.py-1.rounded-full.text-xs.font-medium'
+          ).textContent;
+          if (selectedCategory === '전체' || category === selectedCategory) {
+            item.style.display = '';
+          } else {
+            item.style.display = 'none';
+          }
+        });
+      });
+
+      // Pagination functionality
+      document.querySelectorAll('nav button').forEach((button) => {
+        button.addEventListener('click', function () {
+          // Remove active state from all buttons
+          document.querySelectorAll('nav button').forEach((btn) => {
+            btn.classList.remove(
+              'text-white',
+              'bg-gray-800',
+              'border-gray-800'
+            );
+            btn.classList.add('text-gray-700', 'bg-white', 'border-gray-300');
+          });
+
+          // Add active state to clicked button
+          this.classList.remove('text-gray-700', 'bg-white', 'border-gray-300');
+          this.classList.add('text-white', 'bg-gray-800', 'border-gray-800');
+        });
+      });
+
+      $('.wishlist-btn').on('click', function (e) {
+        e.preventDefault();
+        e.stopPropagation();
+
+        const isLoggedIn = $('#isLoggedIn').val() === 'true';
+        if (!isLoggedIn) {
+          $('#loginAlertModal').css('display', 'flex');
           return;
         }
 
-        if (!confirm('정말 삭제하시겠습니까?')) {
-          e.preventDefault();
-        }
+        const $btn = $(this);
+        const perfumeId = $btn.data('perfume-id');
+
+        $.ajax({
+          type: 'POST',
+          url: '/wishlist/toggle-ajax', // Ajax용 컨트롤러 URL
+          data: { perfumeId: perfumeId },
+          success: function (response) {
+            // response는 서버에서 "added" 또는 "removed" 문자열을 받는다고 가정
+            if (response === 'added') {
+              $btn
+                .find('i')
+                .removeClass('far fa-heart text-gray-400')
+                .addClass('fas fa-heart text-red-500');
+            } else if (response === 'removed') {
+              $btn
+                .find('i')
+                .removeClass('fas fa-heart text-red-500')
+                .addClass('far fa-heart text-gray-400');
+            }
+          },
+          error: function (xhr) {
+            console.error('찜 실패:', xhr.responseText);
+          },
+        });
       });
 
-      cancelDeleteBtn.addEventListener('click', () => {
-        // 체크박스 숨기고 선택 해제
-        deleteCheckboxes.forEach(cb => {
-          cb.classList.add('hidden');
-          cb.checked = false;
+      function closeLoginModal() {
+        document.getElementById('loginAlertModal').style.display = 'none';
+        window.location.href = '/login';
+      }
+
+      // 카트에 추가하는 애니메이션
+      function animateAddToCart($clickedBtn) {
+        const $group = $clickedBtn.closest('.group');
+        const $productImage = $group.find('.mainImage').first(); // 해당 카드 내 이미지
+        const $cartIcon = $('#cart-count').parent(); // 장바구니 아이콘
+
+        if ($productImage.length === 0 || $cartIcon.length === 0) {
+          console.warn('필요한 요소가 존재하지 않습니다.');
+          return;
+        }
+
+        const imgOffset = $productImage.offset();
+        const imgWidth = $productImage.width();
+        const imgHeight = $productImage.height();
+        const cartOffset = $cartIcon.offset();
+
+        const $flyImg = $productImage
+          .clone()
+          .css({
+            position: 'absolute',
+            top: imgOffset.top,
+            left: imgOffset.left,
+            width: imgWidth,
+            height: imgHeight,
+            borderRadius: '10px',
+            zIndex: 1000,
+            pointerEvents: 'none',
+            opacity: 0.8,
+            transition: 'all 0.8s ease-in-out',
+          })
+          .appendTo('body');
+
+        setTimeout(() => {
+          $flyImg.css({
+            top: cartOffset.top + 10,
+            left: cartOffset.left + 10,
+            width: 30,
+            height: 30,
+            opacity: 0,
+          });
+        }, 10);
+
+        $flyImg.on('transitionend', () => {
+          $flyImg.remove();
+        });
+      }
+
+      // 비동기방식으로 카트에 담기
+      $(document).ready(function () {
+        $(document).on('click', '.addToCartBtn', function (e) {
+          e.preventDefault();
+
+          const isLoggedIn = $('#isLoggedIn').val() === 'true';
+          if (!isLoggedIn) {
+            $('#loginAlertModal').css('display', 'flex');
+            return;
+          }
+
+          const $clickedBtn = $(this);
+          const productId = $clickedBtn.data('product-id');
+
+          $.ajax({
+            type: 'POST',
+            url: '/cart/add',
+            data: JSON.stringify({ perfumeId: productId, quantity: 1 }),
+            contentType: 'application/json',
+            success: function (response) {
+              $('#cart-count').text(response.cartItemCount);
+              animateAddToCart($clickedBtn);
+            },
+            error: function (xhr) {
+              if (xhr.status === 400 || xhr.status === 409) {
+                $('#alreadyInCartModal').removeClass('hidden');
+              } else {
+                alert('장바구니 추가 실패: ' + xhr.responseText);
+              }
+            },
+          });
         });
 
-        // 삭제/취소 버튼 숨기기
-        deleteModeButtons.classList.add('hidden');
+        $('#closeAlreadyInCartModal').on('click', function () {
+          $('#alreadyInCartModal').addClass('hidden');
+        });
 
-        // 삭제 모드 버튼 텍스트 초기화
-        toggleDeleteModeBtn.textContent = '삭제 모드';
-      });
-    }
-  });
+        // 바로구매 버튼 클릭 이벤트
+        $(document).on('click', '.buy-now-btn', function (e) {
+          e.preventDefault();
 
-  // Category filter functionality
-  const categoryFilter = document.querySelector('select:first-of-type');
-  categoryFilter.addEventListener('change', function () {
-    const selectedCategory = this.value;
-    const productItems = document.querySelectorAll(
-            '.bg-white.rounded-lg.shadow-sm'
-    );
-
-    productItems.forEach((item) => {
-      const category = item.querySelector(
-              '.inline-flex.items-center.px-2.py-1.rounded-full.text-xs.font-medium'
-      ).textContent;
-      if (selectedCategory === '전체' || category === selectedCategory) {
-        item.style.display = '';
-      } else {
-        item.style.display = 'none';
-      }
-    });
-  });
-
-  // Pagination functionality
-  document.querySelectorAll('nav button').forEach((button) => {
-    button.addEventListener('click', function () {
-      // Remove active state from all buttons
-      document.querySelectorAll('nav button').forEach((btn) => {
-        btn.classList.remove(
-                'text-white',
-                'bg-gray-800',
-                'border-gray-800'
-        );
-        btn.classList.add('text-gray-700', 'bg-white', 'border-gray-300');
-      });
-
-      // Add active state to clicked button
-      this.classList.remove('text-gray-700', 'bg-white', 'border-gray-300');
-      this.classList.add('text-white', 'bg-gray-800', 'border-gray-800');
-    });
-  });
-
-  $('.wishlist-btn').on('click', function (e) {
-    e.preventDefault();
-    e.stopPropagation();
-
-    const isLoggedIn = $('#isLoggedIn').val() === "true";
-    if (!isLoggedIn) {
-      $('#loginAlertModal').css('display', 'flex');
-      return;
-    }
-
-    const $btn = $(this);
-    const perfumeId = $btn.data('perfume-id');
-
-    $.ajax({
-      type: 'POST',
-      url: '/wishlist/toggle-ajax', // Ajax용 컨트롤러 URL
-      data: { perfumeId: perfumeId },
-      success: function (response) {
-        // response는 서버에서 "added" 또는 "removed" 문자열을 받는다고 가정
-        if (response === "added") {
-          $btn.find('i')
-                  .removeClass('far fa-heart text-gray-400')
-                  .addClass('fas fa-heart text-red-500');
-        } else if (response === "removed") {
-          $btn.find('i')
-                  .removeClass('fas fa-heart text-red-500')
-                  .addClass('far fa-heart text-gray-400');
-        }
-      },
-      error: function (xhr) {
-        console.error('찜 실패:', xhr.responseText);
-      }
-    });
-  });
-
-  function closeLoginModal() {
-    document.getElementById("loginAlertModal").style.display = "none";
-    window.location.href = '/login';
-  }
-
-  // 카트에 추가하는 애니메이션
-  function animateAddToCart($clickedBtn) {
-    const $group = $clickedBtn.closest('.group');
-    const $productImage = $group.find('.mainImage').first(); // 해당 카드 내 이미지
-    const $cartIcon = $('#cart-count').parent(); // 장바구니 아이콘
-
-    if ($productImage.length === 0 || $cartIcon.length === 0) {
-      console.warn('필요한 요소가 존재하지 않습니다.');
-      return;
-    }
-
-    const imgOffset = $productImage.offset();
-    const imgWidth = $productImage.width();
-    const imgHeight = $productImage.height();
-    const cartOffset = $cartIcon.offset();
-
-    const $flyImg = $productImage.clone()
-            .css({
-              position: 'absolute',
-              top: imgOffset.top,
-              left: imgOffset.left,
-              width: imgWidth,
-              height: imgHeight,
-              borderRadius: '10px',
-              zIndex: 1000,
-              pointerEvents: 'none',
-              opacity: 0.8,
-              transition: 'all 0.8s ease-in-out',
-            })
-            .appendTo('body');
-
-    setTimeout(() => {
-      $flyImg.css({
-        top: cartOffset.top + 10,
-        left: cartOffset.left + 10,
-        width: 30,
-        height: 30,
-        opacity: 0,
-      });
-    }, 10);
-
-    $flyImg.on('transitionend', () => {
-      $flyImg.remove();
-    });
-  }
-
-  // 비동기방식으로 카트에 담기
-  $(document).ready(function () {
-    $(document).on('click', '.addToCartBtn', function(e) {
-      e.preventDefault();
-
-      const isLoggedIn = $('#isLoggedIn').val() === "true";
-      if (!isLoggedIn) {
-        $('#loginAlertModal').css('display', 'flex');
-        return;
-      }
-
-      const $clickedBtn = $(this);
-      const productId = $clickedBtn.data('product-id');
-
-      $.ajax({
-        type: 'POST',
-        url: '/cart/add',
-        data: JSON.stringify({ perfumeId: productId, quantity: 1 }),
-        contentType: 'application/json',
-        success: function(response) {
-          $('#cart-count').text(response.cartItemCount);
-          animateAddToCart($clickedBtn);
-        },
-        error: function(xhr) {
-          if (xhr.status === 400 || xhr.status === 409) {
-            $('#alreadyInCartModal').removeClass('hidden');
-          } else {
-            alert('장바구니 추가 실패: ' + xhr.responseText);
+          const isLoggedIn = $('#isLoggedIn').val() === 'true';
+          if (!isLoggedIn) {
+            $('#loginAlertModal').css('display', 'flex');
+            return;
           }
-        }
+
+          const $clickedBtn = $(this);
+          const perfumeId = $clickedBtn.data('perfume-id');
+          const perfumeName = $clickedBtn.data('perfume-name');
+
+          // 바로구매 처리
+          $.ajax({
+            type: 'POST',
+            url: '/wishlist/buyNow-ajax',
+            data: { perfumeId: perfumeId, quantity: 1 },
+            success: function (response) {
+              if (response.startsWith('success:')) {
+                // 성공 시 결제 페이지로 이동
+                const parts = response.split(':');
+                const itemsJson = parts[1];
+                const totalAmount = parts[2];
+                const deliveryFee = parts[3];
+                const discountAmount = parts[4];
+                const quantity = parts[5];
+
+                // 결제 페이지로 리다이렉트
+                window.location.href = `/order/checkout?items=${itemsJson}&totalAmount=${totalAmount}&deliveryFee=${deliveryFee}&discountAmount=${discountAmount}&itemCount=${quantity}`;
+              } else if (response === 'unauthorized') {
+                $('#loginAlertModal').css('display', 'flex');
+              } else {
+                alert('구매 처리 중 오류가 발생했습니다.');
+              }
+            },
+            error: function (xhr) {
+              console.error('바로구매 오류:', xhr.responseText);
+              alert('구매 처리 중 오류가 발생했습니다.');
+            },
+          });
+        });
       });
-    });
+    </script>
 
-    $('#closeAlreadyInCartModal').on('click', function() {
-      $('#alreadyInCartModal').addClass('hidden');
-    });
-  });
+    <div
+      id="loginAlertModal"
+      style="
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: rgba(0, 0, 0, 0.4);
+        display: none;
+        align-items: center;
+        justify-content: center;
+        z-index: 1000;
+      "
+    >
+      <div
+        style="
+          background: white;
+          padding: 30px;
+          border-radius: 10px;
+          font-size: 16px;
+          text-align: center;
+          box-shadow: 0 5px 20px rgba(0, 0, 0, 0.2);
+        "
+      >
+        로그인이 필요한 기능입니다.
+        <br /><br />
+        <button
+          onclick="closeLoginModal()"
+          style="
+            background: #ef4444;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 6px;
+            cursor: pointer;
+          "
+        >
+          닫기
+        </button>
+      </div>
+    </div>
 
-</script>
-
-<div id="loginAlertModal" style="
-      position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-      background: rgba(0, 0, 0, 0.4); display: none;
-      align-items: center; justify-content: center; z-index: 1000;">
-  <div style="
-        background: white; padding: 30px; border-radius: 10px;
-        font-size: 16px; text-align: center; box-shadow: 0 5px 20px rgba(0,0,0,0.2);">
-    로그인이 필요한 기능입니다.
-    <br/><br/>
-    <button onclick="closeLoginModal()" style="
-          background: #ef4444; color: white; border: none;
-          padding: 10px 20px; border-radius: 6px; cursor: pointer;">
-      닫기
-    </button>
-  </div>
-</div>
-
-<!-- 이미 장바구니에 담긴 상품입니다 모달 -->
-<div id="alreadyInCartModal" class="modal hidden fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-  <div class="modal-content bg-white rounded-lg p-6 w-80 text-center relative">
-    <h2 class="text-xl font-semibold mb-4">알림</h2>
-    <p class="mb-6">이미 장바구니에 담긴 상품입니다.</p>
-    <button id="closeAlreadyInCartModal" class="px-4 py-2 bg-gray-800 text-white rounded hover:bg-gray-700 transition">
-      닫기
-    </button>
-  </div>
-</div>
-
-</body>
+    <!-- 이미 장바구니에 담긴 상품입니다 모달 -->
+    <div
+      id="alreadyInCartModal"
+      class="modal hidden fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50"
+    >
+      <div
+        class="modal-content bg-white rounded-lg p-6 w-80 text-center relative"
+      >
+        <h2 class="text-xl font-semibold mb-4">알림</h2>
+        <p class="mb-6">이미 장바구니에 담긴 상품입니다.</p>
+        <button
+          id="closeAlreadyInCartModal"
+          class="px-4 py-2 bg-gray-800 text-white rounded hover:bg-gray-700 transition"
+        >
+          닫기
+        </button>
+      </div>
+    </div>
+  </body>
 </html>
