@@ -55,6 +55,19 @@ public class OrderService {
     return orderRepository.findById(orderId);
   }
 
+  /** 모든 주문 목록 조회 (OrderItem 포함) */
+  public List<Order> getAllOrders() {
+    List<Order> orders = orderRepository.findAllByOrderByCreatedAtDesc();
+
+    // 각 주문에 대해 OrderItem 목록을 로드
+    for (Order order : orders) {
+      List<OrderItem> orderItems = getOrderItemsByOrderId(order.getOrderId());
+      order.setOrderItems(orderItems);
+    }
+
+    return orders;
+  }
+
   /** 사용자별 주문 목록 조회 (OrderItem 포함) */
   public List<Order> findOrdersByUserId(Long userId) {
     List<Order> orders = orderRepository.findByUser_UserIdOrderByCreatedAtDesc(userId);
