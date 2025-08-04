@@ -2,11 +2,8 @@
 <html lang="en" xmlns:th="http://www.thymeleaf.org" xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout" layout:decorate="~{fragments/admin_layout}">
 <head>
     <title>상품 목록</title>
-    <th:block layout:fragment="css">
-        <link rel="stylesheet" href="/css/admin_custom.css">
-    </th:block>
 </head>
-<body>
+
 <div layout:fragment="content">
     <!-- Content Header (Page header) -->
     <div class="content-header">
@@ -17,7 +14,7 @@
                 </div><!-- /.col -->
                 <div class="col-sm-6">
                     <ol class="breadcrumb float-sm-right">
-                        <li class="breadcrumb-item"><a th:href="@{/admin/dashboard}">Home</a></li>
+                        <li class="breadcrumb-item"><a th:href="@{/admin/product/list}">Home</a></li>
                         <li class="breadcrumb-item active">상품 목록</li>
                     </ol>
                 </div><!-- /.col -->
@@ -39,7 +36,6 @@
                         <div class="card-body">
                             <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
                                 <div>
-                                    <a th:href="@{/admin/dashboard}" class="add-button" style="background-color: #6c757d; margin-right: 10px;">관리자 대시보드로 돌아가기</a>
                                     <a th:href="@{/shop/list}" class="shop-list-button">쇼핑몰 상품 목록보기</a>
                                 </div>
                                 <div>
@@ -97,6 +93,7 @@
     </section>
     <!-- /.content -->
 </div>
+
 <th:block layout:fragment="script">
     <script>
         function toggleAll(source) {
@@ -133,5 +130,4 @@
         }
     </script>
 </th:block>
-</body>
 </html>
