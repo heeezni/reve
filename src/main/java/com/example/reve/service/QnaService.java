@@ -291,11 +291,14 @@ public class QnaService {
 
     validateUserPermission(principal, qna);
 
-    // 첨부 파일 디렉토리 삭제 (attachmentFiles 필드 사용)
+    // 1. DB의 첨부파일 목록을 먼저 비우고 저장하여 qna_attachments 레코드 삭제 유도
     if (qna.getAttachmentFiles() != null && !qna.getAttachmentFiles().isEmpty()) {
-      // 변경된 FileUploadService의 deleteDirectory 메소드를 사용하여 디렉토리 삭제
-      fileUploadService.deleteDirectory("qna", String.valueOf(qna.getQnaId()));
+      qna.getAttachmentFiles().clear();
+      qnaRepository.save(qna);
     }
+
+    // 2. 실제 파일이 저장된 디렉토리 삭제
+    fileUploadService.deleteDirectory("qna", String.valueOf(qna.getQnaId()));
 
     qnaRepository.delete(qna);
   }
@@ -402,9 +405,16 @@ public class QnaService {
               .findById(qnaId)
               .orElseThrow(() -> new NoSuchElementException("Q&A를 찾을 수 없습니다. ID: " + qnaId));
 
+      // 1. attachmentFiles 비우기
       if (qna.getAttachmentFiles() != null && !qna.getAttachmentFiles().isEmpty()) {
+        qna.getAttachmentFiles().clear();
+        qnaRepository.save(qna);
+
+        // 2. 실제 파일 삭제
         fileUploadService.deleteDirectory("qna", String.valueOf(qna.getQnaId()));
       }
+
+      // 3. Qna 엔티티 삭제
       qnaRepository.delete(qna);
     }
   }
