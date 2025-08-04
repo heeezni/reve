@@ -13,7 +13,6 @@ import com.example.reve.domain.Order;
 import com.example.reve.domain.Role;
 import com.example.reve.domain.User;
 import com.example.reve.repository.UserRepository;
-import com.example.reve.service.CouponService;
 import com.example.reve.service.OrderService;
 import com.example.reve.service.PerfumeService;
 import com.example.reve.service.UserService;
@@ -30,20 +29,11 @@ public class AdminController {
   private final PerfumeService perfumeService;
   private final UserService userService;
   private final UserRepository userRepository;
-  private final CouponService couponService;
   private final OrderService orderService;
 
   @GetMapping("/dashboard")
-  public String dashboard(Model model) {
-    long totalPerfumeCount = perfumeService.getTotalPerfumeCount();
-    long totalUserCount = userService.getTotalUserCount();
-    long totalCouponCount = couponService.getTotalCouponCount();
-
-    model.addAttribute("totalPerfumeCount", totalPerfumeCount);
-    model.addAttribute("totalUserCount", totalUserCount);
-    model.addAttribute("totalCouponCount", totalCouponCount);
-
-    return "admin/dashboard";
+  public String dashboard() {
+    return "redirect:/admin/product/list";
   }
 
   @GetMapping("/product/list")

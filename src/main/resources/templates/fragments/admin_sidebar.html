@@ -3,7 +3,7 @@
 <body>
 <aside class="main-sidebar sidebar-dark-primary elevation-4" th:fragment="adminSidebar">
     <!-- Brand Logo -->
-    <a th:href="@{/admin/dashboard}" class="brand-link">
+    <a th:href="@{/admin/product/list}" class="brand-link">
         <span class="brand-text font-weight-light">Rêve</span>
     </a>
 
@@ -19,35 +19,14 @@
             </div>
         </div>
 
-        <!-- SidebarSearch Form -->
-        <div class="form-inline">
-            <div class="input-group" data-widget="sidebar-search">
-                <input class="form-control form-control-sidebar" type="search" placeholder="Search" aria-label="Search">
-                <div class="input-group-append">
-                    <button class="btn btn-sidebar">
-                        <i class="fas fa-search fa-fw"></i>
-                    </button>
-                </div>
-            </div>
-        </div>
-
         <!-- Sidebar Menu -->
         <nav class="mt-2">
             <ul class="nav nav-pills nav-sidebar flex-column" data-widget="treeview" role="menu" data-accordion="false">
                 <!-- Add icons to the links using the .nav-icon class
                      with font-awesome or any other icon font library -->
-                <li class="nav-item">
-                    <a th:href="@{/admin/dashboard}" class="nav-link active">
-                        <i class="nav-icon fas fa-tachometer-alt"></i>
-                        <p>
-                            Dashboard
-                        </p>
-                    </a>
-                    
-                
                 <li class="nav-header">쇼핑몰 관리</li>
                 <li class="nav-item">
-                    <a th:href="@{/admin/product/list}" class="nav-link">
+                    <a th:href="@{/admin/product/list}" class="nav-link active">
                         <i class="nav-icon fas fa-box"></i>
                         <p>
                             상품 현황
@@ -70,15 +49,7 @@
                         </p>
                     </a>
                 </li>
-                <li class="nav-item">
-                    <a th:href="@{/admin/coupon/list}" class="nav-link">
-                        <i class="nav-icon fas fa-ticket-alt"></i>
-                        <p>
-                            쿠폰 현황
-                        </p>
-                    </a>
-                </li>
-                
+
             </ul>
         </nav>
         <!-- /.sidebar-menu -->
