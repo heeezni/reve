@@ -1,0 +1,266 @@
+<!DOCTYPE html>
+<html lang="ko" xmlns:th="http://www.thymeleaf.org">
+  <head
+    th:replace="~{fragments/header :: head(title='결제 완료 | Rêve')}"
+  ></head>
+  <body class="font-sans text-gray-800">
+    <!-- Header Fragment -->
+    <div th:replace="~{fragments/header :: header}"></div>
+
+    <!-- Main Content -->
+    <main class="pt-20">
+      <div class="min-h-screen bg-gray-50 py-12">
+        <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
+          <!-- Success Message -->
+          <div class="text-center mb-12">
+            <div
+              class="w-20 h-20 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-6"
+            >
+              <i class="fas fa-check text-3xl text-green-600"></i>
+            </div>
+            <h1 class="text-3xl font-bold text-gray-800 mb-4">
+              결제가 완료되었습니다!
+            </h1>
+            <p class="text-lg text-gray-600">
+              주문이 성공적으로 처리되었습니다.
+            </p>
+          </div>
+
+          <!-- Order Information -->
+          <div class="bg-white rounded-lg shadow-sm p-8 mb-8">
+            <h2 class="text-xl font-semibold text-gray-800 mb-6">주문 정보</h2>
+
+            <div class="grid md:grid-cols-2 gap-8">
+              <!-- Order Details -->
+              <div class="space-y-4">
+                <div class="flex justify-between">
+                  <span class="text-gray-600">주문번호</span>
+                  <span class="font-medium" th:text="${orderId}"
+                    >ORD-2024-001</span
+                  >
+                </div>
+                <div class="flex justify-between">
+                  <span class="text-gray-600">주문일시</span>
+                  <span class="font-medium" th:text="${orderDate}"
+                    >2024-01-15 14:30:25</span
+                  >
+                </div>
+                <div class="flex justify-between">
+                  <span class="text-gray-600">결제수단</span>
+                  <span class="font-medium">Toss 간편결제</span>
+                </div>
+                <div class="flex justify-between">
+                  <span class="text-gray-600">결제금액</span>
+                  <span class="font-bold text-lg" th:text="${totalAmount}"
+                    >34,600원</span
+                  >
+                </div>
+              </div>
+
+              <!-- Delivery Information -->
+              <div class="space-y-4">
+                <div>
+                  <span class="text-gray-600">배송지</span>
+                  <p class="font-medium mt-1">홍길동 (010-1234-5678)</p>
+                  <p class="text-sm text-gray-600">
+                    서울특별시 강남구 테헤란로 123
+                  </p>
+                </div>
+                <div>
+                  <span class="text-gray-600">배송 예정일</span>
+                  <p class="font-medium mt-1" th:text="${deliveryDate}">
+                    2024-01-17 ~ 2024-01-18
+                  </p>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Ordered Products -->
+          <div class="bg-white rounded-lg shadow-sm p-8 mb-8">
+            <h2 class="text-xl font-semibold text-gray-800 mb-6">주문 상품</h2>
+
+            <div class="space-y-4" id="orderedProductsContainer">
+              <!-- 상품 정보가 JavaScript로 동적 생성됨 -->
+            </div>
+          </div>
+
+          <!-- Next Steps -->
+          <div class="bg-blue-50 rounded-lg p-6 mb-8">
+            <h3 class="text-lg font-semibold text-blue-800 mb-4">다음 단계</h3>
+            <div class="space-y-3">
+              <div class="flex items-start space-x-3">
+                <div
+                  class="w-6 h-6 bg-blue-600 text-white rounded-full flex items-center justify-center text-sm font-medium mt-0.5"
+                >
+                  1
+                </div>
+                <div>
+                  <p class="font-medium text-blue-800">상품 준비</p>
+                  <p class="text-sm text-blue-700">
+                    주문 확인 후 상품을 준비합니다 (1-2일 소요)
+                  </p>
+                </div>
+              </div>
+              <div class="flex items-start space-x-3">
+                <div
+                  class="w-6 h-6 bg-blue-600 text-white rounded-full flex items-center justify-center text-sm font-medium mt-0.5"
+                >
+                  2
+                </div>
+                <div>
+                  <p class="font-medium text-blue-800">배송 시작</p>
+                  <p class="text-sm text-blue-700">
+                    택배사에 상품을 전달하여 배송을 시작합니다
+                  </p>
+                </div>
+              </div>
+              <div class="flex items-start space-x-3">
+                <div
+                  class="w-6 h-6 bg-blue-600 text-white rounded-full flex items-center justify-center text-sm font-medium mt-0.5"
+                >
+                  3
+                </div>
+                <div>
+                  <p class="font-medium text-blue-800">배송 완료</p>
+                  <p class="text-sm text-blue-700">
+                    배송 완료 후 배송 추적 정보를 확인할 수 있습니다
+                  </p>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Action Buttons -->
+          <div class="flex flex-col sm:flex-row gap-4 justify-center">
+            <a
+              href="/mypage/order"
+              class="bg-gray-800 text-white py-3 px-8 rounded-md hover:bg-gray-700 transition-colors font-medium text-center"
+            >
+              주문 내역 보기
+            </a>
+            <a
+              href="/mypage"
+              class="border border-gray-300 text-gray-700 py-3 px-8 rounded-md hover:bg-gray-50 transition-colors font-medium text-center"
+            >
+              마이페이지
+            </a>
+            <a
+              href="/shop/list"
+              class="border border-gray-300 text-gray-700 py-3 px-8 rounded-md hover:bg-gray-50 transition-colors font-medium text-center"
+            >
+              쇼핑 계속하기
+            </a>
+          </div>
+
+          <!-- Customer Service -->
+          <div class="mt-12 text-center">
+            <p class="text-gray-600 mb-2">
+              문의사항이 있으시면 언제든 연락주세요
+            </p>
+            <p class="text-gray-800 font-medium">고객센터: 1588-1234</p>
+            <p class="text-sm text-gray-500">
+              평일 09:00 - 18:00 (주말/공휴일 휴무)
+            </p>
+          </div>
+        </div>
+      </div>
+    </main>
+
+    <!-- Footer Fragment -->
+    <div th:replace="~{fragments/footer :: footer}"></div>
+
+    <script>
+      // 페이지 로드 시 주문 완료 알림
+      document.addEventListener('DOMContentLoaded', function () {
+        // 주문 완료 토스트 메시지 (선택사항)
+        console.log('주문이 성공적으로 완료되었습니다!');
+
+        // 주문 상품 정보 표시
+        displayOrderedProducts();
+      });
+
+      // 주문 상품 정보 표시 함수
+      function displayOrderedProducts() {
+        // 세션 스토리지에서 주문 데이터 가져오기
+        const orderData = sessionStorage.getItem('orderData');
+        let cartItemsJson = '[[${cartItems}]]';
+
+        if (orderData) {
+          try {
+            const parsedOrderData = JSON.parse(orderData);
+            cartItemsJson = parsedOrderData.items || cartItemsJson;
+          } catch (e) {
+            console.error('세션 스토리지 데이터 파싱 실패:', e);
+          }
+        }
+
+        const container = document.getElementById('orderedProductsContainer');
+
+        try {
+          // HTML 엔티티를 원래 문자로 변환
+          let cleanJson = cartItemsJson;
+          if (cleanJson.includes('&quot;')) {
+            cleanJson = cleanJson.replace(/&quot;/g, '"');
+          }
+          if (cleanJson.includes('&amp;')) {
+            cleanJson = cleanJson.replace(/&amp;/g, '&');
+          }
+
+          const items = JSON.parse(cleanJson);
+
+          if (items && items.length > 0) {
+            items.forEach((item) => {
+              const itemElement = document.createElement('div');
+              itemElement.className =
+                'flex items-center space-x-4 p-4 bg-gray-50 rounded-lg';
+              itemElement.innerHTML = `
+                <img src="${
+                  item.image || '/images/product/product1.jpg'
+                }" alt="상품" class="w-16 h-16 object-cover rounded-md" />
+                <div class="flex-1">
+                  <h3 class="font-medium text-gray-800">${item.name}</h3>
+                  <p class="text-sm text-gray-600">수량: ${item.quantity}개</p>
+                </div>
+                <div class="text-right">
+                  <p class="font-bold text-gray-800">${parseInt(
+                    item.totalPrice
+                  ).toLocaleString()}원</p>
+                </div>
+              `;
+              container.appendChild(itemElement);
+            });
+          } else {
+            // 기본 상품 표시
+            container.innerHTML = `
+              <div class="flex items-center space-x-4 p-4 bg-gray-50 rounded-lg">
+                <img src="/images/product/product1.jpg" alt="상품" class="w-16 h-16 object-cover rounded-md" />
+                <div class="flex-1">
+                  <h3 class="font-medium text-gray-800">디어 무드 멀티 퍼퓸 70ml</h3>
+                  <p class="text-sm text-gray-600">수량: 1개</p>
+                </div>
+                <div class="text-right">
+                  <p class="font-bold text-gray-800">24,600원</p>
+                </div>
+              </div>
+            `;
+          }
+        } catch (error) {
+          // 기본 상품 표시
+          container.innerHTML = `
+            <div class="flex items-center space-x-4 p-4 bg-gray-50 rounded-lg">
+              <img src="/images/product/product1.jpg" alt="상품" class="w-16 h-16 object-cover rounded-md" />
+              <div class="flex-1">
+                <h3 class="font-medium text-gray-800">디어 무드 멀티 퍼퓸 70ml</h3>
+                <p class="text-sm text-gray-600">수량: 1개</p>
+              </div>
+              <div class="text-right">
+                <p class="font-bold text-gray-800">24,600원</p>
+              </div>
+            </div>
+          `;
+        }
+      }
+    </script>
+  </body>
+</html>

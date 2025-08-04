@@ -1,0 +1,383 @@
+<!DOCTYPE html>
+<html lang="ko" xmlns:th="http://www.thymeleaf.org">
+  <head th:replace="~{fragments/header :: head(title='주문 상세 | Rêve')}">
+  </head>
+  <body class="font-sans text-gray-800">
+    <!-- Header Fragment -->
+    <div th:replace="~{fragments/header :: header}"></div>
+
+    <!-- Main Content -->
+    <main class="pt-20">
+      <div class="min-h-screen bg-gray-50 py-12">
+        <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
+          <!-- Breadcrumb -->
+          <nav class="mb-6">
+            <ol class="flex items-center space-x-2 text-sm text-gray-600">
+              <li><a href="/" class="hover:text-gray-800">홈</a></li>
+              <li><i class="fas fa-chevron-right text-xs"></i></li>
+              <li>
+                <a href="/mypage" class="hover:text-gray-800">마이페이지</a>
+              </li>
+              <li><i class="fas fa-chevron-right text-xs"></i></li>
+              <li>
+                <a href="/mypage/order" class="hover:text-gray-800">주문내역</a>
+              </li>
+              <li><i class="fas fa-chevron-right text-xs"></i></li>
+              <li class="text-gray-800">주문 상세</li>
+            </ol>
+          </nav>
+
+          <!-- Page Title -->
+          <div class="mb-8">
+            <h1 class="text-3xl font-bold text-gray-800 mb-2">주문 상세</h1>
+            <p class="text-gray-600">주문 정보와 배송 현황을 확인하세요</p>
+          </div>
+
+          <!-- Order Status -->
+          <div class="bg-white rounded-lg shadow-sm p-6 mb-8">
+            <div class="flex items-center justify-between mb-4">
+              <h2 class="text-xl font-semibold text-gray-800">주문 상태</h2>
+              <span
+                th:if="${order.orderStatus eq 'ORDERED'}"
+                class="inline-flex items-center px-4 py-2 rounded-full text-sm font-medium bg-blue-100 text-blue-800"
+              >
+                주문완료
+              </span>
+              <span
+                th:if="${order.orderStatus eq 'PREPARING'}"
+                class="inline-flex items-center px-4 py-2 rounded-full text-sm font-medium bg-yellow-100 text-yellow-800"
+              >
+                배송준비중
+              </span>
+              <span
+                th:if="${order.orderStatus eq 'SHIPPING'}"
+                class="inline-flex items-center px-4 py-2 rounded-full text-sm font-medium bg-orange-100 text-orange-800"
+              >
+                배송중
+              </span>
+              <span
+                th:if="${order.orderStatus eq 'DELIVERED'}"
+                class="inline-flex items-center px-4 py-2 rounded-full text-sm font-medium bg-green-100 text-green-800"
+              >
+                배송완료
+              </span>
+              <span
+                th:if="${order.orderStatus eq 'CANCELLED'}"
+                class="inline-flex items-center px-4 py-2 rounded-full text-sm font-medium bg-red-100 text-red-800"
+              >
+                주문취소
+              </span>
+            </div>
+
+            <!-- Progress Steps -->
+            <div class="flex items-center justify-between">
+              <div class="flex items-center">
+                <div
+                  class="w-8 h-8 bg-blue-600 text-white rounded-full flex items-center justify-center text-sm font-medium"
+                >
+                  <i class="fas fa-check"></i>
+                </div>
+                <span class="ml-2 text-sm font-medium text-gray-800"
+                  >주문완료</span
+                >
+              </div>
+              <div class="flex-1 h-1 bg-gray-200 mx-4"></div>
+              <div class="flex items-center">
+                <div
+                  th:if="${order.orderStatus eq 'PREPARING' or order.orderStatus eq 'SHIPPING' or order.orderStatus eq 'DELIVERED'}"
+                  class="w-8 h-8 rounded-full flex items-center justify-center text-sm font-medium bg-blue-600 text-white"
+                ></div>
+                <div
+                  th:if="${order.orderStatus eq 'ORDERED' or order.orderStatus eq 'CANCELLED'}"
+                  class="w-8 h-8 rounded-full flex items-center justify-center text-sm font-medium bg-gray-200 text-gray-400"
+                >
+                  <i class="fas fa-box"></i>
+                </div>
+                <span class="ml-2 text-sm font-medium text-gray-800"
+                  >배송준비중</span
+                >
+              </div>
+              <div class="flex-1 h-1 bg-gray-200 mx-4"></div>
+              <div class="flex items-center">
+                <div
+                  th:if="${order.orderStatus eq 'SHIPPING' or order.orderStatus eq 'DELIVERED'}"
+                  class="w-8 h-8 rounded-full flex items-center justify-center text-sm font-medium bg-blue-600 text-white"
+                ></div>
+                <div
+                  th:if="${order.orderStatus eq 'ORDERED' or order.orderStatus eq 'PREPARING' or order.orderStatus eq 'CANCELLED'}"
+                  class="w-8 h-8 rounded-full flex items-center justify-center text-sm font-medium bg-gray-200 text-gray-400"
+                >
+                  <i class="fas fa-truck"></i>
+                </div>
+                <span class="ml-2 text-sm font-medium text-gray-800"
+                  >배송중</span
+                >
+              </div>
+              <div class="flex-1 h-1 bg-gray-200 mx-4"></div>
+              <div class="flex items-center">
+                <div
+                  th:if="${order.orderStatus eq 'DELIVERED'}"
+                  class="w-8 h-8 rounded-full flex items-center justify-center text-sm font-medium bg-blue-600 text-white"
+                ></div>
+                <div
+                  th:if="${order.orderStatus eq 'ORDERED' or order.orderStatus eq 'PREPARING' or order.orderStatus eq 'SHIPPING' or order.orderStatus eq 'CANCELLED'}"
+                  class="w-8 h-8 rounded-full flex items-center justify-center text-sm font-medium bg-gray-200 text-gray-400"
+                >
+                  <i class="fas fa-check-circle"></i>
+                </div>
+                <span class="ml-2 text-sm font-medium text-gray-800"
+                  >배송완료</span
+                >
+              </div>
+            </div>
+          </div>
+
+          <!-- Order Information -->
+          <div class="grid md:grid-cols-2 gap-8 mb-8">
+            <!-- Order Details -->
+            <div class="bg-white rounded-lg shadow-sm p-6">
+              <h2 class="text-xl font-semibold text-gray-800 mb-6">
+                주문 정보
+              </h2>
+              <div class="space-y-4">
+                <div class="flex justify-between">
+                  <span class="text-gray-600">주문번호</span>
+                  <span class="font-medium" th:text="${order.orderNumber}"
+                    >ORD-20240118-001</span
+                  >
+                </div>
+                <div class="flex justify-between">
+                  <span class="text-gray-600">주문일시</span>
+                  <span
+                    class="font-medium"
+                    th:text="${#temporals.format(order.createdAt, 'yyyy-MM-dd HH:mm')}"
+                    >2024-01-18 14:30</span
+                  >
+                </div>
+                <div class="flex justify-between">
+                  <span class="text-gray-600">결제수단</span>
+                  <span class="font-medium" th:text="${order.paymentMethod}"
+                    >TOSS</span
+                  >
+                </div>
+                <div class="flex justify-between">
+                  <span class="text-gray-600">결제상태</span>
+                  <span
+                    th:if="${order.paymentStatus eq 'PAID'}"
+                    class="font-medium"
+                    >결제완료</span
+                  >
+                  <span
+                    th:if="${order.paymentStatus eq 'PENDING'}"
+                    class="font-medium"
+                    >결제대기</span
+                  >
+                  <span
+                    th:if="${order.paymentStatus eq 'REFUNDED'}"
+                    class="font-medium"
+                    >환불완료</span
+                  >
+                </div>
+                <div class="flex justify-between">
+                  <span class="text-gray-600">배송 예정일</span>
+                  <span class="font-medium" th:text="${deliveryDate}"
+                    >2024-01-19 ~ 2024-01-20</span
+                  >
+                </div>
+              </div>
+            </div>
+
+            <!-- Delivery Information -->
+            <div class="bg-white rounded-lg shadow-sm p-6">
+              <h2 class="text-xl font-semibold text-gray-800 mb-6">
+                배송 정보
+              </h2>
+              <div class="space-y-4">
+                <div>
+                  <span class="text-gray-600">수령인</span>
+                  <p class="font-medium mt-1" th:text="${order.receiver}">
+                    홍길동
+                  </p>
+                </div>
+                <div>
+                  <span class="text-gray-600">연락처</span>
+                  <p class="font-medium mt-1" th:text="${order.tel}">
+                    010-1234-5678
+                  </p>
+                </div>
+                <div>
+                  <span class="text-gray-600">배송지</span>
+                  <p class="font-medium mt-1" th:text="${order.address}">
+                    서울특별시 강남구 테헤란로 123
+                  </p>
+                </div>
+                <div
+                  th:if="${order.orderRequest != null and order.orderRequest != ''}"
+                >
+                  <span class="text-gray-600">배송 요청사항</span>
+                  <p class="font-medium mt-1" th:text="${order.orderRequest}">
+                    문 앞에 놓아주세요
+                  </p>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Ordered Products -->
+          <div class="bg-white rounded-lg shadow-sm p-6 mb-8">
+            <h2 class="text-xl font-semibold text-gray-800 mb-6">주문 상품</h2>
+            <div class="space-y-4">
+              <div
+                th:each="item : ${orderItems}"
+                class="flex items-center space-x-4 p-4 border border-gray-200 rounded-lg"
+              >
+                <img
+                  th:src="${item.productImage != null ? item.productImage : '/images/product/product1.jpg'}"
+                  th:alt="${item.productName}"
+                  class="w-20 h-20 object-cover rounded-md"
+                />
+                <div class="flex-1">
+                  <h3
+                    class="font-medium text-gray-800 mb-2"
+                    th:text="${item.productName}"
+                  >
+                    상품명
+                  </h3>
+                  <p
+                    class="text-sm text-gray-600 mb-1"
+                    th:text="'수량: ' + ${item.orderQuantity} + '개'"
+                  >
+                    수량: 1개
+                  </p>
+                  <p
+                    class="text-sm text-gray-600"
+                    th:text="'개당 가격: ' + ${#numbers.formatInteger(item.pricePerItem, 3, 'COMMA')} + '원'"
+                  >
+                    개당 가격: 24,600원
+                  </p>
+                </div>
+                <div class="text-right">
+                  <p
+                    class="font-bold text-gray-800"
+                    th:text="${#numbers.formatInteger(item.totalPrice, 3, 'COMMA')} + '원'"
+                  >
+                    24,600원
+                  </p>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Price Summary -->
+          <div class="bg-white rounded-lg shadow-sm p-6 mb-8">
+            <h2 class="text-xl font-semibold text-gray-800 mb-6">결제 정보</h2>
+            <div class="space-y-3">
+              <div class="flex justify-between">
+                <span class="text-gray-600">상품 금액</span>
+                <span
+                  th:text="${#numbers.formatInteger(order.totalPrice - order.deliveryFee + order.discountAmount, 3, 'COMMA')} + '원'"
+                  >24,600원</span
+                >
+              </div>
+              <div
+                class="flex justify-between"
+                th:if="${order.discountAmount > 0}"
+              >
+                <span class="text-red-500">할인 금액</span>
+                <span
+                  class="text-red-500"
+                  th:text="'-' + ${#numbers.formatInteger(order.discountAmount, 3, 'COMMA')} + '원'"
+                  >-1,000원</span
+                >
+              </div>
+              <div class="flex justify-between">
+                <span class="text-gray-600">배송비</span>
+                <span th:if="${order.deliveryFee eq 0}">무료</span>
+                <span
+                  th:if="${order.deliveryFee gt 0}"
+                  th:text="${#numbers.formatInteger(order.deliveryFee, 3, 'COMMA') + '원'}"
+                  >3,000원</span
+                >
+              </div>
+              <div class="border-t pt-3">
+                <div class="flex justify-between text-lg font-bold">
+                  <span>총 결제금액</span>
+                  <span
+                    class="text-gray-800"
+                    th:text="${#numbers.formatInteger(order.totalPrice, 3, 'COMMA')} + '원'"
+                    >27,600원</span
+                  >
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Action Buttons -->
+          <div class="flex flex-col sm:flex-row gap-4 justify-center">
+            <a
+              href="/mypage/order"
+              class="bg-gray-800 text-white py-3 px-8 rounded-md hover:bg-gray-700 transition-colors font-medium text-center"
+            >
+              주문 목록으로
+            </a>
+            <button
+              th:if="${order.orderStatus eq 'DELIVERED'}"
+              class="border border-gray-300 text-gray-700 py-3 px-8 rounded-md hover:bg-gray-50 transition-colors font-medium text-center"
+            >
+              리뷰 작성
+            </button>
+            <button
+              th:if="${order.orderStatus eq 'ORDERED' or order.orderStatus eq 'PREPARING'}"
+              th:onclick="'cancelOrder(' + ${order.orderId} + ')'"
+              class="border border-red-300 text-red-700 py-3 px-8 rounded-md hover:bg-red-50 transition-colors font-medium text-center"
+            >
+              주문 취소
+            </button>
+          </div>
+
+          <!-- Customer Service -->
+          <div class="mt-12 text-center">
+            <p class="text-gray-600 mb-2">
+              문의사항이 있으시면 언제든 연락주세요
+            </p>
+            <p class="text-gray-800 font-medium">고객센터: 1588-1234</p>
+            <p class="text-sm text-gray-500">
+              평일 09:00 - 18:00 (주말/공휴일 휴무)
+            </p>
+          </div>
+        </div>
+      </div>
+    </main>
+
+    <!-- Footer Fragment -->
+    <div th:replace="~{fragments/footer :: footer}"></div>
+
+    <script>
+      // 주문 취소 함수
+      function cancelOrder(orderId) {
+        if (confirm('정말로 이 주문을 취소하시겠습니까?')) {
+          fetch('/mypage/order-cancel/' + orderId, {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+            },
+          })
+            .then((response) => response.json())
+            .then((data) => {
+              if (data.success) {
+                alert(data.message);
+                // 주문 목록 페이지로 이동
+                window.location.href = '/mypage/order';
+              } else {
+                alert(data.message);
+              }
+            })
+            .catch((error) => {
+              console.error('Error:', error);
+              alert('주문 취소 중 오류가 발생했습니다.');
+            });
+        }
+      }
+    </script>
+  </body>
+</html>
