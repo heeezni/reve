@@ -1,5 +1,7 @@
 package com.example.reve.controller.user;
 
+import java.security.Principal;
+
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -52,6 +54,13 @@ public class MemberController {
     Long userId = userService.signup(create);
     couponService.newUserCoupon(userId);
     pointService.getPoint(userId, 1000);
+    return "index";
+  }
+
+  @PostMapping("/delete")
+  public String deleteMember(Principal principal) {
+    String loginId = principal.getName();
+    userService.delete(loginId);
     return "index";
   }
 }

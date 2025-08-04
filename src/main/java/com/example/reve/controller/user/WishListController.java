@@ -116,18 +116,31 @@ public class WishListController {
     return ResponseEntity.ok(wished ? "added" : "removed");
   }
 
-  // 구매버튼 구현
-  @PostMapping("/wishlist/buy")
-  public String buyWish(@RequestParam Long perfumeId, Principal principal) {
+  // 장바구니 추가
+  @PostMapping("/wishlist/addCart-ajax")
+  @ResponseBody
+  public ResponseEntity addCart(@RequestParam Long perfumeId, Principal principal) {
     if (principal == null) {
-      return "redirect:/login";
+      return ResponseEntity.status(401).body("unauthorized");
     }
     String loginId = principal.getName();
-    int result = cartService.addToCart(loginId, perfumeId, 1);
-    if (result == 1) {
-      return "redirect:/cart";
+    boolean result = wishListService.addCart(perfumeId, loginId);
+    if (result) {
+      return ResponseEntity.ok("added");
+    } else {
+      return ResponseEntity.ok("exists");
     }
+  }
+
+  // 위시리스트 삭제
+  @PostMapping("/wishlist/delete-ajax")
+  @ResponseBody
+  public ResponseEntity<String> deleteWishlist(@RequestParam Long perfumeId, Principal principal) {
+    if (principal == null) {
+      return ResponseEntity.status(401).body("unauthorized");
+    }
+    String loginId = principal.getName();
     wishListService.wishperfumeDelete(perfumeId, loginId);
-    return "redirect:/cart";
+    return ResponseEntity.ok("deleted");
   }
 }

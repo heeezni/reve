@@ -205,6 +205,7 @@ public class UserService implements UserDetailsService { // UserDetailsService �
   public void deleteUser(Long userId) {
     // 해당 사용자의 모든 쿠폰 삭제
     couponRepository.deleteAll(couponRepository.findByUser_UserId(userId));
+    pointRepository.deleteById(userId); // 포인트도 삭제
     userRepository.deleteById(userId);
   }
 
@@ -221,5 +222,15 @@ public class UserService implements UserDetailsService { // UserDetailsService �
 
   public int getPointByUserId(Long userId) {
     return pointRepository.getTotalPointByUserId(userId);
+  }
+
+  // 사용자 삭제
+  @Transactional
+  public void delete(String loginId) {
+    User user = userRepository.findByLoginId(loginId).orElseThrow();
+    // 해당 사용자의 모든 쿠폰 삭제
+    couponRepository.deleteAll(couponRepository.findByUser_UserId(user.getUserId()));
+    pointRepository.deleteById(user.getUserId()); // 포인트도 삭제
+    userRepository.deleteById(user.getUserId());
   }
 }
