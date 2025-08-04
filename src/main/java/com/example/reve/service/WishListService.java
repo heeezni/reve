@@ -27,6 +27,7 @@ public class WishListService {
   private final PerfumeRepository perfumeRepository;
   private final ReviewRepository reviewRepository;
   private final UserRepository userRepository;
+  private final CartRepository cartRepository;
 
   // 찜목록에 추가하거나 삭제하는 로직임.
   @Transactional
@@ -140,5 +141,29 @@ public class WishListService {
 
     wishListRepository.deleteAll(toDelete);
     log.info("선택된 찜상품들 삭제 완료");
+  }
+
+  // 카트 추가 서비스
+  public boolean addCart(Long perfumeId, String loginId) {
+    User user =
+        userRepository
+            .findByLoginId(loginId)
+            .orElseThrow(() -> new IllegalArgumentException("로그인이 필요합니다"));
+    Optional<Cart> checkCart =
+        cartRepository.findByUser_UserIdAndPerfume_PerfumeId(user.getUserId(), perfumeId);
+    Perfume perfume =
+        perfumeRepository
+            .findByPerfumeId(perfumeId)
+            .orElseThrow(() -> new IllegalArgumentException("상품이 없습니다"));
+    if (checkCart.isPresent()) {
+      return false;
+    } else {
+      Cart cart = new Cart();
+      cart.setPerfume(perfume);
+      cart.setUser(user);
+      cart.setQuantity(1);
+      cartRepository.save(cart);
+      return true;
+    }
   }
 }
