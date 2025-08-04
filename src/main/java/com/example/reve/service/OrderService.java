@@ -2,9 +2,13 @@ package com.example.reve.service;
 
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
+import com.example.reve.domain.User;
+import com.example.reve.dto.GetOrderDTO;
+import com.example.reve.repository.UserRepository;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -22,6 +26,7 @@ public class OrderService {
 
   private final OrderRepository orderRepository;
   private final OrderItemRepository orderItemRepository;
+  private final UserRepository userRepository;
 
   /** 주문 생성 */
   @Transactional
@@ -118,5 +123,32 @@ public class OrderService {
       return;
     }
     throw new RuntimeException("주문을 찾을 수 없습니다: " + orderId);
+  }
+
+  //주문내역 조회하기
+  public List<GetOrderDTO>getAllOrders(String loginId) {
+    User user= userRepository.findByLoginId(loginId).orElseThrow();
+    List<Order> orders = orderRepository.findByUser_UserIdOrderByCreatedAtDesc(user.getUserId());
+    List<GetOrderDTO> dtoList = new ArrayList<>();
+
+    for (Order order : orders) {
+      GetOrderDTO dto = new GetOrderDTO(); // DTO 객체 생성
+
+      // 엔티티에서 DTO로 값 복사
+      dto.setOrderNumber(order.getOrderNumber());
+      dto.setCreateAt(order.getCreatedAt());
+      dto.setTotalPrice(order.getTotalPrice());
+
+      // 주문 항목이 있다면 첫 번째 향수 객체를 DTO에 넣음
+      List<OrderItem> items = order.getOrderItems();
+      if (items != null && !items.isEmpty()) {
+        OrderItem firstItem = items.get(0);
+        dto.setPerfume(firstItem.getPerfume());
+      }
+
+      // 리스트에 추가
+      dtoList.add(dto);
+    }
+    return dtoList;
   }
 }
