@@ -436,15 +436,13 @@
     if (couponSelect) {
       const selectedOption = couponSelect.options[couponSelect.selectedIndex];
 
-      console.log("선택된 쿠폰 value:", selectedOption?.value);
-      console.log("선택된 쿠폰 할인율:", selectedOption?.getAttribute('data-discount-rate'));
-
       if (selectedOption) {
-        if (selectedOption.value === "none" || selectedOption.value === "") {
-          couponDiscountRate = 0;  // 쿠폰 미적용 옵션 처리
+        const discountRateStr = selectedOption.getAttribute('data-discount-rate')?.trim();
+
+        if (discountRateStr && !isNaN(discountRateStr)) {
+          couponDiscountRate = Number(discountRateStr);
         } else {
-          const discountRateStr = selectedOption.getAttribute('data-discount-rate');
-          couponDiscountRate = discountRateStr ? parseFloat(discountRateStr) : 0;
+          couponDiscountRate = 0; // 할인율이 없는 경우
         }
       }
     }
@@ -452,7 +450,6 @@
     const couponDiscountAmount = totalPriceAfterDiscount * (couponDiscountRate / 100);
     const totalDiscountCombined = totalDiscount + couponDiscountAmount;
     const totalAfterCoupon = totalPriceAfterDiscount - couponDiscountAmount;
-
     const deliveryFee = totalAfterCoupon >= 50000 ? 0 : 3000;
     const totalPayment = totalAfterCoupon + deliveryFee;
 
@@ -511,7 +508,10 @@
     // 쿠폰 선택 변경 시 주문 요약 갱신
     const couponSelect = document.querySelector('select[name="selectedCoupon"]');
     if (couponSelect) {
-      couponSelect.addEventListener('change', updateOrderSummary);
+      couponSelect.addEventListener('change', (event) => {
+        event.preventDefault();  // 폼 제출 방지 (필요하면)
+        updateOrderSummary();
+      });
     }
 
     document.querySelectorAll('.price-per-item').forEach(el => {
