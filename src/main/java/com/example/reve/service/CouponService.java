@@ -148,6 +148,10 @@ public class CouponService {
     return (int) couponRepository.countUsableCoupons(userId);
   }
 
+  public long getTotalCouponCount() {
+    return couponRepository.count();
+  }
+
   // 쿠폰 발급 메서드
   public void saveCoupon(
       Coupon coupon, User user, LocalDate expiresDate, LocalDate validFrom, LocalDate issuedAt) {
