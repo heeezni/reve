@@ -54,4 +54,10 @@ public class MemberController {
     pointService.getPoint(userId, 1000);
     return "index";
   }
+
+  @PostMapping("/member/delete")
+  public String deleteMember(@RequestParam Long userId) {
+    userService.deleteUser(userId);
+    return "index";
+  }
 }
