@@ -57,8 +57,12 @@ public class CartController {
       Long userId = user.getUserId();
       List<CouponDTO> coupons = couponService.getCoupon(userId);
       model.addAttribute("coupons", coupons);
+
+      int userPoint = userService.getPointByUserId(userId);
+      model.addAttribute("userPoint", userPoint);
     } else {
       model.addAttribute("coupons", List.of());
+      model.addAttribute("userPoint", 0); // 포인트가 없으면 0처리
     }
 
     CartFormDTO form = new CartFormDTO(); // DTO는 new 해도 됨
