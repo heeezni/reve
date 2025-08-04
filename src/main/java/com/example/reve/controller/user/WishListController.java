@@ -89,10 +89,11 @@ public class WishListController {
     }
     String loginId = principal.getName();
     try {
-      int result = cartService.addToCart(loginId, perfumeId, 1);
+      cartService.addToCart(loginId, perfumeId, 1);
       wishListService.wishperfumeDelete(perfumeId, loginId);
     } catch (Exception e) {
-      redirectAttributes.addFlashAttribute("error", "이미 장바구니에 있는 상품 입니다");
+      redirectAttributes.addFlashAttribute("error", "이미 장바구니에 있는 상품입니다");
+      return "redirect:/mypage/wishlist";
     }
     return "redirect:/mypage/wishlist";
   }
