@@ -33,8 +33,9 @@ public class SecurityConfig {
                         "/css/**",
                         "/js/**",
                         "/images/**",
-                        "/uploads/**",
                         "/webjars/**",
+                        "/dist/**",
+                        "/plugins/**",
                         "/member/check/**",
                         "/favicon.ico")
                     .permitAll()
