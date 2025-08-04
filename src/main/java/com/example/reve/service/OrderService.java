@@ -150,6 +150,7 @@ public class OrderService {
       GetOrderDTO dto = new GetOrderDTO(); // DTO 객체 생성
 
       // 엔티티에서 DTO로 값 복사
+      dto.setOrderId(order.getOrderId());
       dto.setOrderNumber(order.getOrderNumber());
       dto.setCreateAt(order.getCreatedAt());
       dto.setTotalPrice(order.getTotalPrice());

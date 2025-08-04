@@ -76,7 +76,7 @@
               <div class="flex items-center justify-between">
                 <div>
                   <p class="text-sm font-medium text-gray-600">쿠폰</p>
-                  <p class="text-2xl font-bold text-gray-800" th:text="${countCoupon}"></p>
+                  <p class="text-2xl font-bold text-gray-800" th:text="${countCoupon} + ' ' + 개"></p>
                 </div>
                 <div
                   class="w-12 h-12 bg-green-100 rounded-full flex items-center justify-center"
@@ -116,7 +116,7 @@
               <div class="flex items-center justify-between">
                 <div>
                   <p class="text-sm font-medium text-gray-600">주문내역</p>
-                  <p class="text-2xl font-bold text-gray-800" th:text="${#lists.size(orderList)} + '건'"></p>
+                  <p class="text-2xl font-bold text-gray-800" th:text="${#lists.size(orderList)} + ' 건'"></p>
                 </div>
                 <div
                   class="w-12 h-12 bg-yellow-100 rounded-full flex items-center justify-center"
@@ -168,7 +168,7 @@
                           <p class="text-md text-gray-700" th:text="'주문번호: ' + ${order.orderNumber}"></p>
                           <p class="text-md font-bold text-gray-800" th:text="${#numbers.formatDecimal(order.totalPrice, 0, 'COMMA', 0, 'POINT')} + '원'"></p>
                         </div>
-                        <a th:href="@{'/mypage/order/' + ${order.orderNumber}}" class="text-sm text-blue-600 hover:underline mt-2 inline-block">상세보기 →</a>
+                        <a th:href="@{'/mypage/order-detail/' + ${order.orderId}}" class="text-sm text-blue-600 hover:underline mt-2 inline-block">상세보기 →</a>
                       </div>
                     </th:block>
                     <!-- 주문내역-->

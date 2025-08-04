@@ -8,6 +8,7 @@ import lombok.Data;
 
 @Data
 public class GetOrderDTO {
+  private Long orderId;
   private String orderNumber;
   private LocalDateTime createAt;
   private Perfume perfume;
