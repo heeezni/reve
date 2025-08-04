@@ -9,6 +9,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 
+import com.example.reve.dto.*;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 
@@ -25,10 +26,6 @@ import org.springframework.web.multipart.MultipartFile;
 import com.example.reve.domain.CustomUserDetails;
 import com.example.reve.domain.Order;
 import com.example.reve.domain.OrderItem;
-import com.example.reve.dto.CouponDTO;
-import com.example.reve.dto.NewPasswordDTO;
-import com.example.reve.dto.UpdateProfileDTO;
-import com.example.reve.dto.WishListShowDTO;
 import com.example.reve.service.CouponService;
 import com.example.reve.service.OrderService;
 import com.example.reve.service.PointService;
@@ -320,5 +317,14 @@ public class MypageController {
     }
 
     return response;
+  }
+
+  // 주문내역 조회하기
+  @GetMapping("/oderList")
+  public String oderList(Model model, Principal principal) {
+    String loginId = principal.getName();
+    List<GetOrderDTO>orderList = orderService.getAllOrders(loginId);
+    model.addAttribute("orderList", orderList);
+    return "user/mypage/index";
   }
 }
