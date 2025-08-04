@@ -6,7 +6,7 @@
     <title>관리자 대시보드</title>
 
     <link rel="icon" th:href="@{/images/favicon.ico}" type="image/x-icon">
-    <th:block th:replace="fragments/admin_common_scripts :: adminCommonCss"></th:block>
+    <th:block th:replace="~{fragments/admin_common_scripts :: adminCommonCss}"></th:block>
     <th:block layout:fragment="css"></th:block>
 </head>
 <body class="hold-transition sidebar-mini layout-fixed">
@@ -24,7 +24,7 @@
     <!-- /.navbar -->
 
     <!-- Main Sidebar Container -->
-    <div th:replace="fragments/admin_sidebar :: adminSidebar"></div>
+    <div th:replace="~{fragments/admin_sidebar :: adminSidebar}"></div>
 
     <!-- Content Wrapper. Contains page content -->
     <div class="content-wrapper" layout:fragment="content">
@@ -32,12 +32,12 @@
     </div>
     <!-- /.content-wrapper -->
 
-        <div th:replace="fragments/admin_footer :: adminFooter"></div>
+        <div th:replace="~{fragments/admin_footer :: adminFooter}"></div>
 
 </div>
 <!-- ./wrapper -->
 
-    <th:block th:replace="fragments/admin_common_scripts :: adminCommonJs"></th:block>
+    <th:block th:replace="~{fragments/admin_common_scripts :: adminCommonJs}"></th:block>
     <th:block layout:fragment="script"></th:block>
 </body>
 </html>
