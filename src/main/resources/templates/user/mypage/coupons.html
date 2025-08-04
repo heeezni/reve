@@ -30,7 +30,7 @@
                 && coupon.expiresAt.isAfter(#temporals.createNow)}">
                 <div class="px-6 py-4">
                   <div class="grid grid-cols-12 gap-4 items-center">
-                    <div class="col-span-1 text-center text-sm text-gray-600">번호</div>
+                    <div class="col-span-1 text-center text-sm text-gray-600 coupon-index">1</div>
                     <div class="col-span-1 text-center">
                       <span class="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-green-100 text-green-800" th:text="${coupon.couponName}"></span>
                     </div>
@@ -104,6 +104,13 @@
           });
         });
       });
+
+      const indexElements = document.querySelectorAll(".coupon-index");
+      let count = 1;
+      indexElements.forEach(el => {
+        el.textContent = count++;
+      });
+
     </script>
   </body>
 </html>
