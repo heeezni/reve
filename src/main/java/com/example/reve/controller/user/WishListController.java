@@ -121,26 +121,26 @@ public class WishListController {
   @ResponseBody
   public ResponseEntity addCart(@RequestParam Long perfumeId, Principal principal) {
     if (principal == null) {
-      return  ResponseEntity.status(401).body("unauthorized");
+      return ResponseEntity.status(401).body("unauthorized");
     }
     String loginId = principal.getName();
     boolean result = wishListService.addCart(perfumeId, loginId);
-    if (result){
+    if (result) {
       return ResponseEntity.ok("added");
-    }else {
-    return ResponseEntity.ok("exists");
+    } else {
+      return ResponseEntity.ok("exists");
     }
   }
-  //위시리스트 삭제
+
+  // 위시리스트 삭제
   @PostMapping("/wishlist/delete-ajax")
   @ResponseBody
   public ResponseEntity<String> deleteWishlist(@RequestParam Long perfumeId, Principal principal) {
-    if(principal == null) {
+    if (principal == null) {
       return ResponseEntity.status(401).body("unauthorized");
     }
     String loginId = principal.getName();
     wishListService.wishperfumeDelete(perfumeId, loginId);
     return ResponseEntity.ok("deleted");
   }
-
 }

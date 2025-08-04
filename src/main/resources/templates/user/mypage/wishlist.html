@@ -92,12 +92,13 @@
 
                             <!-- 장바구니/바로구매 -->
                             <div class="flex items-center space-x-2">
-                              <form th:action="@{/wishlist/addCart}" method="post">
-                                <input type="hidden" name="perfumeId" th:value="${getWishList.perfumeId}" />
-                                <button class="bg-gray-800 text-white px-4 py-2 rounded-md hover:bg-gray-700 transition-colors text-sm font-medium" type="submit">
+                                <button class="add-to-cart-btn bg-gray-800 text-white px-4 py-2 rounded-md hover:bg-gray-700 transition-colors text-sm font-medium"
+                                        type="button"
+                                        th:data-perfume-id="${getWishList.perfumeId}"
+                                        th:data-perfume-name="${getWishList.perfumeName}"
+                                >
                                   장바구니 담기
                                 </button>
-                              </form>
                               <button class="border border-gray-300 text-gray-700 px-4 py-2 rounded-md hover:bg-gray-50 transition-colors text-sm font-medium">
                                 바로구매
                               </button>
@@ -380,48 +381,44 @@
           deleteModal.show(`${checked.length}개 상품을 삭제하시겠습니까?`, selectedForm);
         });
 
-        // 바로구매 버튼 → 단순 알림 모달
-        document.querySelectorAll("button").forEach(btn => {
-          if (btn.textContent.includes("바로구매")) {
-            btn.addEventListener("click", () => {
-              if (hasServerError) {
-                alertModal.show(errorValue);
-                return;
+        // 장바구니 버튼
+        document.querySelectorAll(".add-to-cart-btn").forEach(btn => {
+          btn.addEventListener("click", async  e => {
+            const perfumeId = btn.dataset.perfumeId;
+            const perfumeName = btn.dataset.perfumeName;
+            try {
+              const res = await fetch("/wishlist/addCart-ajax", {
+                method: "post",
+                headers: {"Content-Type": "application/x-www-form-urlencoded"},
+                body: new URLSearchParams({perfumeId})
+              });
+              const status = await res.text();
+              if(status === "added"){
+                cartModal.show(`"${perfumeName}"을 장바구니에 추가했습니다<br>삭제할까요?`)
+              }else if(status === "exists"){
+                cartModal.show(`"${perfumeName}"가 이미 장바구니 안에 있습니다<br>삭제할까요?`)
+              }else if(status === "unauthorized"){
+                cartModal.show("로그인이 필요합니다")
               }
-              const item = btn.closest(".wishlist-item");
-              const productName = item?.querySelector("h3 a")?.textContent.trim() || "상품";
-              alertModal.show(`"${productName}" 바로구매 페이지로 이동합니다.`);
-            });
-          }
-        });
-
-        document.querySelectorAll(".remove-wishlist").forEach((btn) => {
-          btn.addEventListener("click", function (e) {
-            if (hasServerError) {
-              alertModal.show(errorValue);
-              return;
+              //삭제 여부
+              const confirmBtn  = document.getElementById("confirmCartBtn");
+              confirmBtn.onclick= async () =>{
+                const deleteRes = await fetch("/wishlist/delete-ajax", {
+                  method: "POST",
+                  headers: { "Content-Type": "application/x-www-form-urlencoded" },
+                  body: new URLSearchParams({ perfumeId })
+                });
+                const deleteStatus = await deleteRes.text();
+                if (deleteStatus === "deleted") {
+                  location.reload(); // 새로고침으로 위시리스트 반영
+                } else {
+                  alertModal.show("삭제에 실패했습니다.");
+                }
+              };
+            }catch (err){
+              console.error();
             }
-            e.preventDefault();
-            const form = this.closest("form");
-            const item = this.closest(".wishlist-item");
-            const productName = item?.querySelector("h3 a")?.textContent.trim() || "상품";
-            deleteModal.show(`"${productName}"을(를) 위시리스트에서<br>삭제하시겠습니까?`, form);
-          });
-        });
-
-        // 장바구니 버튼 → 모달 확인 후 form submit
-        document.querySelectorAll("form[action='/wishlist/addCart'] button[type='submit']").forEach(btn => {
-          btn.addEventListener("click", e => {
-            if (hasServerError) {
-              alertModal.show(errorValue);
-              return;
-            }
-            e.preventDefault();
-            const form = btn.closest("form");
-            const item = btn.closest(".wishlist-item");
-            const productName = item?.querySelector("h3 a")?.textContent.trim() || "상품";
-            cartModal.show(`"${productName}"을(를) 장바구니에 추가하시겠습니까?`, form);
-          });
+          })
         });
 
         // 페이지 상태 초기화
