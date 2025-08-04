@@ -13,12 +13,10 @@ import com.example.reve.service.PointService;
 import com.example.reve.service.UserService;
 
 import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
 
 @Controller
 @RequestMapping("/member")
 @RequiredArgsConstructor
-@Slf4j
 public class MemberController {
   private final UserService userService;
   private final CouponService couponService;
@@ -50,7 +48,6 @@ public class MemberController {
 
   @PostMapping("/signup")
   public String signup(CreateUserDTO create) {
-    log.info("가입 정보 {}", create);
     Long userId = userService.signup(create);
     couponService.newUserCoupon(userId);
     pointService.getPoint(userId, 1000);

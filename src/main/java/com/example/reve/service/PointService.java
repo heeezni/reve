@@ -19,7 +19,6 @@ public class PointService {
 
   // 적립금 발급
   public void getPoint(Long userId, int pointAmount) {
-    log.info("적립급 발급 서비스 호출");
     User user = userRepository.findById(userId).orElseThrow();
     Point point = pointRepository.findByUser_UserId(userId).orElse(null);
     if (point == null) {
@@ -38,7 +37,6 @@ public class PointService {
   public Integer getPointAmount(String loginId) {
     User user = userRepository.findByLoginId(loginId).orElseThrow();
     log.info(
-        "회원 {} 님이 소유한 적립급 : {}",
         user.getLoginId(),
         pointRepository.findPointAmountByUserId(user.getUserId()).orElse(0));
     return pointRepository.findPointAmountByUserId(user.getUserId()).orElse(0);

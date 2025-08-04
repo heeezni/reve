@@ -117,7 +117,6 @@ public class WishListService {
 
   // 찜 상품 삭제
   public void wishperfumeDelete(Long perfumeId, String loginId) {
-    log.info("찜 상품 삭제 서비스 호출");
     User user = userRepository.findByLoginId(loginId).orElseThrow();
     Optional<WishList> wish =
         wishListRepository.findByUser_UserIdAndPerfume_PerfumeId(user.getUserId(), perfumeId);
@@ -129,7 +128,6 @@ public class WishListService {
 
   // 찜 상품들 삭제
   public void wishlistDelete(List<Long> perfumeIds, String loginId) {
-    log.info("선택한 찜상품들 삭제 서비스 호출");
     User user = userRepository.findByLoginId(loginId).orElseThrow();
 
     List<WishList> wishLists = wishListRepository.findByUser_UserId(user.getUserId());
@@ -140,7 +138,6 @@ public class WishListService {
             .collect(Collectors.toList());
 
     wishListRepository.deleteAll(toDelete);
-    log.info("선택된 찜상품들 삭제 완료");
   }
 
   // 카트 추가 서비스
