@@ -9,7 +9,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 
-import com.example.reve.dto.*;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 
@@ -26,6 +25,7 @@ import org.springframework.web.multipart.MultipartFile;
 import com.example.reve.domain.CustomUserDetails;
 import com.example.reve.domain.Order;
 import com.example.reve.domain.OrderItem;
+import com.example.reve.dto.*;
 import com.example.reve.service.CouponService;
 import com.example.reve.service.OrderService;
 import com.example.reve.service.PointService;
@@ -54,6 +54,10 @@ public class MypageController {
       model.addAttribute("mypage", userService.selectMypage(loginId));
       model.addAttribute("wish", wishListService.getCount(loginId));
       model.addAttribute("point", pointService.getPointAmount(loginId));
+
+      List<GetOrderDTO> orderList = orderService.getAllOrders(loginId);
+      model.addAttribute("orderList", orderList);
+
       int result = couponService.countCoupon(loginId);
       model.addAttribute("countCoupon", result);
       // mypage.userId == currentUserId 조건으로 수정/삭제 버튼 렌더링
@@ -317,14 +321,5 @@ public class MypageController {
     }
 
     return response;
-  }
-
-  // 주문내역 조회하기
-  @GetMapping("/oderList")
-  public String oderList(Model model, Principal principal) {
-    String loginId = principal.getName();
-    List<GetOrderDTO>orderList = orderService.getAllOrders(loginId);
-    model.addAttribute("orderList", orderList);
-    return "user/mypage/index";
   }
 }

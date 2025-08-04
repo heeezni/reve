@@ -6,22 +6,24 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
-import com.example.reve.domain.User;
-import com.example.reve.dto.GetOrderDTO;
-import com.example.reve.repository.UserRepository;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.example.reve.domain.Order;
 import com.example.reve.domain.OrderItem;
+import com.example.reve.domain.User;
+import com.example.reve.dto.GetOrderDTO;
 import com.example.reve.repository.OrderItemRepository;
 import com.example.reve.repository.OrderRepository;
+import com.example.reve.repository.UserRepository;
 
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 
 @Service
 @RequiredArgsConstructor
 @Transactional(readOnly = true)
+@Slf4j
 public class OrderService {
 
   private final OrderRepository orderRepository;
@@ -125,9 +127,9 @@ public class OrderService {
     throw new RuntimeException("주문을 찾을 수 없습니다: " + orderId);
   }
 
-  //주문내역 조회하기
-  public List<GetOrderDTO>getAllOrders(String loginId) {
-    User user= userRepository.findByLoginId(loginId).orElseThrow();
+  // 주문내역 조회하기
+  public List<GetOrderDTO> getAllOrders(String loginId) {
+    User user = userRepository.findByLoginId(loginId).orElseThrow();
     List<Order> orders = orderRepository.findByUser_UserIdOrderByCreatedAtDesc(user.getUserId());
     List<GetOrderDTO> dtoList = new ArrayList<>();
 
@@ -149,6 +151,7 @@ public class OrderService {
       // 리스트에 추가
       dtoList.add(dto);
     }
+    log.info("dtoList: {}", dtoList);
     return dtoList;
   }
 }
