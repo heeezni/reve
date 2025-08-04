@@ -179,11 +179,12 @@
                             class="w-full border border-gray-300 rounded-md px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-gray-800 focus:border-transparent"
                             th:field="*{selectedCoupon}">
                       <option value="" disabled selected>쿠폰을 선택하세요</option>
+                      <option value="none">쿠폰을 적용하지 않음</option>
                       <option
                               th:each="coupon : ${coupons}"
                               th:value="${coupon.couponId}"
                               th:text="${coupon.couponName + ' (' + coupon.discountRate + '% 할인, ' + #temporals.format(coupon.expiresAt, 'yyyy-MM-dd') + '까지)'}"
-                              th:attr="data-discount-rate=${coupon.discountRate}">
+                              th:data-discount-rate="${coupon.discountRate}">
                       </option>
                     </select>
                   </form>
@@ -434,8 +435,18 @@
     let couponDiscountRate = 0;
     if (couponSelect) {
       const selectedOption = couponSelect.options[couponSelect.selectedIndex];
-      const discountRateStr = selectedOption?.getAttribute('data-discount-rate');
-      couponDiscountRate = discountRateStr ? parseFloat(discountRateStr) : 0;
+
+      console.log("선택된 쿠폰 value:", selectedOption?.value);
+      console.log("선택된 쿠폰 할인율:", selectedOption?.getAttribute('data-discount-rate'));
+
+      if (selectedOption) {
+        if (selectedOption.value === "none" || selectedOption.value === "") {
+          couponDiscountRate = 0;  // 쿠폰 미적용 옵션 처리
+        } else {
+          const discountRateStr = selectedOption.getAttribute('data-discount-rate');
+          couponDiscountRate = discountRateStr ? parseFloat(discountRateStr) : 0;
+        }
+      }
     }
 
     const couponDiscountAmount = totalPriceAfterDiscount * (couponDiscountRate / 100);
@@ -496,6 +507,12 @@
   window.addEventListener('DOMContentLoaded', () => {
     updateOrderSummary();
     toggleEmptyCartState();
+
+    // 쿠폰 선택 변경 시 주문 요약 갱신
+    const couponSelect = document.querySelector('select[name="selectedCoupon"]');
+    if (couponSelect) {
+      couponSelect.addEventListener('change', updateOrderSummary);
+    }
 
     document.querySelectorAll('.price-per-item').forEach(el => {
       const num = extractNumber(el.textContent);
