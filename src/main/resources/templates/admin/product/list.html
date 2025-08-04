@@ -1,166 +1,137 @@
 <!DOCTYPE html>
-<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<html lang="en" xmlns:th="http://www.thymeleaf.org" xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout" layout:decorate="~{fragments/admin_layout}">
 <head>
-    <meta charset="utf-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>상품 목록</title>
-
-    <th:block th:replace="fragments/admin_common_scripts :: adminCommonCss"></th:block>
+    <th:block layout:fragment="css">
+        <link rel="stylesheet" href="/css/admin_custom.css">
+    </th:block>
 </head>
-<body class="hold-transition sidebar-mini layout-fixed">
-<div class="wrapper">
-
-    <!-- Navbar -->
-    <nav class="main-header navbar navbar-expand navbar-white navbar-light">
-        <!-- Left navbar links -->
-        <ul class="navbar-nav">
-            <li class="nav-item">
-                <a class="nav-link" data-widget="pushmenu" href="#" role="button"><i class="fas fa-bars"></i></a>
-            </li>
-        </ul>
-
-        <!-- Right navbar links -->
-        <ul class="navbar-nav ml-auto">
-        </ul>
-    </nav>
-    <!-- /.navbar -->
-
-    <!-- Main Sidebar Container -->
-    <div th:replace="fragments/admin_sidebar :: adminSidebar"></div>
-
-    <!-- Content Wrapper. Contains page content -->
-    <div class="content-wrapper">
-        <!-- Content Header (Page header) -->
-        <div class="content-header">
-            <div class="container-fluid">
-                <div class="row mb-2">
-                    <div class="col-sm-6">
-                        <h1 class="m-0">상품 목록</h1>
-                    </div><!-- /.col -->
-                    <div class="col-sm-6">
-                        <ol class="breadcrumb float-sm-right">
-                            <li class="breadcrumb-item"><a th:href="@{/admin/dashboard}">Home</a></li>
-                            <li class="breadcrumb-item active">상품 목록</li>
-                        </ol>
-                    </div><!-- /.col -->
-                </div><!-- /.row -->
-            </div><!-- /.container-fluid -->
-        </div>
-        <!-- /.content-header -->
-
-        <!-- Main content -->
-        <section class="content">
-            <div class="container-fluid">
-                <div class="row">
-                    <div class="col-12">
-                        <div class="card">
-                            <div class="card-header">
-                                <h3 class="card-title">상품 정보</h3>
-                            </div>
-                            <!-- /.card-header -->
-                            <div class="card-body">
-                                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
-                                    <div>
-                                        <a th:href="@{/admin/dashboard}" class="add-button" style="background-color: #6c757d; margin-right: 10px;">관리자 대시보드로 돌아가기</a>
-                                        <a th:href="@{/shop/list}" class="shop-list-button">쇼핑몰 상품 목록보기</a>
-                                    </div>
-                                    <div>
-                                        <a th:href="@{/admin/shop/regist}" class="add-button">새 상품 추가</a>
-                                    </div>
-                                </div>
-
-                                <table id="example2" class="table table-bordered table-hover">
-                                    <thead>
-                                    <tr>
-                                        <th><input type="checkbox" onclick="toggleAll(this)" aria-label="모두 선택"></th>
-                                        <th>ID</th>
-                                        <th>상품명</th>
-                                        <th>향</th>
-                                        <th>재고</th>
-                                        <th>가격</th>
-                                        <th>할인율</th>
-                                        <th>이미지</th>
-                                        <th>액션</th>
-                                    </tr>
-                                    </thead>
-                                    <tbody>
-                                    <tr th:each="perfume : ${perfumes}">
-                                        <td><input type="checkbox" name="perfumeIdList" th:value="${perfume.perfumeId}" aria-label="상품 선택"></td>
-                                        <td th:text="${perfume.perfumeId}"></td>
-                                        <td th:text="${perfume.perfumeName}"></td>
-                                        <td th:text="${perfume.scent}"></td>
-                                        <td th:text="${perfume.stock}"></td>
-                                        <td th:text="${perfume.price}"></td>
-                                        <td th:text="${perfume.discount}"></td>
-                                        <td><img th:src="${perfume.imageUrl}" alt="상품 이미지" style="width: 50px; height: 50px; object-fit: cover;"></td>
-                                        <td class="actions">
-                                            <a th:href="@{/admin/shop/edit/{perfumeId}(perfumeId=${perfume.perfumeId})}">수정</a>
-                                            <form th:action="@{/admin/shop/delete}" method="post" class="delete-form" onsubmit="return confirm('정말로 삭제하시겠습니까?');">
-                                                <input type="hidden" name="id" th:value="${perfume.perfumeId}">
-                                                <button type="submit" class="delete-button">삭제</button>
-                                            </form>
-                                        </td>
-                                    </tr>
-                                    </tbody>
-                                </table>
-
-                                <div class="bulk-actions">
-                                    <button type="button" onclick="submitBulkDelete();">선택된 상품 삭제</button>
-                                </div>
-                            </div>
-                            <!-- /.card-body -->
-                        </div>
-                        <!-- /.card -->
-                    </div>
-                    <!-- /.col -->
-                </div>
-                <!-- /.row -->
-            </div><!-- /.container-fluid -->
-        </section>
-        <!-- /.content -->
+<body>
+<div layout:fragment="content">
+    <!-- Content Header (Page header) -->
+    <div class="content-header">
+        <div class="container-fluid">
+            <div class="row mb-2">
+                <div class="col-sm-6">
+                    <h1 class="m-0">상품 목록</h1>
+                </div><!-- /.col -->
+                <div class="col-sm-6">
+                    <ol class="breadcrumb float-sm-right">
+                        <li class="breadcrumb-item"><a th:href="@{/admin/dashboard}">Home</a></li>
+                        <li class="breadcrumb-item active">상품 목록</li>
+                    </ol>
+                </div><!-- /.col -->
+            </div><!-- /.row -->
+        </div><!-- /.container-fluid -->
     </div>
-    <!-- /.content-wrapper -->
+    <!-- /.content-header -->
 
-    <div th:replace="fragments/admin_footer :: adminFooter"></div>
+    <!-- Main content -->
+    <section class="content">
+        <div class="container-fluid">
+            <div class="row">
+                <div class="col-12">
+                    <div class="card">
+                        <div class="card-header">
+                            <h3 class="card-title">상품 정보</h3>
+                        </div>
+                        <!-- /.card-header -->
+                        <div class="card-body">
+                            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
+                                <div>
+                                    <a th:href="@{/admin/dashboard}" class="add-button" style="background-color: #6c757d; margin-right: 10px;">관리자 대시보드로 돌아가기</a>
+                                    <a th:href="@{/shop/list}" class="shop-list-button">쇼핑몰 상품 목록보기</a>
+                                </div>
+                                <div>
+                                    <a th:href="@{/admin/shop/regist}" class="add-button">새 상품 추가</a>
+                                </div>
+                            </div>
 
+                            <table id="example2" class="table table-bordered table-hover">
+                                <thead>
+                                <tr>
+                                    <th><input type="checkbox" onclick="toggleAll(this)" aria-label="모두 선택"></th>
+                                    <th>ID</th>
+                                    <th>상품명</th>
+                                    <th>향</th>
+                                    <th>재고</th>
+                                    <th>가격</th>
+                                    <th>할인율</th>
+                                    <th>이미지</th>
+                                    <th>액션</th>
+                                </tr>
+                                </thead>
+                                <tbody>
+                                <tr th:each="perfume : ${perfumes}">
+                                    <td><input type="checkbox" name="perfumeIdList" th:value="${perfume.perfumeId}" aria-label="상품 선택"></td>
+                                    <td th:text="${perfume.perfumeId}"></td>
+                                    <td th:text="${perfume.perfumeName}"></td>
+                                    <td th:text="${perfume.scent}"></td>
+                                    <td th:text="${perfume.stock}"></td>
+                                    <td th:text="${perfume.price}"></td>
+                                    <td th:text="${perfume.discount}"></td>
+                                    <td><img th:src="${perfume.imageUrl}" alt="상품 이미지" style="width: 50px; height: 50px; object-fit: cover;"></td>
+                                    <td class="actions">
+                                        <a th:href="@{/admin/shop/edit/{perfumeId}(perfumeId=${perfume.perfumeId})}">수정</a>
+                                        <form th:action="@{/admin/shop/delete}" method="post" class="delete-form" onsubmit="return confirm('정말로 삭제하시겠습니까?');">
+                                            <input type="hidden" name="id" th:value="${perfume.perfumeId}">
+                                            <button type="submit" class="delete-button">삭제</button>
+                                        </form>
+                                    </td>
+                                </tr>
+                                </tbody>
+                            </table>
+
+                            <div class="bulk-actions">
+                                <button type="button" onclick="submitBulkDelete();">선택된 상품 삭제</button>
+                            </div>
+                        </div>
+                        <!-- /.card-body -->
+                    </div>
+                    <!-- /.card -->
+                </div>
+                <!-- /.col -->
+            </div>
+            <!-- /.row -->
+        </div><!-- /.container-fluid -->
+    </section>
+    <!-- /.content -->
 </div>
-<!-- ./wrapper -->
-
-    <th:block th:replace="fragments/admin_common_scripts :: adminCommonJs"></th:block>
-
-<script>
-    function toggleAll(source) {
-        checkboxes = document.querySelectorAll('input[name="perfumeIdList"]');
-        for(var i=0, n=checkboxes.length;i<n;i++) {
-            checkboxes[i].checked = source.checked;
+<th:block layout:fragment="script">
+    <script>
+        function toggleAll(source) {
+            checkboxes = document.querySelectorAll('input[name="perfumeIdList"]');
+            for(var i=0, n=checkboxes.length;i<n;i++) {
+                checkboxes[i].checked = source.checked;
+            }
         }
-    }
 
-    function submitBulkDelete() {
-        const checkedItems = document.querySelectorAll('input[name="perfumeIdList"]:checked');
-        if (checkedItems.length === 0) {
-            alert('삭제할 상품을 선택해주세요.');
+        function submitBulkDelete() {
+            const checkedItems = document.querySelectorAll('input[name="perfumeIdList"]:checked');
+            if (checkedItems.length === 0) {
+                alert('삭제할 상품을 선택해주세요.');
+                return false;
+            }
+
+            if (confirm('선택된 상품들을 정말로 삭제하시겠습니까?')) {
+                const form = document.createElement('form');
+                form.method = 'post';
+                form.action = '/admin/shop/delete';
+
+                checkedItems.forEach(item => {
+                    const input = document.createElement('input');
+                    input.type = 'hidden';
+                    input.name = 'perfumeIdList';
+                    input.value = item.value;
+                    form.appendChild(input);
+                });
+
+                document.body.appendChild(form);
+                form.submit();
+            }
             return false;
         }
-
-        if (confirm('선택된 상품들을 정말로 삭제하시겠습니까?')) {
-            const form = document.createElement('form');
-            form.method = 'post';
-            form.action = '/admin/shop/delete';
-
-            checkedItems.forEach(item => {
-                const input = document.createElement('input');
-                input.type = 'hidden';
-                input.name = 'perfumeIdList';
-                input.value = item.value;
-                form.appendChild(input);
-            });
-
-            document.body.appendChild(form);
-            form.submit();
-        }
-        return false;
-    }
-</script>
+    </script>
+</th:block>
 </body>
 </html>
