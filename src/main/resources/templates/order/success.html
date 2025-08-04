@@ -61,7 +61,12 @@
               <div class="space-y-4">
                 <div>
                   <span class="text-gray-600">배송지</span>
-                  <p class="font-medium mt-1">홍길동 (010-1234-5678)</p>
+                  <p
+                    class="font-medium mt-1"
+                    th:text="${userName} + ' (' + ${userPhone} + ')'"
+                  >
+                    홍길동 (010-1234-5678)
+                  </p>
                   <p class="text-sm text-gray-600">
                     서울특별시 강남구 테헤란로 123
                   </p>

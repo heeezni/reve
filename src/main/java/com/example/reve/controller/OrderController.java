@@ -42,6 +42,7 @@ public class OrderController {
       @RequestParam(value = "deliveryFee", required = false) String deliveryFee,
       @RequestParam(value = "discountAmount", required = false) String discountAmount,
       @RequestParam(value = "itemCount", required = false) String itemCount,
+      @AuthenticationPrincipal CustomUserDetails customUserDetails,
       Model model) {
 
     // 테스트용 데이터 (파라미터가 없을 경우)
@@ -53,6 +54,18 @@ public class OrderController {
     model.addAttribute("orderId", orderId);
     model.addAttribute("totalAmount", finalTotalAmount);
     model.addAttribute("orderDate", orderDate);
+
+    // 현재 로그인한 사용자 정보 추가
+    if (customUserDetails != null && customUserDetails.getUser() != null) {
+      model.addAttribute("userName", customUserDetails.getUser().getName());
+      model.addAttribute("userPhone", customUserDetails.getUser().getPhone());
+      model.addAttribute("userEmail", customUserDetails.getUser().getEmail());
+    } else {
+      // 로그인하지 않은 경우 기본값
+      model.addAttribute("userName", "홍길동");
+      model.addAttribute("userPhone", "010-1234-5678");
+      model.addAttribute("userEmail", "hong@example.com");
+    }
 
     // 장바구니에서 전달받은 상품 정보 처리
     if (itemsJson != null && !itemsJson.isEmpty()) {
@@ -324,6 +337,18 @@ public class OrderController {
       model.addAttribute("totalAmount", String.format("%,d원", totalAmount));
       model.addAttribute("paymentKey", paymentKey);
       model.addAttribute("deliveryDate", deliveryDate);
+
+      // 현재 로그인한 사용자 정보 추가
+      if (customUserDetails != null && customUserDetails.getUser() != null) {
+        model.addAttribute("userName", customUserDetails.getUser().getName());
+        model.addAttribute("userPhone", customUserDetails.getUser().getPhone());
+        model.addAttribute("userEmail", customUserDetails.getUser().getEmail());
+      } else {
+        // 로그인하지 않은 경우 기본값
+        model.addAttribute("userName", "홍길동");
+        model.addAttribute("userPhone", "010-1234-5678");
+        model.addAttribute("userEmail", "hong@example.com");
+      }
 
     } catch (Exception e) {
       // 오류 발생 시 상세 로그 출력

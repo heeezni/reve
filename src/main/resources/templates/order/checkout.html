@@ -79,7 +79,12 @@
                     <span class="ml-2 text-sm font-medium">기본 배송지</span>
                   </label>
                   <div class="mt-2 ml-6 p-3 bg-gray-50 rounded-md">
-                    <p class="text-sm text-gray-800">홍길동 (010-1234-5678)</p>
+                    <p
+                      class="text-sm text-gray-800"
+                      th:text="${userName} + ' (' + ${userPhone} + ')'"
+                    >
+                      홍길동 (010-1234-5678)
+                    </p>
                     <p class="text-sm text-gray-600">
                       서울특별시 강남구 테헤란로 123
                     </p>
@@ -184,7 +189,7 @@
                     <label>
                       <input
                         type="text"
-                        value="홍길동"
+                        th:value="${userName}"
                         class="w-full border border-gray-300 rounded-md px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-gray-800 focus:border-transparent"
                       />
                     </label>
@@ -196,7 +201,7 @@
                     <label>
                       <input
                         type="text"
-                        value="010-1234-5678"
+                        th:value="${userPhone}"
                         class="w-full border border-gray-300 rounded-md px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-gray-800 focus:border-transparent"
                       />
                     </label>
@@ -208,7 +213,7 @@
                     <label>
                       <input
                         type="email"
-                        value="hong@example.com"
+                        th:value="${userEmail}"
                         class="w-full border border-gray-300 rounded-md px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-gray-800 focus:border-transparent"
                       />
                     </label>
@@ -466,8 +471,8 @@
                 amount: actualTotalAmount,
                 orderId: 'order_' + new Date().getTime(),
                 orderName: 'Rêve 향수 구매',
-                customerName: '홍길동',
-                customerEmail: 'hong@example.com',
+                customerName: '[[${userName}]]',
+                customerEmail: '[[${userEmail}]]',
                 successUrl:
                   window.location.origin +
                   '/order/success?items=' +

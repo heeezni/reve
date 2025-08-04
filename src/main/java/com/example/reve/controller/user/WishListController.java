@@ -171,23 +171,39 @@ public class WishListController {
               .findById(perfumeId)
               .orElseThrow(() -> new RuntimeException("상품을 찾을 수 없습니다."));
 
+      // 디버깅: 향수 정보 출력
+      System.out.println("=== 향수 정보 디버깅 (buyNow) ===");
+      System.out.println("향수 ID: " + perfume.getPerfumeId());
+      System.out.println("향수명: " + perfume.getPerfumeName());
+      System.out.println("용량: " + perfume.getVolume());
+      System.out.println("원가: " + perfume.getPrice());
+      System.out.println("할인가: " + perfume.getDiscount());
+      System.out.println("수량: " + quantity);
+      System.out.println("========================");
+
       // CartItem 객체 생성
       CartItem cartItem = new CartItem();
       cartItem.setId(perfume.getPerfumeId());
-      cartItem.setName(perfume.getPerfumeName() + " " + perfume.getVolume() + "ml");
+      cartItem.setName(perfume.getPerfumeName() + " " + perfume.getVolume());
       cartItem.setImage(perfume.getHoverImageUrl());
-      cartItem.setPricePerItem(perfume.getDiscount());
+
+      // 할인가가 0이면 원가를 사용, 아니면 원가에서 할인가를 뺀 금액을 사용
+      int finalPrice =
+          perfume.getDiscount() > 0
+              ? (perfume.getPrice() - perfume.getDiscount())
+              : perfume.getPrice();
+      cartItem.setPricePerItem(finalPrice);
       cartItem.setQuantity(quantity);
-      cartItem.setTotalPrice(perfume.getDiscount() * quantity);
+      cartItem.setTotalPrice(finalPrice * quantity);
 
       // JSON으로 변환
       String itemsJson = objectMapper.writeValueAsString(List.of(cartItem));
 
       // 배송비 계산 (기본 3000원, 5만원 이상 무료)
-      int deliveryFee = (perfume.getDiscount() * quantity >= 50000) ? 0 : 3000;
+      int deliveryFee = (finalPrice * quantity >= 50000) ? 0 : 3000;
 
       // 총 결제금액
-      int totalAmount = (perfume.getDiscount() * quantity) + deliveryFee;
+      int totalAmount = (finalPrice * quantity) + deliveryFee;
 
       // 결제 페이지로 리다이렉트
       return "redirect:/order/checkout?items="
@@ -225,23 +241,54 @@ public class WishListController {
               .findById(perfumeId)
               .orElseThrow(() -> new RuntimeException("상품을 찾을 수 없습니다."));
 
+      // 디버깅: 향수 정보 출력
+      System.out.println("=== 향수 정보 디버깅 (buyNowAjax) ===");
+      System.out.println("향수 ID: " + perfume.getPerfumeId());
+      System.out.println("향수명: " + perfume.getPerfumeName());
+      System.out.println("용량: " + perfume.getVolume());
+      System.out.println("원가: " + perfume.getPrice());
+      System.out.println("할인가: " + perfume.getDiscount());
+      System.out.println("수량: " + quantity);
+
+      // 다른 향수들의 가격도 확인
+      System.out.println("=== 다른 향수들 가격 확인 ===");
+      List<Perfume> allPerfumes = perfumeRepository.findAll();
+      for (Perfume p : allPerfumes) {
+        System.out.println(
+            "ID: "
+                + p.getPerfumeId()
+                + ", 이름: "
+                + p.getPerfumeName()
+                + ", 원가: "
+                + p.getPrice()
+                + ", 할인가: "
+                + p.getDiscount());
+      }
+      System.out.println("========================");
+
       // CartItem 객체 생성
       CartItem cartItem = new CartItem();
       cartItem.setId(perfume.getPerfumeId());
-      cartItem.setName(perfume.getPerfumeName() + " " + perfume.getVolume() + "ml");
+      cartItem.setName(perfume.getPerfumeName() + " " + perfume.getVolume());
       cartItem.setImage(perfume.getHoverImageUrl());
-      cartItem.setPricePerItem(perfume.getDiscount());
+
+      // 할인가가 0이면 원가를 사용, 아니면 원가에서 할인가를 뺀 금액을 사용
+      int finalPrice =
+          perfume.getDiscount() > 0
+              ? (perfume.getPrice() - perfume.getDiscount())
+              : perfume.getPrice();
+      cartItem.setPricePerItem(finalPrice);
       cartItem.setQuantity(quantity);
-      cartItem.setTotalPrice(perfume.getDiscount() * quantity);
+      cartItem.setTotalPrice(finalPrice * quantity);
 
       // JSON으로 변환
       String itemsJson = objectMapper.writeValueAsString(List.of(cartItem));
 
       // 배송비 계산
-      int deliveryFee = (perfume.getDiscount() * quantity >= 50000) ? 0 : 3000;
+      int deliveryFee = (finalPrice * quantity >= 50000) ? 0 : 3000;
 
       // 총 결제금액
-      int totalAmount = (perfume.getDiscount() * quantity) + deliveryFee;
+      int totalAmount = (finalPrice * quantity) + deliveryFee;
 
       // 성공 응답과 함께 결제 정보 반환
       String response =
@@ -257,6 +304,25 @@ public class WishListController {
 
     } catch (Exception e) {
       return ResponseEntity.status(500).body("error:" + e.getMessage());
+    }
+  }
+
+  // 임시: 향수 가격 수정 (테스트용)
+  @GetMapping("/wishlist/fix-price")
+  @ResponseBody
+  public ResponseEntity<String> fixPrice() {
+    try {
+      // 향수 ID 2의 할인가를 8000원으로 수정 (더 현실적인 가격)
+      Perfume perfume = perfumeRepository.findById(2L).orElse(null);
+      if (perfume != null) {
+        perfume.setDiscount(8000);
+        perfumeRepository.save(perfume);
+        return ResponseEntity.ok("테스트향의 가격이 8,000원으로 수정되었습니다.");
+      } else {
+        return ResponseEntity.ok("향수를 찾을 수 없습니다.");
+      }
+    } catch (Exception e) {
+      return ResponseEntity.status(500).body("오류: " + e.getMessage());
     }
   }
 }
