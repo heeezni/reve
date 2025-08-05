@@ -38,7 +38,7 @@ RÊVE는 사용자들이 다양한 향수를 탐색하고 구매할 수 있는 �
 
 1.  **프로젝트 클론:**
     ```bash
-    git clone [프로젝트_레포지토리_URL]
+    git clone https://github.com/heeezni/reve.git
     cd reve
     ```
 
