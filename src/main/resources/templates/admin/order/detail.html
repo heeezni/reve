@@ -1,0 +1,286 @@
+<!DOCTYPE html>
+<html
+  lang="en"
+  xmlns:th="http://www.thymeleaf.org"
+  xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+  layout:decorate="~{fragments/admin_layout}"
+>
+  <head>
+    <title>주문 상세보기</title>
+  </head>
+  <body>
+    <div layout:fragment="content">
+      <!-- Content Header (Page header) -->
+      <div class="content-header">
+        <div class="container-fluid">
+          <div class="row mb-2">
+            <div class="col-sm-6">
+              <h1 class="m-0">주문 상세보기</h1>
+            </div>
+            <!-- /.col -->
+            <div class="col-sm-6">
+              <ol class="breadcrumb float-sm-right">
+                <li class="breadcrumb-item">
+                  <a th:href="@{/admin/dashboard}">Home</a>
+                </li>
+                <li class="breadcrumb-item">
+                  <a th:href="@{/admin/order/list}">주문 목록</a>
+                </li>
+                <li class="breadcrumb-item active">주문 상세보기</li>
+              </ol>
+            </div>
+            <!-- /.col -->
+          </div>
+          <!-- /.row -->
+        </div>
+        <!-- /.container-fluid -->
+      </div>
+      <!-- /.content-header -->
+
+      <!-- Main content -->
+      <section class="content">
+        <div class="container-fluid">
+          <!-- 주문 정보 -->
+          <div class="card">
+            <div class="card-header">
+              <h3 class="card-title">주문 정보</h3>
+            </div>
+            <div class="card-body">
+              <div class="row">
+                <div class="col-md-6">
+                  <table class="table table-borderless">
+                    <tr>
+                      <th width="30%">주문번호</th>
+                      <td th:text="${order.orderNumber}">ORD-20240118-001</td>
+                    </tr>
+                    <tr>
+                      <th>주문일시</th>
+                      <td
+                        th:text="${#temporals.format(order.createdAt, 'yyyy-MM-dd HH:mm:ss')}"
+                      >
+                        2024-01-18 14:30:25
+                      </td>
+                    </tr>
+                    <tr>
+                      <th>주문상태</th>
+                      <td>
+                        <span
+                          th:if="${order.orderStatus eq 'ORDERED'}"
+                          class="badge badge-info"
+                          >주문완료</span
+                        >
+                        <span
+                          th:if="${order.orderStatus eq 'PREPARING'}"
+                          class="badge badge-warning"
+                          >배송준비중</span
+                        >
+                        <span
+                          th:if="${order.orderStatus eq 'SHIPPING'}"
+                          class="badge badge-primary"
+                          >배송중</span
+                        >
+                        <span
+                          th:if="${order.orderStatus eq 'DELIVERED'}"
+                          class="badge badge-success"
+                          >배송완료</span
+                        >
+                        <span
+                          th:if="${order.orderStatus eq 'CANCELLED'}"
+                          class="badge badge-danger"
+                          >주문취소</span
+                        >
+                      </td>
+                    </tr>
+                    <tr>
+                      <th>결제상태</th>
+                      <td>
+                        <span
+                          th:if="${order.paymentStatus eq 'PAID'}"
+                          class="badge badge-success"
+                          >결제완료</span
+                        >
+                        <span
+                          th:if="${order.paymentStatus eq 'PENDING'}"
+                          class="badge badge-warning"
+                          >결제대기</span
+                        >
+                        <span
+                          th:if="${order.paymentStatus eq 'REFUNDED'}"
+                          class="badge badge-danger"
+                          >환불완료</span
+                        >
+                      </td>
+                    </tr>
+                  </table>
+                </div>
+                <div class="col-md-6">
+                  <table class="table table-borderless">
+                    <tr>
+                      <th width="30%">주문자</th>
+                      <td
+                        th:text="${order.user != null ? order.user.name : 'N/A'}"
+                      >
+                        홍길동
+                      </td>
+                    </tr>
+                    <tr>
+                      <th>연락처</th>
+                      <td
+                        th:text="${order.user != null ? order.user.phone : 'N/A'}"
+                      >
+                        010-1234-5678
+                      </td>
+                    </tr>
+                    <tr>
+                      <th>이메일</th>
+                      <td
+                        th:text="${order.user != null ? order.user.email : 'N/A'}"
+                      >
+                        hong@example.com
+                      </td>
+                    </tr>
+                    <tr>
+                      <th>총 결제금액</th>
+                      <td
+                        class="font-weight-bold text-lg"
+                        th:text="${#numbers.formatInteger(order.totalPrice, 1, 'COMMA')} + '원'"
+                      >
+                        24,600원
+                      </td>
+                    </tr>
+                  </table>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- 주문 상품 목록 -->
+          <div class="card">
+            <div class="card-header">
+              <h3 class="card-title">주문 상품</h3>
+            </div>
+            <div class="card-body">
+              <div class="table-responsive">
+                <table class="table table-bordered">
+                  <thead>
+                    <tr>
+                      <th>상품명</th>
+                      <th>수량</th>
+                      <th>단가</th>
+                      <th>소계</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <tr th:each="item : ${order.orderItems}">
+                      <td th:text="${item.productName}">
+                        디어 무드 멀티 퍼퓸 70ml
+                      </td>
+                      <td th:text="${item.orderQuantity} + '개'">1개</td>
+                      <td
+                        th:text="${#numbers.formatInteger(item.pricePerItem, 1, 'COMMA')} + '원'"
+                      >
+                        24,600원
+                      </td>
+                      <td
+                        th:text="${#numbers.formatInteger(item.totalPrice, 1, 'COMMA')} + '원'"
+                      >
+                        24,600원
+                      </td>
+                    </tr>
+                  </tbody>
+                </table>
+              </div>
+            </div>
+          </div>
+
+          <!-- 주문 상태 변경 -->
+          <div class="card">
+            <div class="card-header">
+              <h3 class="card-title">주문 상태 변경</h3>
+            </div>
+            <div class="card-body">
+              <div class="btn-group">
+                <button
+                  type="button"
+                  class="btn btn-warning"
+                  th:if="${order.orderStatus eq 'ORDERED'}"
+                  th:onclick="'updateOrderStatus(' + ${order.orderId} + ', \'PREPARING\')'"
+                >
+                  배송준비중으로 변경
+                </button>
+                <button
+                  type="button"
+                  class="btn btn-primary"
+                  th:if="${order.orderStatus eq 'PREPARING'}"
+                  th:onclick="'updateOrderStatus(' + ${order.orderId} + ', \'SHIPPING\')'"
+                >
+                  배송중으로 변경
+                </button>
+                <button
+                  type="button"
+                  class="btn btn-success"
+                  th:if="${order.orderStatus eq 'SHIPPING'}"
+                  th:onclick="'updateOrderStatus(' + ${order.orderId} + ', \'DELIVERED\')'"
+                >
+                  배송완료로 변경
+                </button>
+                <button
+                  type="button"
+                  class="btn btn-danger"
+                  th:if="${order.orderStatus eq 'ORDERED' or order.orderStatus eq 'PREPARING'}"
+                  th:onclick="'updateOrderStatus(' + ${order.orderId} + ', \'CANCELLED\')'"
+                >
+                  주문취소
+                </button>
+              </div>
+            </div>
+          </div>
+
+          <!-- 뒤로가기 버튼 -->
+          <div class="card">
+            <div class="card-body">
+              <a th:href="@{/admin/order/list}" class="btn btn-secondary">
+                <i class="fas fa-arrow-left"></i> 주문 목록으로 돌아가기
+              </a>
+            </div>
+          </div>
+        </div>
+        <!-- /.container-fluid -->
+      </section>
+      <!-- /.content -->
+    </div>
+
+    <script>
+      // 주문 상태 업데이트
+      function updateOrderStatus(orderId, status) {
+        if (!confirm('주문 상태를 변경하시겠습니까?')) {
+          return;
+        }
+
+        fetch('/admin/order/update-status', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({
+            orderId: orderId,
+            orderStatus: status,
+          }),
+        })
+          .then((response) => response.json())
+          .then((data) => {
+            if (data.success) {
+              alert('주문 상태가 변경되었습니다.');
+              location.reload();
+            } else {
+              alert('주문 상태 변경에 실패했습니다: ' + data.message);
+            }
+          })
+          .catch((error) => {
+            console.error('Error:', error);
+            alert('주문 상태 변경 중 오류가 발생했습니다.');
+          });
+      }
+    </script>
+  </body>
+</html>

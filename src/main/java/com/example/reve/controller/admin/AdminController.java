@@ -10,6 +10,7 @@ import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import com.example.reve.domain.CustomUserDetails;
 import com.example.reve.domain.Order;
+import com.example.reve.domain.OrderItem;
 import com.example.reve.domain.Role;
 import com.example.reve.domain.User;
 import com.example.reve.repository.UserRepository;
@@ -82,6 +83,21 @@ public class AdminController {
     model.addAttribute("orders", orders);
 
     return "admin/order/list";
+  }
+
+  @GetMapping("/order/detail/{orderId}")
+  public String orderDetail(@PathVariable("orderId") Long orderId, Model model) {
+    Order order =
+        orderService
+            .findOrderById(orderId)
+            .orElseThrow(() -> new IllegalArgumentException("주문을 찾을 수 없습니다: " + orderId));
+
+    // 주문 상품 목록 로드
+    List<OrderItem> orderItems = orderService.getOrderItemsByOrderId(orderId);
+    order.setOrderItems(orderItems);
+
+    model.addAttribute("order", order);
+    return "admin/order/detail";
   }
 
   @PostMapping("/order/update-status")
