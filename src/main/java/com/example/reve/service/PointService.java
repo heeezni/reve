@@ -37,8 +37,7 @@ public class PointService {
   public Integer getPointAmount(String loginId) {
     User user = userRepository.findByLoginId(loginId).orElseThrow();
     log.info(
-        user.getLoginId(),
-        pointRepository.findPointAmountByUserId(user.getUserId()).orElse(0));
+        user.getLoginId(), pointRepository.findPointAmountByUserId(user.getUserId()).orElse(0));
     return pointRepository.findPointAmountByUserId(user.getUserId()).orElse(0);
   }
 }

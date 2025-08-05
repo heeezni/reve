@@ -33,7 +33,6 @@ import com.example.reve.service.UserService;
 import com.example.reve.service.WishListService;
 
 import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
 
 @Controller
 @RequestMapping("/mypage")

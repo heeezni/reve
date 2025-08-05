@@ -14,7 +14,6 @@ import org.springframework.stereotype.Component;
 import com.example.reve.service.CouponService;
 
 import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
 
 @Component
 @RequiredArgsConstructor
