@@ -76,3 +76,58 @@ reve/
 ├───build.gradle                  # Gradle 빌드 설정 파일
 └───README.md                     # 프로젝트 README 파일
 ```
+
+
+
+```mermaid
+graph TD
+A --> B[".git/"]
+A --> C[".github/"]
+A --> D[".gradle/"]
+A --> E[".idea/"]
+A --> F["build/"]
+A --> G["gradle/"]
+A --> H["src/"]
+A --> I["build.gradle"]
+A --> J["gradlew"]
+A --> K["README.md"]
+A --> L["settings.gradle"]
+A --> M[".gitattributes"]
+A --> N[".gitignore"]
+
+    H --> O["main/"]
+    H --> P["test/"]
+
+    O --> Q["java/"]
+    O --> R["resources/"]
+
+    Q --> S["com/example/reve/"]
+    S --> T["ReveApplication.java"]
+    S --> U["config/"]
+    S --> V["controller/"]
+    S --> W["domain/"]
+    S --> X["dto/"]
+    S --> Y["repository/"]
+    S --> Z["service/"]
+
+    R --> AA["application.properties"]
+    R --> AB["static/"]
+    R --> AC["templates/"]
+
+    AB --> AD["css/"]
+    AB --> AE["images/"]
+    AB --> AF["js/"]
+    AB --> AG["plugins/"]
+
+    AC --> AH["index.html"]
+    AC --> AI["admin/"]
+    AC --> AJ["board/"]
+    AC --> AK["cart/"]
+    AC --> AL["common/"]
+    AC --> AM["fragments/"]
+    AC --> AN["info/"]
+    AC --> AO["member/"]
+    AC --> AP["order/"]
+    AC --> AQ["shop/"]
+    AC --> AR["user/"]
+```
