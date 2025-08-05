@@ -1,101 +1,78 @@
-# 향수 쇼핑몰 클론 프로젝트
+# RÊVE - 향수 쇼핑몰 프로젝트
+
+RÊVE는 사용자들이 다양한 향수를 탐색하고 구매할 수 있는 온라인 향수 쇼핑몰 프로젝트입니다. 직관적인 사용자 인터페이스와 안정적인 백엔드 시스템을 통해 편리하고 즐거운 쇼핑 경험을 제공합니다.
+
+## 주요 기능
+
+*   **제품 관리:** 향수 제품 목록 조회, 상세 정보 확인, 검색 기능.
+*   **장바구니:** 선택한 제품을 장바구니에 담고 수량을 조절하는 기능.
+*   **주문 및 결제:** 장바구니의 제품을 주문하고 결제하는 프로세스 (Toss Payments 연동 가능성).
+*   **회원 시스템:** 사용자 회원 가입, 로그인, 마이페이지, 주문 내역 조회.
+*   **관리자 페이지:** 제품, 주문, 회원, 게시판 등 쇼핑몰 전반을 관리하는 기능.
+*   **게시판:** 공지사항, Q&A 등 사용자 소통을 위한 게시판.
+
+## 사용 기술
+
+### 백엔드
+
+*   **언어:** Java
+*   **프레임워크:** Spring Boot
+*   **빌드 도구:** Gradle
+*   **데이터베이스:** (application.properties를 통해 설정 가능. 개발 환경에서는 H2 Database 또는 MySQL/PostgreSQL 등 외부 DB 사용 가능)
+
+### 프론트엔드
+
+*   **템플릿 엔진:** Thymeleaf
+*   **마크업/스타일/스크립트:** HTML5, CSS3, JavaScript
+*   **UI 프레임워크:** Bootstrap
+*   **JavaScript 라이브러리:** jQuery, Chart.js 등
+
+## 시작하기
+
+### 필수 요구사항
+
+*   Java Development Kit (JDK) 21 이상
+*   Git
+
+### 설치 및 실행
+
+1.  **프로젝트 클론:**
+    ```bash
+    git clone [프로젝트_레포지토리_URL]
+    cd reve
+    ```
+
+2.  **프로젝트 빌드:**
+    ```bash
+    ./gradlew build
+    ```
+
+3.  **애플리케이션 실행:**
+    ```bash
+    ./gradlew bootRun
+    ```
+    애플리케이션은 기본적으로 `http://localhost:8080`에서 실행됩니다.
 
 ## 프로젝트 구조
 
 ```
-src/                       # 소스 코드 및 리소스 파일
-    ├───main/                  # 메인 애플리케이션 소스
-    │   ├───java/              # Java 소스 코드
-    │   │   └───com/
-    │   │       └───example/
-    │   │           └───reve/
-    │   │               ├───ReveApplication.java # Spring Boot 애플리케이션 메인 클래스
-    │   │               └───controller/          # 웹 요청을 처리하는 컨트롤러 패키지
-    │   │                   ├───InfoController.java # 정보 페이지 (소개, 약관, 정책) 관련 컨트롤러
-    │   │                   ├───admin/             # 관리자 기능 관련 컨트롤러
-    │   │                   │   ├───AdminBoardController.java # 관리자 게시판 (공지, Q&A) 관련 컨트롤러
-    │   │                   │   ├───AdminController.java # 관리자 대시보드, 상품, 주문, 회원 관리 컨트롤러
-    │   │                   │   └───AdminCouponController.java # 관리자 쿠폰 관리 관련 컨트롤러
-    │   │                   └───user/              # 사용자 기능 관련 컨트롤러
-    │   │                       ├───BoardController.java # 사용자 게시판 (공지, Q&A) 관련 컨트롤러
-    │   │                       ├───CartController.java # 사용자 장바구니 관련 컨트롤러
-    │   │                       ├───MemberController.java # 사용자 회원 (로그인, 회원가입) 관련 컨트롤러
-    │   │                       ├───MypageController.java # 사용자 마이페이지 관련 컨트롤러
-    │   │                       ├───OrderController.java # 사용자 주문 (결제, 확인) 관련 컨트롤러
-    │   │                       └───ShopController.java # 사용자 상품 (목록, 상세) 관련 컨트롤러
-    │   └───resources/           # 애플리케이션 리소스 파일
-    │       ├───application.properties # Spring Boot 설정 파일 (포트, DB 연결 등)
-    │       ├───static/          # 정적 리소스 (CSS, JS, 이미지 등)
-    │       │   ├───image/       # 이미지 파일
-    │       │   │   └───.gitkeep # 빈 디렉토리 유지를 위한 더미 파일
-    │       │   └───js/          # JavaScript 파일
-    │       │       └───.gitkeep # 빈 디렉토리 유지를 위한 더미 파일
-    │       └───templates/       # Thymeleaf 등 템플릿 엔진이 사용하는 HTML 파일
-    │           ├───index.html             # 메인 홈 페이지 (URL: /)
-    │           ├───admin/                 # 관리자 페이지
-    │           │   ├───dashboard.html     # 관리자 대시보드 (URL: /admin/dashboard)
-    │           │   ├───board/             # 관리자 게시판 관리
-    │           │   │   ├───notice/        # 관리자 공지사항 관리
-    │           │   │   │   ├───form.html  # 공지사항 작성/수정 폼 (URL: /admin/board/notice/form)
-    │           │   │   │   └───list.html  # 공지사항 목록 (URL: /admin/board/notice/list)
-    │           │   │   └───qna/           # 관리자 Q&A 관리
-    │           │   │       ├───list.html  # Q&A 목록 (URL: /admin/board/qna/list)
-    │           │   │       └───reply.html # Q&A 답변 작성 (URL: /admin/board/qna/reply)
-    │           │   ├───coupon/            # 관리자 쿠폰 관리
-    │           │   │   ├───add.html       # 쿠폰 등록 폼 (URL: /admin/coupon/add)
-    │           │   │   ├───edit.html      # 쿠폰 수정 폼 (URL: /admin/coupon/edit)
-    │           │   │   └───list.html      # 쿠폰 목록 (URL: /admin/coupon/list)
-    │           │   ├───fragment/          # 관리자 페이지 공통 UI 조각
-    │           │   │   ├───footer.html    # 푸터 (재사용)
-    │           │   │   ├───header.html    # 헤더 (재사용)
-    │           │   │   └───sidebar.html   # 사이드바 (재사용)
-    │           │   ├───member/            # 관리자 회원 관리
-    │           │   │   └───list.html      # 회원 목록 (URL: /admin/member/list)
-    │           │   ├───order/             # 관리자 주문 관리
-    │           │   │   └───list.html      # 주문 목록 (URL: /admin/order/list)
-    │           │   └───product/           # 관리자 상품 관리
-    │           │       ├───add.html       # 상품 등록 폼 (URL: /admin/product/add)
-    │           │       ├───edit.html      # 상품 수정 폼 (URL: /admin/product/edit)
-    │           │       └───list.html      # 상품 목록 (URL: /admin/product/list)
-    │           ├───common/                # 공통 페이지
-    │           │   └───error.html         # 에러 페이지 (직접 URL 매핑 없음, 에러 발생 시 사용)
-    │           ├───info/                  # 정보성 페이지
-    │           │   ├───about.html         # 회사/서비스 소개 (URL: /info/about)
-    │           │   ├───policy.html        # 개인정보처리방침 (URL: /info/policy)
-    │           │   └───terms.html         # 이용약관 (URL: /info/terms)
-    │           ├───member/                # 회원 관련 페이지
-    │           │   ├───login.html         # 로그인 페이지 (URL: /member/login)
-    │           │   └───signup.html        # 회원가입 페이지 (URL: /member/signup)
-    │           └───user/                  # 사용자 페이지
-    │               ├───board/             # 사용자 게시판
-    │               │   ├───notice/        # 사용자 공지사항
-    │               │   │   ├───detail.html # 공지사항 상세 (URL: /board/notice/detail)
-    │               │   │   └───list.html  # 공지사항 목록 (URL: /board/notice/list)
-    │               │   └───qna/           # 사용자 Q&A
-    │               │       ├───detail.html # Q&A 상세 (URL: /board/qna/detail)
-    │               │       ├───form.html  # Q&A 작성 폼 (URL: /board/qna/form)
-    │               │       └───list.html  # Q&A 목록 (URL: /board/qna/list)
-    │               ├───cart/              # 사용자 장바구니
-    │               │   └───cart.html      # 장바구니 페이지 (URL: /cart)
-    │               ├───fragment/          # 사용자 페이지 공통 UI 조각
-    │               │   ├───footer.html    # 푸터 (재사용)
-    │               │   ├───header.html    # 헤더 (재사용)
-    │               │   └───sidebar.html   # 사이드바 (재사용)
-    │               ├───mypage/            # 사용자 마이페이지
-    │               │   ├───account.html   # 계정 정보 (URL: /shop/mypage/account)
-    │               │   ├───index.html     # 마이페이지 대시보드 (URL: /shop/mypage)
-    │               │   ├───order.html     # 주문 내역 (URL: /shop/mypage/order)
-    │               │   └───wishlist.html  # 위시리스트 (URL: /shop/mypage/wishlist)
-    │               ├───order/             # 사용자 주문 관련
-    │               │   ├───checkout.html  # 결제 페이지 (URL: /shop/order/checkout)
-    │               │   └───confirmation.html # 결제 완료 페이지 (URL: /shop/order/confirmation)
-    │               └───shop/              # 사용자 쇼핑
-    │                   ├───detail.html    # 상품 상세 (URL: /shop/detail)
-    │                   └───list.html      # 상품 목록 (URL: /shop/list)
-    └───test/                  # 테스트 코드
-        └───java/              # Java 테스트 소스 코드
-            └───com/
-                └───example/
-                    └───reve/
-                        └───ReveApplicationTests.java # Spring Boot 테스트 클래스
+reve/
+├───src/
+│   ├───main/
+│   │   ├───java/                 # 백엔드 Java 소스 코드 (Spring Boot 애플리케이션)
+│   │   │   └───com/example/reve/
+│   │   │       ├───ReveApplication.java
+│   │   │       ├───config/       # 설정 클래스
+│   │   │       ├───controller/   # REST API 및 웹 컨트롤러
+│   │   │       ├───domain/       # 엔티티 및 도메인 모델
+│   │   │       ├───dto/          # 데이터 전송 객체 (DTO)
+│   │   │       ├───repository/   # 데이터 접근 계층 (Spring Data JPA)
+│   │   │       └───service/      # 비즈니스 로직 서비스
+│   │   └───resources/
+│   │       ├───application.properties # 애플리케이션 설정 (데이터베이스, 서버 포트 등)
+│   │       ├───static/           # 정적 리소스 (CSS, JS, 이미지, 플러그인)
+│   │       └───templates/        # HTML 템플릿 (Thymeleaf 등)
+│   └───test/                     # 단위 및 통합 테스트
+├───build.gradle                  # Gradle 빌드 설정 파일
+└───README.md                     # 프로젝트 README 파일
 ```
