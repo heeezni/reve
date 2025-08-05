@@ -2,6 +2,8 @@ package com.example.reve.service;
 
 import java.io.File;
 import java.io.IOException;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.List;
 import java.util.UUID;
 import java.util.stream.Collectors;
@@ -57,7 +59,6 @@ public class PerfumeService {
   }
 
   // 향수 등록 시 이미지 등록하는 로직
-  // 향수 등록 시 이미지 등록하는 로직
   public String storeImage(MultipartFile file) {
     if (file.isEmpty()) {
       return null; // 빈 파일이면 null 반환
@@ -69,9 +70,10 @@ public class PerfumeService {
       String uniqueFilename = UUID.randomUUID().toString() + extension;
 
       // perfume 폴더 하위로 저장
-      File directory = new File(uploadDir + "/perfume/");
+      Path directoryPath = Paths.get(uploadDir, "perfume");
+      File directory = directoryPath.toFile();
       if (!directory.exists()) {
-        directory.mkdirs(); // 디렉토리 없으면 생성
+        directory.mkdirs();
       }
 
       File saveFile = new File(directory, uniqueFilename);
@@ -110,9 +112,9 @@ public class PerfumeService {
     if (imageUrl == null || imageUrl.isBlank()) return;
 
     String filename = imageUrl.replace(imageUrlPrefix, "");
-    String fullPath = uploadDir + filename;
+    Path fullPath = Paths.get(uploadDir, filename); // OS 독립적 경로
 
-    File file = new File(fullPath);
+    File file = fullPath.toFile();
     if (file.exists()) {
       boolean deleted = file.delete();
       if (!deleted) {
