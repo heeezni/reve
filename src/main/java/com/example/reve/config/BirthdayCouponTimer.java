@@ -17,7 +17,6 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
 @Component
-@Slf4j
 @RequiredArgsConstructor
 public class BirthdayCouponTimer {
   private final CouponService couponService;
@@ -32,11 +31,9 @@ public class BirthdayCouponTimer {
           try {
             // 매달 1일에 실행
             if (LocalDate.now().getDayOfMonth() == 1) {
-              log.info("당월 쿠폰 발급 시작");
               couponService.couponByMonth();
             }
           } catch (Exception e) {
-            log.error("쿠폰 자동발급 오류{}", e.getMessage());
             throw new RuntimeException(e);
           }
         };

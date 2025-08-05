@@ -79,7 +79,6 @@ public class CouponService {
 
     // 오늘 생일 확인
     if (!today.equals(birthday)) {
-      log.info("오늘이 생일이 아님");
       return;
     }
 
@@ -111,7 +110,6 @@ public class CouponService {
         // 쿠폰 발급
         coupon = new Coupon();
         saveCoupon(coupon, user, expiresDate, validFrom, issuedAt);
-        log.info("기존 회원들 생일 조회 후 발급 성공 {}", user);
       }
     }
   }

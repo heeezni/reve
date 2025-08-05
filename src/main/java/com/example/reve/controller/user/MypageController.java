@@ -38,7 +38,6 @@ import lombok.extern.slf4j.Slf4j;
 @Controller
 @RequestMapping("/mypage")
 @RequiredArgsConstructor
-@Slf4j
 public class MypageController {
 
   private final UserService userService;
@@ -64,7 +63,6 @@ public class MypageController {
       model.addAttribute("currentUserId", customUserDetails.getUser().getUserId());
       return "user/mypage/index";
     } else {
-      log.error("loginId is {}", loginId);
       return "redirect:/";
     }
   }
@@ -117,7 +115,6 @@ public class MypageController {
       model.addAttribute("deliveredCount", deliveredCount);
 
     } catch (Exception e) {
-      log.error("주문 내역 조회 중 오류 발생: {}", e.getMessage());
       // 오류 발생 시 빈 리스트로 초기화
       model.addAttribute("orders", new ArrayList<>());
       model.addAttribute("todayOrderCount", 0L);
@@ -177,7 +174,6 @@ public class MypageController {
       }
 
     } catch (Exception e) {
-      log.error("주문 상세 조회 중 오류 발생: {}", e.getMessage());
       model.addAttribute("error", "주문 상세 정보를 불러오는 중 오류가 발생했습니다.");
       return "common/error";
     }
@@ -202,7 +198,6 @@ public class MypageController {
     Long userId = customUserDetails.getUser().getUserId();
     List<CouponDTO> couponList = couponService.getCoupon(userId);
     model.addAttribute("couponList", couponList);
-    log.info("회원이 가지고 있는 쿠폰 리스트 couponList {}", model.addAttribute("couponList", couponList));
 
     return "user/mypage/coupons";
   }
@@ -228,14 +223,12 @@ public class MypageController {
       Model model,
       MultipartFile profileImage,
       @AuthenticationPrincipal CustomUserDetails customUserDetails) {
-    log.info("회원 정보 수정 컨트롤러 호출");
     try {
       // 수정된 회원 정보 가져오기
       String loginId = customUserDetails.getUsername();
       UpdateProfileDTO result = userService.update(updateProfileDTO, loginId, profileImage);
       model.addAttribute("profile", result);
     } catch (Exception e) {
-      log.error("회원 정보 수정 실패");
       throw new RuntimeException(e.getMessage());
     }
     return "redirect:/mypage/account";
@@ -258,7 +251,6 @@ public class MypageController {
     String loginId = customUserDetails.getUsername();
     boolean result = userService.updatePassword(newPasswordDTO, loginId);
     model.addAttribute("result", result);
-    log.debug("비밀번호 변경 여부 {}", model.addAttribute("result", result));
     if (result) {
       request.logout();
       return "redirect:/";
@@ -315,7 +307,6 @@ public class MypageController {
       }
 
     } catch (Exception e) {
-      log.error("주문 취소 중 오류 발생: {}", e.getMessage());
       response.put("success", false);
       response.put("message", "주문 취소 중 오류가 발생했습니다.");
     }

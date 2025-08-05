@@ -42,14 +42,12 @@ public class UserService implements UserDetailsService { // UserDetailsService �
    * @param create (아이디,비밀번호, 이메일, 휴대폰 번호)
    */
   public Long signup(CreateUserDTO create) {
-    log.info("회원 가입 서비스 호출");
     // 아이디 중복 확인
     if (userRepository.findByLoginId(create.getLoginId()).isPresent()) {
       throw new DuplicateKeyException("이미 있는 아이디 입니다");
     }
     // 비밀번호 암호화
     String encodedPassword = passwordEncoder.encode(create.getPassword());
-    log.info("암호화 성공 : {}", encodedPassword);
     // 휴대폰 번호 조합
     String phone = create.getFirstNum() + create.getMiddleNum() + create.getLastNum();
     // DB 저장
@@ -61,7 +59,6 @@ public class UserService implements UserDetailsService { // UserDetailsService �
             .phone(phone)
             .email(create.getEmail())
             .build();
-    log.info("회원 가입 유저 {}", user);
     userRepository.save(user);
     return user.getUserId();
   }
@@ -73,7 +70,6 @@ public class UserService implements UserDetailsService { // UserDetailsService �
    * @return user
    */
   public User login(LoginUserDTO loginUser) {
-    log.info("로그인 서비스 호출");
     // 로그인 아이디 비교
     User user =
         userRepository
@@ -84,14 +80,12 @@ public class UserService implements UserDetailsService { // UserDetailsService �
     if (!passwordEncoder.matches(loginUser.getPassword(), user.getPassword())) {
       throw new BadCredentialsException("비밀번호가 일치하지 않음");
     }
-    log.info("로그인 성공 : {}", user);
 
     return user;
   }
 
   // 아이디 중복 검사
   public boolean checklogin(String loginId) {
-    log.info("아이디 중복 검사 {}", userRepository.existsByLoginId(loginId));
     return userRepository.existsByLoginId(loginId);
   }
 
@@ -124,7 +118,6 @@ public class UserService implements UserDetailsService { // UserDetailsService �
       UpdateProfileDTO updateProfileDTO, String loginId, MultipartFile profileImg) {
     // 로그인 아이디가 같은 회원
     User user = userRepository.findByLoginId(loginId).orElseThrow();
-    log.info("profile image : {}", profileImg);
 
     if (profileImg != null && !profileImg.isEmpty()) {
       try {
@@ -133,9 +126,7 @@ public class UserService implements UserDetailsService { // UserDetailsService �
         }
         // 파일 저장
         String userIdStr = Long.toString(user.getUserId());
-        log.info("userIdStr : {}", userIdStr);
         String saveUrl = profileUrlService.saveProfileImage(profileImg, "profile", userIdStr);
-        log.info("saveUrl : {}", saveUrl);
         // 프로필 사진 경로
         user.setProfileUrl(saveUrl);
       } catch (IOException e) {
@@ -152,7 +143,6 @@ public class UserService implements UserDetailsService { // UserDetailsService �
     // 닉네임
     user.setNickname(updateProfileDTO.getNickname());
 
-    log.info("회원 정보 변경 : {}", user);
     // 수정하기
     userRepository.save(user);
     // 생일 등록 시 생일쿠폰 발급
