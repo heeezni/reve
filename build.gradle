@@ -25,7 +25,6 @@ repositories {
 }
 
 dependencies {
-    //스케줄링 관련
     implementation 'org.springframework.boot:spring-boot-starter'
     //Security 관련
     implementation 'org.springframework.boot:spring-boot-starter-security'
